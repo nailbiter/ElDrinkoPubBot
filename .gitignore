@@ -10,6 +10,9 @@ buildNumber.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
-#vim files
+# vim files
 *.swp
 *.swo
+
+# secrets
+secret.json
