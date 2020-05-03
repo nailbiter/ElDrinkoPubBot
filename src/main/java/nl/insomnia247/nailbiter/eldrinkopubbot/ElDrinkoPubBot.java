@@ -13,10 +13,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import com.mongodb.MongoClientURI;
 import com.mongodb.MongoClient;
+import org.json.JSONObject;
+import com.mongodb.client.model.Filters;
 
 public class ElDrinkoPubBot extends TelegramLongPollingBot {
-    private String _token = null;
     private MongoClient _mongoClient = null;
+    private String _botname = null;
+    private JSONObject _config = null;
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -28,21 +31,27 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot {
             } catch(TelegramApiException tae) {}
         }
     }
-    ElDrinkoPubBot(String token, String dbpass) {
-        _token = token;
+    ElDrinkoPubBot(String dbpass, String botname) {
         _mongoClient = _GetMongoClient(dbpass);
-
-        System.err.format("mongo: %s\n",_mongoClient.getDatabase("beerbot").getCollection("_keyring").find().first().toJson());
+        _config = new JSONObject(
+                _mongoClient
+                .getDatabase("beerbot")
+                .getCollection("_keyring")
+                .find(Filters.eq("id",botname))
+                .first()
+                .toJson());
+        System.err.format("_config: %s\n",_config.toString());
+        _botname = botname;
     }
 
     @Override
     public String getBotUsername() {
-        return "ElDrinkoPubBot";
+        return _botname;
     }
 
     @Override
     public String getBotToken() {
-        return this._token;
+        return _config.getJSONObject("telegram").getString("token");
     }
 	private static MongoClient _GetMongoClient(String password) {
 		String url = String.format("mongodb+srv://%s:%s@cluster0-ta3pc.gcp.mongodb.net/%s?retryWrites=true&w=majority", 
