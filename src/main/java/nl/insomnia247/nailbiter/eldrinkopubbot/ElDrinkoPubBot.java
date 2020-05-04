@@ -15,20 +15,42 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.MongoClient;
 import org.json.JSONObject;
 import com.mongodb.client.model.Filters;
+import java.util.Map;
+import java.util.HashMap;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 
 public class ElDrinkoPubBot extends TelegramLongPollingBot {
+    private static final String _BEERLIST = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGSUiAeapo7eHNfA1v9ov_Cc2oCjWNsmcpadN6crtxJ236uDOKt_C_cR1hsXCyqZucp_lQoeRHlu0k/pub?gid=0&single=true&output=tsv";
     private MongoClient _mongoClient = null;
     private String _botname = null;
     private JSONObject _config = null;
+    private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(update.getMessage().getChatId().toString());
-            sendMessage.setText("Well, all information looks like noise until you break the code.");
+            UserData ud = new UserData(update.getMessage().getChatId());
+            ElDrinkoStateMachine edsm = null;
+            System.err.format("here %s\n","fc4721b74e5c861c");
+            if( !_data.containsKey(ud.toString()) ) {
+                System.err.format("here %s\n","abbfe7d43f0ae807");
+                edsm = new ElDrinkoStateMachine(ud, _mongoClient)
+                    .setUp()
+                    ;
+                _data.put(ud.toString(),edsm);
+            } else {
+                System.err.format("here %s\n","d6948b5130d382da");
+                edsm = _data.get(ud.toString());
+            }
+            System.err.format("%s\n",edsm);
+            System.err.format("here %s\n","59d8d719aae37e66");
+            SendMessage sendMessage = (SendMessage) edsm.apply(TelegramInputMessage.CreateInputMessage(update.getMessage()));
+            System.err.format("here %s\n","52b2688632dd0b0b");
             try {
                 execute(sendMessage);
-            } catch(TelegramApiException tae) {}
+            } catch(TelegramApiException tae) {
+                System.err.format("here %s\n","05f6e0757caf298b");
+            }
         }
     }
     ElDrinkoPubBot(String dbpass, String botname) {
