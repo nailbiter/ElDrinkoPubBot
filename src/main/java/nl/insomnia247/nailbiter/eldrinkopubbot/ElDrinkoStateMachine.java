@@ -1,13 +1,14 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
+import com.mongodb.MongoClient;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachine;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextOutputMessage;
-import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachine;
-import java.util.function.Predicate;
-import java.util.function.Function;
-import com.mongodb.MongoClient;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
-import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
 
 
 /**
@@ -17,50 +18,38 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Tele
     private final UserData _ud;
     private final PersistentStorage _persistentStorage;
     public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient) {
-        super("start");
-        System.err.format("%s\n","f6cb33845066c88e");
+        super("_");
         _ud = ud;
         _persistentStorage = new PersistentStorage(
                 mongoClient.getDatabase("beerbot").getCollection("data"), 
                 "id",
                 ud.toString()
                 );
-        System.err.format("%s\n","aecb56794ac95ffb");
+    }
+    private static Predicate<TelegramInputMessage> _TrivialPredicate() {
+        return new Predicate<TelegramInputMessage>(){
+        
+            @Override
+            public boolean test(TelegramInputMessage im) {
+                return true;
+            }
+        };
+    }
+    private Function<TelegramInputMessage,TelegramOutputMessage> _keyboardMessage(String msg, String[] categories) {
+        return new Function<TelegramInputMessage,TelegramOutputMessage>() {
+            @Override
+            public TelegramOutputMessage apply(TelegramInputMessage im) {
+                return new TelegramKeyboard(_ud, msg, categories);
+            }
+        };
     }
     public ElDrinkoStateMachine setUp() {
             System.err.format("%s\n","52970894e62074d5");
 
             ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
-                .addTransition("start",
-                    "end",
-                    new Predicate<TelegramInputMessage>(){
-                        @Override
-                        public boolean test(TelegramInputMessage im) {
-                            return true;
-                        }
-                    }, 
-                    new Function<TelegramInputMessage,TelegramOutputMessage>() {
-                        @Override
-                        public TelegramOutputMessage apply(TelegramInputMessage im) {
-                            return new TelegramTextOutputMessage(_ud,"start -> end");
-                        }
-                    }
-                )
-                .addTransition("end",
-                    "start",
-                    new Predicate<TelegramInputMessage>(){
-                        @Override
-                        public boolean test(TelegramInputMessage im) {
-                            return true;
-                        }
-                    }, 
-                    new Function<TelegramInputMessage,TelegramOutputMessage>() {
-                        @Override
-                        public TelegramOutputMessage apply(TelegramInputMessage im) {
-                            return new TelegramTextOutputMessage(_ud,"end -> start");
-                        }
-                    }
-                )
+                .addTransition("_", "start", _TrivialPredicate(), _keyboardMessage("Добро Пожаловать.",
+                            new String[]{"Посмотреть описание","Сформировать заказ покупку"}
+                            ))
                 ;
             if(_persistentStorage.contains("state")) {
                 System.err.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state"));
