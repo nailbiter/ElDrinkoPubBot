@@ -4,6 +4,8 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.model.TextInputMessage;
 /**
  * @author Alex Leontiev
  */
-public class TelegramTextInputMessage implements TextInputMessage {
-
+public class TelegramTextInputMessage extends TelegramInputMessage implements TextInputMessage {
+    public TelegramTextInputMessage(String ans) {
+        super(ans);
+    }
 }

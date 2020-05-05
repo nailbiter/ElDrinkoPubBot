@@ -1,5 +1,14 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
-
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.model.Filters;
+import java.util.HashMap;
+import java.util.Map;
+import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputArrayMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
+import org.json.JSONObject;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -11,25 +20,20 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRem
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-import com.mongodb.MongoClientURI;
-import com.mongodb.MongoClient;
-import org.json.JSONObject;
-import com.mongodb.client.model.Filters;
-import java.util.Map;
-import java.util.HashMap;
-import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
-import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
+
 
 public class ElDrinkoPubBot extends TelegramLongPollingBot {
-    private static final String _BEERLIST = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGSUiAeapo7eHNfA1v9ov_Cc2oCjWNsmcpadN6crtxJ236uDOKt_C_cR1hsXCyqZucp_lQoeRHlu0k/pub?gid=0&single=true&output=tsv";
     private MongoClient _mongoClient = null;
     private String _botname = null;
     private JSONObject _config = null;
     private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            UserData ud = new UserData(update.getMessage().getChatId());
+        TelegramInputMessage tim = TelegramInputMessage.CreateInputMessage(update);
+        System.err.format(" c4aa6c56bd61a895 \n");
+        if(tim != null) {
+            System.err.format(" 78cbf16ed274bfe5 \n");
+            UserData ud = new UserData(update);
             ElDrinkoStateMachine edsm = null;
             System.err.format("here %s\n","fc4721b74e5c861c");
             if( !_data.containsKey(ud.toString()) ) {
@@ -43,10 +47,19 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot {
                 edsm = _data.get(ud.toString());
             }
             System.err.format("%s\n",edsm);
-            System.err.format("here %s\n","59d8d719aae37e66");
-            SendMessage sendMessage = (SendMessage) edsm.apply(TelegramInputMessage.CreateInputMessage(update.getMessage()));
             System.err.format("here %s\n","52b2688632dd0b0b");
+            _execute(edsm.apply(tim));
+        }
+    }
+    void _execute(OutputMessage om) {
+        if( om instanceof OutputArrayMessage ) {
+            for(OutputMessage omm: ((OutputArrayMessage)om).getMessages()) {
+                _execute(omm);
+            }
+        } else {
+            SendMessage sendMessage = (SendMessage) om;
             try {
+		        sendMessage.setParseMode("Markdown");
                 execute(sendMessage);
             } catch(TelegramApiException tae) {
                 System.err.format("here %s\n","05f6e0757caf298b");

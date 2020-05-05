@@ -19,6 +19,7 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
     protected Map<ImmutablePair<String,String>,ImmutablePair<Predicate<InputMessage>,Function<InputMessage,OutputMessage>>> _transitions = new HashMap<>();
     public StateMachine(String state) {
         _currentState = state;
+        _states.add(state);
     }
     public StateMachine addTransition(String from, String to, Predicate<InputMessage> transitionCondition, Function<InputMessage,OutputMessage> transitionAction) {
         if(!_states.contains(to)) {
@@ -69,5 +70,10 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
             res.append(String.format("\"%s\" -> \"%s\"\n",p.left,p.right));
         }
         return res.toString();
+    }
+    public StateMachine addStateMachine(StateMachine anotherStateMachine) {
+        _states.addAll(anotherStateMachine._states);
+        _transitions.putAll(anotherStateMachine._transitions);
+        return this;
     }
 }
