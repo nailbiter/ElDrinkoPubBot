@@ -3,8 +3,9 @@ import com.mongodb.MongoClient;
 import java.lang.StringBuilder;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.KeyboardAnswer;
@@ -16,8 +17,8 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboardAnswer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramOutputMessage;
-import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.Tsv;
 import org.json.JSONArray;
@@ -31,6 +32,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private static final String _BEERLIST = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGSUiAeapo7eHNfA1v9ov_Cc2oCjWNsmcpadN6crtxJ236uDOKt_C_cR1hsXCyqZucp_lQoeRHlu0k/pub?gid=0&single=true&output=tsv";
     private final UserData _ud;
     private final PersistentStorage _persistentStorage;
+    private final Consumer<JSONObject>  _sendOrderCallback;
     private final String[] _PAYMENT_METHOD = new String[]{"наличными","терминал"};
     private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
         @Override
@@ -38,9 +40,10 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             return im instanceof TelegramTextInputMessage;
         }
     };
-    public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient) {
+    public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient, Consumer<JSONObject> sendOrderCallback) {
         super("_");
         _ud = ud;
+        _sendOrderCallback = sendOrderCallback;
         _persistentStorage = new PersistentStorage(
                 mongoClient.getDatabase("beerbot").getCollection("data"), 
                 "id",
@@ -132,7 +135,6 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         return sb.toString();
     }
     public ElDrinkoStateMachine setUp() {
-        StateMachine<TelegramInputMessage,OutputMessage> subStateMachine = createSubStateMachine();
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
             .addTransition("_", "start", _TrivialPredicate(), _keyboardMessage("Добро Пожаловать. Сейчас у нас есть:\n%p",
                         new String[]{"Посмотреть описание","Сформировать заказ покупку"}
@@ -153,17 +155,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             });
                         }
                     })
-        .addStateMachine(subStateMachine)
             .addTransition("start","choose_product_to_make_order",_MessageKeyboardComparisonPredicate("1"),_productKeyboardMessage("Выберите продукт"))
-            ;
-        if(_persistentStorage.contains("state")) {
-            System.err.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state"));
-            this._currentState = _persistentStorage.get("state");
-        }
-        return res;
-    }
-    private StateMachine<TelegramInputMessage,OutputMessage> createSubStateMachine() {
-        return new StateMachine<TelegramInputMessage,OutputMessage>("choose_product_to_make_order")
             .addTransition("choose_product_to_make_order","choose_amount",_MessageKeyboardComparisonPredicate(null),
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
@@ -325,11 +317,21 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 new Function<TelegramInputMessage,OutputMessage>() {
                     @Override
                     public OutputMessage apply(TelegramInputMessage im) {
+                        JSONObject obj = new JSONObject(_persistentStorage.get("order"));
+                        obj.put("address",_persistentStorage.get("address"));
+                        obj.put("payment",_persistentStorage.get("payment"));
+                        obj.put("uid",_ud.toString());
+                        _sendOrderCallback.accept(obj);
                         _persistentStorage.set("order","");
                         return new TelegramKeyboard(_ud,"Благодарим за заказ!",new String[]{"Посмотреть описание","Сформировать заказ покупку"});
                     }
         })
             ;
+        if(_persistentStorage.contains("state")) {
+            System.err.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state"));
+            this._currentState = _persistentStorage.get("state");
+        }
+        return res;
     }
     private static boolean _IsFloatInteger(float f) {
         return f==Math.floor(f);

@@ -9,6 +9,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import org.json.JSONObject;
+import java.util.function.Consumer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -22,11 +23,25 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 
-public class ElDrinkoPubBot extends TelegramLongPollingBot {
+public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<JSONObject>{
     private MongoClient _mongoClient = null;
     private String _botname = null;
     private JSONObject _config = null;
     private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
+    private static final long _MASTER_CHAT_ID = 145766172;
+    @Override 
+    public void accept(JSONObject o) {
+        SendMessage sendMessage = new SendMessage();
+        String chatId = Long.toString(_MASTER_CHAT_ID);
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(o.toString());
+        try {
+            System.err.format("sending %s to %s\n",o.toString(),chatId);
+            execute(sendMessage);
+        } catch(Exception e) {
+            System.err.format(" f531ae90faad7adb \n");
+        }
+    }
     @Override
     public void onUpdateReceived(Update update) {
         TelegramInputMessage tim = TelegramInputMessage.CreateInputMessage(update);
@@ -38,7 +53,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot {
             System.err.format("here %s\n","fc4721b74e5c861c");
             if( !_data.containsKey(ud.toString()) ) {
                 System.err.format("here %s\n","abbfe7d43f0ae807");
-                edsm = new ElDrinkoStateMachine(ud, _mongoClient)
+                edsm = new ElDrinkoStateMachine(ud, _mongoClient, this)
                     .setUp()
                     ;
                 _data.put(ud.toString(),edsm);
