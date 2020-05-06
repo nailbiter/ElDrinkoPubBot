@@ -124,10 +124,19 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     private static String _FormattedProductList() {
         Tsv tsv = new Tsv(_SafeUrl(_BEERLIST));
+        System.err.format("tsv: %s\n",tsv);
         StringBuilder sb = new StringBuilder();
         List<String> descriptions = tsv.getColumn("name");
+        List<Float> prices = new ArrayList<>();
+        for(String price:tsv.getColumn("price (UAH/L)")) {
+            prices.add(Float.parseFloat(price));
+        }
         for(int i = 0; i < descriptions.size(); i++) {
-            sb.append(String.format("%d. %s",i+1,descriptions.get(i)));
+            sb.append(String.format("%d. %s (%.2f грн./л.)",
+                        i+1,
+                        descriptions.get(i),
+                        prices.get(i)
+                        ));
             if(i+1<descriptions.size()) {
                 sb.append("\n");
             }
