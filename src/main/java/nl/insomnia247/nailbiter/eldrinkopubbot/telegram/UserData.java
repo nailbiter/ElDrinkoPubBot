@@ -6,15 +6,20 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  */
 public class UserData {
     private long _chatId = 0;
+    private String _username = null;
     public UserData(Update update) {
         if(update.hasMessage()) {
             _chatId = update.getMessage().getChatId();
+            _username = update.getMessage().getFrom().getUserName();
         } else if(update.hasCallbackQuery()) {
             _chatId = update.getCallbackQuery().getMessage().getChatId();
         }
     }
-    Long getChatId() {
+    public Long getChatId() {
         return _chatId;
+    }
+    public String getUserName() {
+        return "@"+_username;
     }
     @Override
     public String toString() {

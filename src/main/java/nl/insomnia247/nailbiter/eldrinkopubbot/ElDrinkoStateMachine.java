@@ -329,7 +329,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         JSONObject obj = new JSONObject(_persistentStorage.get("order"));
                         obj.put("address",_persistentStorage.get("address"));
                         obj.put("payment",_persistentStorage.get("payment"));
-                        obj.put("uid",_ud.toString());
+                        obj.put("uid",_ud.getUserName());
                         _sendOrderCallback.accept(obj);
                         _persistentStorage.set("order","");
                         return new TelegramKeyboard(_ud,"Благодарим за заказ!",new String[]{"Посмотреть описание","Сформировать заказ покупку"});
