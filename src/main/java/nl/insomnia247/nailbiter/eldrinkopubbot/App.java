@@ -7,6 +7,7 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import nl.insomnia247.nailbiter.eldrinkopubbot.ElDrinkoPubBot;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Hello world!
