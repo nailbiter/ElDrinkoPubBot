@@ -21,9 +21,6 @@ public class App
         File file = new File("./secret.txt");
         String content = FileUtils.readFileToString(file, "utf-8").trim();
 
-        Properties p = new Properties();
-        p.setProperty("log",".");
-		PropertyConfigurator.configure(p);
 		PropertyConfigurator.configure(App.class.getClassLoader().getResource("log4j.properties"));
 
 		ApiContextInitializer.init();
