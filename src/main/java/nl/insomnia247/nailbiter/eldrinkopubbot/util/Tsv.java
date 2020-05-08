@@ -18,9 +18,14 @@ public class Tsv {
     private Map<String,List<String>> _content = new HashMap<>();
     public Tsv(URL url) {
         InputStream in = null;
+        Cache cache = new Cache(60);
         try {
-            in = url.openStream();
-            _content = _ParseContent(IOUtils.toString( in ));
+            String body = null;
+            if(cache.get(url.toString())==null) {
+                in = url.openStream();
+                cache.put(url.toString(),IOUtils.toString( in ));
+            }
+            _content = _ParseContent((String)cache.get(url.toString()));
         } catch(Exception e ) {
             System.err.format("exception: %s\n",e);
         } finally {
