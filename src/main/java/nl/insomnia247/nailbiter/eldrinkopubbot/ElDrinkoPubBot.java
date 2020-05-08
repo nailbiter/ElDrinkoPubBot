@@ -4,12 +4,13 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.model.Filters;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputArrayMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import java.util.function.Consumer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -29,6 +30,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<J
     private JSONObject _config = null;
     private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
     private static final long _MASTER_CHAT_ID = 145766172;
+    private static Logger _Log = Logger.getLogger(ElDrinkoPubBot.class);
     @Override 
     public void accept(JSONObject o) {
         SendMessage sendMessage = new SendMessage();
@@ -36,33 +38,33 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<J
         sendMessage.setChatId(chatId);
         sendMessage.setText(o.toString());
         try {
-            System.err.format("sending %s to %s\n",o.toString(),chatId);
+            _Log.info(String.format("sending %s to %s\n",o.toString(),chatId));
             execute(sendMessage);
         } catch(Exception e) {
-            System.err.format(" f531ae90faad7adb \n");
+            _Log.info(String.format(" f531ae90faad7adb \n"));
         }
     }
     @Override
     public void onUpdateReceived(Update update) {
         TelegramInputMessage tim = TelegramInputMessage.CreateInputMessage(update);
-        System.err.format(" c4aa6c56bd61a895 \n");
+        _Log.info(String.format(" c4aa6c56bd61a895 \n"));
         if(tim != null) {
-            System.err.format(" 78cbf16ed274bfe5 \n");
+            _Log.info(String.format(" 78cbf16ed274bfe5 \n"));
             UserData ud = new UserData(update);
             ElDrinkoStateMachine edsm = null;
-            System.err.format("here %s\n","fc4721b74e5c861c");
+            _Log.info(String.format("here %s\n","fc4721b74e5c861c"));
             if( !_data.containsKey(ud.toString()) ) {
-                System.err.format("here %s\n","abbfe7d43f0ae807");
-                edsm = new ElDrinkoStateMachine(ud, _mongoClient, this)
+                _Log.info(String.format("here %s\n","abbfe7d43f0ae807"));
+                edsm = new ElDrinkoStateMachine(ud, _mongoClient, this, _config)
                     .setUp()
                     ;
                 _data.put(ud.toString(),edsm);
             } else {
-                System.err.format("here %s\n","d6948b5130d382da");
+                _Log.info(String.format("here %s\n","d6948b5130d382da"));
                 edsm = _data.get(ud.toString());
             }
-            System.err.format("%s\n",edsm);
-            System.err.format("here %s\n","52b2688632dd0b0b");
+            _Log.info(String.format("%s\n",edsm));
+            _Log.info(String.format("here %s\n","52b2688632dd0b0b"));
             _execute(edsm.apply(tim));
         }
     }
@@ -77,7 +79,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<J
 		        sendMessage.setParseMode("Markdown");
                 execute(sendMessage);
             } catch(TelegramApiException tae) {
-                System.err.format("here %s\n","05f6e0757caf298b");
+                _Log.info(String.format("here %s\n","05f6e0757caf298b"));
             }
         }
     }
@@ -90,7 +92,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<J
                 .find(Filters.eq("id",botname))
                 .first()
                 .toJson());
-        System.err.format("_config: %s\n",_config.toString());
+        _Log.info(String.format("_config: %s\n",_config.toString()));
         _botname = botname;
     }
 
@@ -111,7 +113,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<J
 			uri = new MongoClientURI(url);
 		}
 		catch(Exception e) {
-			System.err.format("EXCEPTION!\n");
+			_Log.info(String.format("EXCEPTION!\n"));
 		}
 		return new MongoClient(uri);
 	}

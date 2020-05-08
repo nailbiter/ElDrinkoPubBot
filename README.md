@@ -1,9 +1,22 @@
 # ElDrinkoPubBot
 ElDrinkoPubBot
 
-# run
+## build
 
 ```sh
-mvn install # if needed
-mvn exec:java -Dexec.mainClass="nl.insomnia247.nailbiter.eldrinkopubbot.App"
+mvn install
+```
+
+## run
+
+```sh
+./bin/reset_db.pl # if needed
+./bin/start.sh
+```
+
+## run test
+
+```sh
+./bin/reset_db.pl # if needed
+./bin/testmode.sh
 ```

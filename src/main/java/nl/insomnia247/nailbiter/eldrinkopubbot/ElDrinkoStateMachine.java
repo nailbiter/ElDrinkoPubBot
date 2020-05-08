@@ -1,5 +1,8 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
 import com.mongodb.MongoClient;
+import java.util.Date;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import java.lang.StringBuilder;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -21,6 +24,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.Tsv;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -34,18 +38,23 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private final PersistentStorage _persistentStorage;
     private final Consumer<JSONObject>  _sendOrderCallback;
     private final String[] _PAYMENT_METHOD = new String[]{"наличными","терминал"};
+    private static Logger _Log = Logger.getLogger(ElDrinkoStateMachine.class);
+    private static MongoCollection<Document> _LogDb = null;
     private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
         @Override
         public boolean test(TelegramInputMessage im) {
             return im instanceof TelegramTextInputMessage;
         }
     };
-    public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient, Consumer<JSONObject> sendOrderCallback) {
+    public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient, Consumer<JSONObject> sendOrderCallback, JSONObject config) {
         super("_");
         _ud = ud;
         _sendOrderCallback = sendOrderCallback;
+        if( _LogDb == null ) {
+            _LogDb = mongoClient.getDatabase("beerbot").getCollection(config.getJSONObject("mongodb").getString("logs"));
+        }
         _persistentStorage = new PersistentStorage(
-                mongoClient.getDatabase("beerbot").getCollection("data"), 
+                mongoClient.getDatabase("beerbot").getCollection(config.getJSONObject("mongodb").getString("data")), 
                 "id",
                 ud.toString()
                 );
@@ -105,7 +114,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         try {
             url = new URL(u);
         } catch (Exception e) {
-            System.err.format("malformed url: \"%s\"\n",u);
+            _Log.info(String.format("malformed url: \"%s\"\n",u));
         }
         return url;
     }
@@ -124,7 +133,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     private static String _FormattedProductList() {
         Tsv tsv = new Tsv(_SafeUrl(_BEERLIST));
-        System.err.format("tsv: %s\n",tsv);
+        _Log.info(String.format("tsv: %s\n",tsv));
         StringBuilder sb = new StringBuilder();
         List<String> descriptions = tsv.getColumn("name");
         List<Float> prices = new ArrayList<>();
@@ -237,10 +246,10 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
                         public OutputMessage apply(TelegramInputMessage im) {
-                            System.err.format(" 1ee9068eb4441ddd \n");
+                            _Log.info(String.format(" 1ee9068eb4441ddd \n"));
                             JSONArray cart = new JSONObject(_persistentStorage.get("order")).getJSONArray("cart");
-                            System.err.format(" 17694b345db033db \n");
-                            System.err.format("cart: %s\n",cart);
+                            _Log.info(String.format(" 17694b345db033db \n"));
+                            _Log.info(String.format("cart: %s\n",cart));
                             ArrayList<String> res = new ArrayList<String>();
                             for(int i = 0; i < cart.length(); i++) {
                                 res.add(String.format("%.1f литров пива \"%s\"",
@@ -248,7 +257,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                             cart.getJSONObject(i).getString("name")
                                             ));
                             }
-                            System.err.format("res: %s\n",res);
+                            _Log.info(String.format("res: %s\n",res));
                             return new TelegramKeyboard(_ud,"что будем удалять?",res.toArray(new String[]{}));
                         }
                     })
@@ -337,7 +346,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         })
             ;
         if(_persistentStorage.contains("state")) {
-            System.err.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state"));
+            _Log.info(String.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state")));
             this._currentState = _persistentStorage.get("state");
         }
         return res;
@@ -347,7 +356,18 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     @Override
     protected void _onSetStateCallback(String state) {
-        System.err.format("state: %s\n",state);
+        _Log.info(String.format("state: %s\n",state));
         _persistentStorage.set("state",state);
+    }
+    @Override
+    protected void _log(String msg) {
+        _Log.info(msg);
+        if(_LogDb!=null && _ud!=null && false) {
+            Date now = new Date();
+            _LogDb.insertOne(new Document("_ud",_ud.toString())
+                    .append("date",now.toGMTString())
+                    .append("msg",msg)
+                    );
+        }
     }
 }
