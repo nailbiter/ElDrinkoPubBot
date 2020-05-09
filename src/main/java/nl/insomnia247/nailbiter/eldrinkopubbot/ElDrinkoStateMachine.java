@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.JSONTools;
 
 
 /**
@@ -119,7 +120,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         List<List<String>> products = tsv.getRecords();
         context.put("products", products);
         if(order!=null) {
-            context.put("order",order);
+            Map<String,Object> orderMap = JSONTools.JSONObjectToMap(order);
+            _Log.info(orderMap.toString());
+            context.put("order",orderMap);
         }
 
         String template = _GetResource(templateName);
