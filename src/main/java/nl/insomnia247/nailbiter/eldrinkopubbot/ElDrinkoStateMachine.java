@@ -103,6 +103,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         };
     }
     private static String _GetResource(String templateName) {
+        _Log.info(String.format("_GetResource(%s)",templateName));
         String template = null;
         try {
           InputStream in 
@@ -111,6 +112,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         } catch(Exception e) {
           _Log.info(" 60a93278bbe5f78d \n");
         }
+        _Log.info(String.format("res: %s",template));
         return template;
     }
     private String _ProcessTemplate(String templateName, JSONObject order) {
@@ -353,7 +355,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                 );
                     }
                 })
-        .addTransition("confirm","choose_address",_MessageKeyboardComparisonPredicate("1"),_textMessage("введите адрес"))
+        .addTransition("confirm","choose_address",
+                _MessageKeyboardComparisonPredicate("1"),
+                _textMessage(_GetResource("054edccc65c193f7583a5773")))
         .addTransition("choose_address","choose_payment",_IS_TEXT_MESSAGE,
                 new Function<TelegramInputMessage,OutputMessage>() {
                     @Override

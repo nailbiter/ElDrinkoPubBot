@@ -7,8 +7,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
  * @author Alex Leontiev
  */
 public class TelegramTextOutputMessage extends TelegramOutputMessage {
+    String _msg = null;
     public TelegramTextOutputMessage(UserData ud, String msg) {
         super(ud);
         setText(msg);
+        _msg = msg;
+    }
+    @Override
+    public String toString() {
+        return String.format("TelegramOutputMessage(%s)",_msg);
     }
 }
