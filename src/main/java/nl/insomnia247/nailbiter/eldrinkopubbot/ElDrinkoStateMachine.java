@@ -97,17 +97,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         return new Function<TelegramInputMessage,OutputMessage>() {
             @Override
             public OutputMessage apply(TelegramInputMessage im) {
-                return new TelegramKeyboard(_ud, _ProcessTemplate(msg), categories);
+                return new TelegramKeyboard(_ud, _ProcessTemplate(msg,null), categories);
             }
         };
     }
-    private String _ProcessTemplate(String templateName) {
-        Jinjava jinjava = new Jinjava();
-        Map<String, Object> context = new HashMap<String,Object>();
-        Tsv tsv = new Tsv(_SafeUrl(_BEERLIST));
-        List<List<String>> products = tsv.getRecords();
-        context.put("products", products);
-
+    private static String _GetResource(String templateName) {
         String template = null;
         try {
           InputStream in 
@@ -116,8 +110,21 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         } catch(Exception e) {
           _Log.info(" 60a93278bbe5f78d \n");
         }
+        return template;
+    }
+    private String _ProcessTemplate(String templateName, JSONObject order) {
+        Jinjava jinjava = new Jinjava();
+        Map<String, Object> context = new HashMap<String,Object>();
+        Tsv tsv = new Tsv(_SafeUrl(_BEERLIST));
+        List<List<String>> products = tsv.getRecords();
+        context.put("products", products);
+        if(order!=null) {
+            context.put("order",order);
+        }
+
+        String template = _GetResource(templateName);
         _Log.info(String.format("template: %s",template));
-        String renderedTemplate = null;
+        String renderedTemplate = _GetResource(templateName);
 		renderedTemplate = jinjava.render(template, context);	
         _Log.info(String.format("renderedTemplate: %s",renderedTemplate));
         return renderedTemplate;
@@ -196,7 +203,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
             .addTransition("_", "start", _TrivialPredicate(), _keyboardMessage2("fdb3ef9a7dcc8e36c4fa489f",
-                        new String[]{"Посмотреть описание","Сформировать заказ покупку"}
+                        new String[]{_GetResource("0780c061af50729a89c0197b"),
+                            _GetResource("3275901e049dae508d9794bd")}
                         ))
             .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("0"), _productKeyboardMessage("Выберите продукт"))
             .addTransition("choose_product_to_see_description", "start", _MessageKeyboardComparisonPredicate(null), 
@@ -214,7 +222,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             });
                         }
                     })
-            .addTransition("start","choose_product_to_make_order",_MessageKeyboardComparisonPredicate("1"),_productKeyboardMessage("Выберите продукт"))
+            .addTransition("start","choose_product_to_make_order",
+                    _MessageKeyboardComparisonPredicate("1"),
+                    _productKeyboardMessage(_GetResource("67c31fcc0fa6566a955c1792")))
             .addTransition("choose_product_to_make_order","choose_amount",_MessageKeyboardComparisonPredicate(null),
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
@@ -235,9 +245,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             order.getJSONArray("cart").put(obj);
                             _persistentStorage.set("order",order.toString());
                             return new TelegramTextOutputMessage(_ud,
-                                    String.format("Вы выбрали \"%s\". Выберите количество (в литрах, с кратностью поллитра)",
-                                        name
-                                        ));
+                                    _ProcessTemplate("ec779e4315ccf36a38c2d470",order));
                         }
                     })
         .addTransition("choose_amount","confirm",
