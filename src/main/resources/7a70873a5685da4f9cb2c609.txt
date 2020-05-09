@@ -1,6 +1,6 @@
 Ви замовили {{(order.cart|last)['amount']}} л {{(order.cart|last)['name']}}.
 Сума замовлення: {{order.sum}} грн.
-Сума за доставку: 20.00 грн.
-Сума до сплати: {{order.sum + 20}} грн.
+Сума за доставку: {{order.delivery_fee}} грн.
+Сума до сплати: {{order.sum + order.delivery_fee}} грн.
 
 Що робимо далі?

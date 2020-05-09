@@ -1,0 +1,4 @@
+Ви замовили: {{%for r in cart.order%}}{{r[1]}}-{{r[2]}} л{%if not loop.last%}; {%endif%}{{%endfor%}}
+Адреса замовлення: {{order.address}}
+Форма сплати: {{order.payment}}
+Сумма до сплати {{order.sum + order.delivery_fee}} грн.

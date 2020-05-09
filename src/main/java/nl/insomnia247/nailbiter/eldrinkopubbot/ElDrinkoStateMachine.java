@@ -48,7 +48,6 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         _GetResource("04a01e8e5b9d67c12e77ac9b"),
         _GetResource("3bb515ee38b009362e946b37")
     };
-    //new String[]{"отправить заказ","изменить способ оплаты","изменить адрес"}
     private final String[] _D1343B2D16FF152D = new String[] {
         _GetResource("9c6abf272ea0b6c0acbefa27"),
         _GetResource("6c0fe50efe214e5ae28b0d99"),
@@ -148,6 +147,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 sum += beerPrice * obj.getDouble("amount");
             }
             orderMap.put("sum",sum);
+            orderMap.put("delivery_fee",(double)20.0);
             _Log.info(orderMap.toString());
             context.put("order",orderMap);
         }
@@ -383,11 +383,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im;
                         int i = Integer.parseInt(tka.getMsg());
                         _persistentStorage.set("payment",_PAYMENT_METHOD[i]);
+                        JSONObject order = new JSONObject(_persistentStorage.get("order"));
+                        order.put("payment",_persistentStorage.get("payment"));
+                        order.put("address",_persistentStorage.get("address"));
                         return new TelegramKeyboard(_ud,
-                                String.format("адрес: %s, способ платежа: %s",
-                                    _persistentStorage.get("address"),
-                                    _persistentStorage.get("payment")
-                                    ),
+                                _ProcessTemplate("eb34fa7ee27d1192ef20f960",order),
                                 _D1343B2D16FF152D);
                     }
         })
@@ -402,8 +402,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                     _persistentStorage.get("address"),
                                     _persistentStorage.get("payment")
                                     ),
-                                new String[]{"отправить заказ","изменить способ оплаты","изменить адрес"}
-                                );
+                                _D1343B2D16FF152D);
+                                
                     }
         })
         .addTransition("send","choose_payment",_MessageComparisonPredicate("1"),
