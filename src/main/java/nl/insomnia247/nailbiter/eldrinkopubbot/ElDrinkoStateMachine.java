@@ -44,7 +44,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private final UserData _ud;
     private final PersistentStorage _persistentStorage;
     private final Consumer<JSONObject>  _sendOrderCallback;
-    private final String[] _PAYMENT_METHOD = new String[]{"наличными","терминал"};
+    private final String[] _PAYMENT_METHOD = new String[]{_GetResource("04a01e8e5b9d67c12e77ac9b"),
+        _GetResource("3bb515ee38b009362e946b37")};
     private static Logger _Log = Logger.getLogger(ElDrinkoStateMachine.class);
     private static MongoCollection<Document> _LogDb = null;
     private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
@@ -363,7 +364,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                     @Override
                     public OutputMessage apply(TelegramInputMessage im) {
                         _persistentStorage.set("address",im.getMsg());
-                        return new TelegramKeyboard(_ud,"Выберите способ оплаты",_PAYMENT_METHOD);
+                        return new TelegramKeyboard(_ud,_GetResource("1dc02faec7377fc537510e30"),
+                                _PAYMENT_METHOD);
                     }
         })
         .addTransition("choose_payment","send",_MessageKeyboardComparisonPredicate(null),
