@@ -1,13 +1,18 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
+import java.util.HashMap;
+import java.io.InputStream;
+import org.apache.commons.io.IOUtils;
+import com.hubspot.jinjava.Jinjava;
 import com.mongodb.MongoClient;
-import java.util.Date;
 import com.mongodb.client.MongoCollection;
-import org.bson.Document;
 import java.lang.StringBuilder;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -25,6 +30,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextOutputMessag
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.Tsv;
 import org.apache.log4j.Logger;
+import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -76,6 +82,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         };
     }
+    /**
+     * @deprecated
+     */
     private Function<TelegramInputMessage,OutputMessage> _keyboardMessage(String msg, String[] categories) {
         return new Function<TelegramInputMessage,OutputMessage>() {
             @Override
@@ -83,6 +92,35 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 return new TelegramKeyboard(_ud, _TransformMessageString(msg), categories);
             }
         };
+    }
+    private Function<TelegramInputMessage,OutputMessage> _keyboardMessage2(String msg, String[] categories) {
+        return new Function<TelegramInputMessage,OutputMessage>() {
+            @Override
+            public OutputMessage apply(TelegramInputMessage im) {
+                return new TelegramKeyboard(_ud, _ProcessTemplate(msg), categories);
+            }
+        };
+    }
+    private String _ProcessTemplate(String templateName) {
+        Jinjava jinjava = new Jinjava();
+        Map<String, Object> context = new HashMap<String,Object>();
+        Tsv tsv = new Tsv(_SafeUrl(_BEERLIST));
+        List<List<String>> products = tsv.getRecords();
+        context.put("products", products);
+
+        String template = null;
+        try {
+          InputStream in 
+              = ElDrinkoStateMachine.class.getClassLoader().getResource(templateName+".txt").openStream();
+		  template = IOUtils.toString( in );
+        } catch(Exception e) {
+          _Log.info(" 60a93278bbe5f78d \n");
+        }
+        _Log.info(String.format("template: %s",template));
+        String renderedTemplate = null;
+		renderedTemplate = jinjava.render(template, context);	
+        _Log.info(String.format("renderedTemplate: %s",renderedTemplate));
+        return renderedTemplate;
     }
     private static Predicate<TelegramInputMessage> _MessageComparisonPredicate(String msg) {
         return new Predicate<TelegramInputMessage>(){
@@ -131,6 +169,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             .replace("%p",_FormattedProductList())
             ;
     }
+    /**
+     * @deprecated
+     */
     private static String _FormattedProductList() {
         Tsv tsv = new Tsv(_SafeUrl(_BEERLIST));
         _Log.info(String.format("tsv: %s\n",tsv));
@@ -154,7 +195,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
-            .addTransition("_", "start", _TrivialPredicate(), _keyboardMessage("Добро Пожаловать. Сейчас у нас есть:\n%p",
+            .addTransition("_", "start", _TrivialPredicate(), _keyboardMessage2("fdb3ef9a7dcc8e36c4fa489f",
                         new String[]{"Посмотреть описание","Сформировать заказ покупку"}
                         ))
             .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("0"), _productKeyboardMessage("Выберите продукт"))
