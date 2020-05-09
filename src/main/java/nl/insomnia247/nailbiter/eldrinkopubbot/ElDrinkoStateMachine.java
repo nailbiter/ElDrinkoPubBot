@@ -121,9 +121,26 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         context.put("products", products);
         if(order!=null) {
             Map<String,Object> orderMap = JSONTools.JSONObjectToMap(order);
+            //FIXME: try to compute `sum` in templates
+            float sum = 0;
+            JSONArray cart = order.getJSONArray("cart");
+            for(int i = 0; i < cart.length(); i++) {
+                JSONObject obj = cart.getJSONObject(i);
+                if(!obj.has("amount")) {
+                    continue;
+                }
+                float beerPrice = Float.parseFloat(products.stream()
+                    .filter(r -> r.get(1).equals(obj.getString("name")))
+                    .findAny()
+                    .orElse(null)
+                    .get(3));
+                sum += beerPrice * obj.getDouble("amount");
+            }
+            orderMap.put("sum",sum);
             _Log.info(orderMap.toString());
             context.put("order",orderMap);
         }
+        _Log.info(String.format("context: %s",context));
 
         String template = _GetResource(templateName);
         _Log.info(String.format("template: %s",template));
@@ -220,8 +237,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                 new TelegramTextOutputMessage(_ud,
                                         tsv.getColumn("description").get(Integer.parseInt(tka.getMsg()))),
                                     new TelegramKeyboard(_ud, 
-                                            _TransformMessageString("Добро Пожаловать. Сейчас у нас есть:\n%p"),
-                                            new String[]{"Посмотреть описание","Сформировать заказ покупку"}),
+                                            _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null),
+                                            new String[]{_GetResource("0780c061af50729a89c0197b"),
+                                                _GetResource("3275901e049dae508d9794bd")}),
                             });
                         }
                     })
@@ -285,11 +303,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         obj.put("amount",amount);
                         _persistentStorage.set("order",order.toString());
                         return new TelegramKeyboard(_ud,
-                                String.format("Вы выбрали %.1f литров пива \"%s\". Что дальше?",
-                                    obj.getDouble("amount"),
-                                    obj.getString("name")
-                                    ),
-                                new String[]{"добавить еще", "оформить заказ", "удалить заказанное"}
+                                _ProcessTemplate("7a70873a5685da4f9cb2c609",order),
+                                new String[]{_GetResource("d28703745c047d0c0fdaad71"),
+                                    _GetResource("52fa52f003446458b55512e0"),
+                                    _GetResource("2c2e02a2cd6ef6958fc10cdd")
+                                }
                                 );
                     }
                 })
