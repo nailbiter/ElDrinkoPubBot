@@ -44,8 +44,16 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private final UserData _ud;
     private final PersistentStorage _persistentStorage;
     private final Consumer<JSONObject>  _sendOrderCallback;
-    private final String[] _PAYMENT_METHOD = new String[]{_GetResource("04a01e8e5b9d67c12e77ac9b"),
-        _GetResource("3bb515ee38b009362e946b37")};
+    private final String[] _PAYMENT_METHOD = new String[]{
+        _GetResource("04a01e8e5b9d67c12e77ac9b"),
+        _GetResource("3bb515ee38b009362e946b37")
+    };
+    //new String[]{"отправить заказ","изменить способ оплаты","изменить адрес"}
+    private final String[] _D1343B2D16FF152D = new String[] {
+        _GetResource("9c6abf272ea0b6c0acbefa27"),
+        _GetResource("6c0fe50efe214e5ae28b0d99"),
+        _GetResource("458ea57833f558fd9063c425")
+    };
     private static Logger _Log = Logger.getLogger(ElDrinkoStateMachine.class);
     private static MongoCollection<Document> _LogDb = null;
     private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
@@ -380,8 +388,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                     _persistentStorage.get("address"),
                                     _persistentStorage.get("payment")
                                     ),
-                                new String[]{"отправить заказ","изменить способ оплаты","изменить адрес"}
-                                );
+                                _D1343B2D16FF152D);
                     }
         })
         .addTransition("send","edit_address",_MessageComparisonPredicate("2"),_textMessage("введите адрес"))
