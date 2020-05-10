@@ -36,6 +36,9 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
                 );
         return this;
     }
+    protected void _log(String msg) {
+        System.err.println(msg);
+    }
     protected void _setState(String state) throws StateMachineException {
         if(!_states.contains(state)) {
             throw new StateMachineException(state);
@@ -45,21 +48,25 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
     }
     @Override
     public OutputMessage apply(InputMessage im) {
-        System.err.format("apply: state: %s\n",_currentState);
+        _log(String.format("apply: state: \"%s\"\nim: \"%s\"",_currentState,im));
         for(String to:_states) {
             ImmutablePair<Predicate<InputMessage>, Function<InputMessage,OutputMessage>> p = null;
+            _log(String.format("checking %s -> %s",_currentState,to));
             if( (p=_transitions.get(new ImmutablePair<String,String>(_currentState,to))) != null ) {
                 if(p.left.test(im)) {
-                    System.err.format("active transition: %s -> %s\n",_currentState,to);
+                    _log(String.format("active transition: %s -> %s",_currentState,to));
                     try {
                       _setState(to);
                     } catch (StateMachineException sme) {
                         return null;
                     }
-                    return p.right.apply(im);
+                    OutputMessage om = p.right.apply(im);
+                    _log(String.format("om: \"%s\"",om));
+                    return om;
                 }
             }
         }
+        _log("did not found suitable transition. returning null");
         return null;
     }
     protected void _onSetStateCallback(String state) {}
