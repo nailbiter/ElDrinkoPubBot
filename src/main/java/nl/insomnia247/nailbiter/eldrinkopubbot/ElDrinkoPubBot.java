@@ -79,6 +79,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
             SendMessage sendMessage = (SendMessage) om;
             try {
 		        sendMessage.setParseMode("Markdown");
+                sendMessage.enableMarkdown(true);
                 execute(sendMessage);
             } catch(TelegramApiException tae) {
                 _Log.info(String.format("here %s\n","05f6e0757caf298b"));

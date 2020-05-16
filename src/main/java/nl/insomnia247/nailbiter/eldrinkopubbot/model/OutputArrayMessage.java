@@ -11,4 +11,8 @@ public class OutputArrayMessage implements OutputMessage {
     public OutputMessage[] getMessages() {
         return _msgs;
     }
+    @Override
+    public String toString() {
+        return _msgs.toString();
+    }
 }
