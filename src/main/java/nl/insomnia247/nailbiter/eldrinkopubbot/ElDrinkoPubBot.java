@@ -110,7 +110,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
         _botname = botname;
         _masterChatId = (long)_config.getJSONObject("telegram").getInt("masterChatId");
         _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
-        _Log.debug("test");
+        _Log.info("test");
     }
 
     @Override
