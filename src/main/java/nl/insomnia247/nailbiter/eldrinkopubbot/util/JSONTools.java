@@ -5,14 +5,15 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 
 /**
  * @author Alex Leontiev
  */
 public class JSONTools {
-    static final Logger _Log = Logger.getLogger(JSONTools.class);
+    static final Logger _Log = LogManager.getLogger(JSONTools.class);
     public static Map<String,Object> JSONObjectToMap(JSONObject o) {
         Map<String,Object> res = new HashMap<>();
         for(String key:o.keySet()) {

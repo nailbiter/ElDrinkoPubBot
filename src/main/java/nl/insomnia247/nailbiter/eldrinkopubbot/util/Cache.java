@@ -4,7 +4,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 
 /**
@@ -14,7 +15,7 @@ public class Cache {
     protected final static Map<String,ImmutablePair<Date,Object>> _DATA 
         = Collections.synchronizedMap(new HashMap<String,ImmutablePair<Date,Object>>());
     private int _expirationSec;
-    private static Logger _Log = Logger.getLogger(Cache.class);
+    private static Logger _Log = LogManager.getLogger(Cache.class);
     public Cache(int expirationSec) {
         _expirationSec = expirationSec;
     }

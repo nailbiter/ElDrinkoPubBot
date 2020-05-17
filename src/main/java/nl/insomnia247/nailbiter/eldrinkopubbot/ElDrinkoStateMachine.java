@@ -32,7 +32,8 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.JSONTools;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.Tsv;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -56,7 +57,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             _GetResource("6c0fe50efe214e5ae28b0d99"),
             _GetResource("458ea57833f558fd9063c425")
     };
-    private static Logger _Log = Logger.getLogger(ElDrinkoStateMachine.class);
+    private static Logger _Log = LogManager.getLogger(ElDrinkoStateMachine.class);
     private static MongoCollection<Document> _LogDb = null;
     private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
         @Override

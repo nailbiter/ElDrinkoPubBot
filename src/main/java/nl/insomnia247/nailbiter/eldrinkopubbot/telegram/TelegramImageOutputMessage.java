@@ -17,7 +17,7 @@ public class TelegramImageOutputMessage extends SendPhoto implements OutputMessa
         this.setChatId(ud.getChatId().toString());
         //this.setPhoto(image.toString());
         String filePath = new DownloadCache(".png").get(image);
-        this.setNewPhoto(new File(filePath));
+        this.setPhoto(new File(filePath));
         this.setCaption(msg);
         _msg = msg;
         _image = image;

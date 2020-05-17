@@ -3,9 +3,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
+import java.util.Collections;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import java.util.Map;
+import java.util.HashMap;
+import org.apache.logging.log4j.LogManager;
 
 
 /**
@@ -16,14 +20,14 @@ public class DownloadCache {
         = Collections.synchronizedMap(new HashMap<String,String>());
     protected final static String _PREFIX = "f0bc74ce18191c931410";
     private String _ext = null;
-    private final static Logger _Log = Logger.getLogger(DownloadCache.class);
+    private final static Logger _Log = LogManager.getLogger(DownloadCache.class);
     public DownloadCache(String ext) {
         _ext = ext;
     }
     public String get(URL u) {
         String url = u.toString();
 
-        if(_DATA.contains(url)) {
+        if(_DATA.containsKey(url)) {
             String res = _DATA.get(url);
             _Log.info(String.format("cache hit for \"%s\" -> \"%s\"",url,res));
             return res;
@@ -34,11 +38,16 @@ public class DownloadCache {
                     ,url.hashCode()
                     ,_ext
                     );
-            ReadableByteChannel readableByteChannel = Channels.newChannel(u.openStream());
-            FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-            FileChannel fileChannel = fileOutputStream.getChannel();
-            fileOutputStream.getChannel()
-              .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            try {
+                ReadableByteChannel readableByteChannel = Channels.newChannel(u.openStream());
+                FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+                FileChannel fileChannel = fileOutputStream.getChannel();
+                fileOutputStream.getChannel()
+                  .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            } catch (Exception e) {
+              _Log.info(" 270b0820b521ef23 \n");
+              return null;
+            }
             _Log.info(String.format("saved to %s",fileName));
             _DATA.put(url,fileName);
             return fileName;
