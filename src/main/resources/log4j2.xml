@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
-	<Appenders>
-		<File name="A1" fileName="A1.log" append="false">
-			<Log4j1XmlLayout />
-		</File>
-		<Console name="STDOUT" target="SYSTEM_OUT">
-			<PatternLayout pattern="%level - %m%n"/>
-		</Console>
-	</Appenders>
-	<Loggers>
-		<Logger name="org.apache.log4j.xml" level="debug">
-			<AppenderRef ref="A1"/>
-		</Logger>
-		<Root level="debug">
-			<AppenderRef ref="STDOUT"/>
-		</Root>
-	</Loggers>
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+        <File name="MyFile" fileName="all.log" immediateFlush="true" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="MyFile"/>
+        </Root>
+    </Loggers>
 </Configuration>
