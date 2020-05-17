@@ -1,5 +1,4 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.telegram;
-import nl.insomnia247.nailbiter.eldrinkopubbot.model.Keyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import java.util.ArrayList;
@@ -9,7 +8,7 @@ import java.util.Arrays;
 /**
  * @author Alex Leontiev
  */
-public class TelegramKeyboard extends TelegramOutputMessage implements Keyboard {
+public class TelegramKeyboard extends TelegramOutputMessage {
     private final static int _COLNUM = 2;
     public TelegramKeyboard(UserData ud, String msg, String[] categories) {
         super(ud);

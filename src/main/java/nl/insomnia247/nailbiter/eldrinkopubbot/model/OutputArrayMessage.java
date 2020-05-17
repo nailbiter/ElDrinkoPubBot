@@ -13,6 +13,10 @@ public class OutputArrayMessage implements OutputMessage {
     }
     @Override
     public String toString() {
-        return _msgs.toString();
+        String res = "";
+        for(OutputMessage msg:_msgs) {
+            res += msg.toString()+",";
+        }
+        return String.format("[%s]",res);
     }
 }

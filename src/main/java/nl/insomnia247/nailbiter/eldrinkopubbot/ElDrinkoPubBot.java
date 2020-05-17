@@ -1,4 +1,5 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -75,7 +76,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
             for(OutputMessage omm: ((OutputArrayMessage)om).getMessages()) {
                 _execute(omm);
             }
-        } else {
+        } else if (om instanceof SendMessage) {
             SendMessage sendMessage = (SendMessage) om;
             try {
 		        sendMessage.setParseMode("Markdown");
@@ -84,6 +85,15 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
             } catch(TelegramApiException tae) {
                 _Log.info(String.format("here %s\n","05f6e0757caf298b"));
             }
+        } else if (om instanceof SendPhoto) {
+            SendPhoto sendPhoto = (SendPhoto) om;
+            try {
+                execute(sendPhoto);
+            } catch(TelegramApiException tae) {
+                _Log.info(" 30517df9663111bd \n");
+            }
+        } else {
+            _Log.info(" 3c269b0998783662 \n");
         }
     }
     ElDrinkoPubBot(String dbpass, String botname) {

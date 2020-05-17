@@ -22,6 +22,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachine;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramImageOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboardAnswer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramOutputMessage;
@@ -209,14 +210,13 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         public OutputMessage apply(TelegramInputMessage im) {
                             TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im;
                             Tsv tsv = new Tsv(_SafeUrl(_BEERLIST));
-                            String msg = tsv.getColumn("description").get(Integer.parseInt(tka.getMsg()))
-                                +"\n\n"
-                                +String.format("[](%s)",
-                                        tsv.getColumn("image link").get(Integer.parseInt(tka.getMsg()))
-                                        );
-                            _Log.info(msg);
+                            String msg 
+                                = tsv.getColumn("description").get(Integer.parseInt(tka.getMsg()));
+                            String imgUrl 
+                                = tsv.getColumn("image link").get(Integer.parseInt(tka.getMsg()));
+                            _Log.info(String.format("msg: %s\nimgUrl: %s",msg,imgUrl));
                             return new OutputArrayMessage(new OutputMessage[]{
-                                new TelegramTextOutputMessage(_ud,msg),
+                                new TelegramImageOutputMessage(_ud, msg, _SafeUrl(imgUrl)),
                                     new TelegramKeyboard(_ud, 
                                             _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null),
                                             new String[]{_GetResource("0780c061af50729a89c0197b"),
