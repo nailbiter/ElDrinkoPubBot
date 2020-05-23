@@ -200,10 +200,22 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
-            .addTransition("_", "start", _TRIVIAL_PREDICATE, _keyboardMessage("fdb3ef9a7dcc8e36c4fa489f",
-                        new String[]{_GetResource("0780c061af50729a89c0197b"),
-                            _GetResource("3275901e049dae508d9794bd")}
-                        ))
+            .addTransition("_", "start", _TRIVIAL_PREDICATE, new Function<TelegramInputMessage,OutputMessage>() {
+                @Override
+                public OutputMessage apply(TelegramInputMessage im) {
+                    return new OutputArrayMessage(new OutputMessage[]{
+                        new TelegramTextOutputMessage(_ud,
+                                _ProcessTemplate("ae784befe1f1bac4d5929a4a",null)),
+                        new TelegramKeyboard(_ud, 
+                                _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null), 
+                                new String[]{
+                                    _GetResource("0780c061af50729a89c0197b"),
+                                    _GetResource("3275901e049dae508d9794bd")}
+                                )
+                    });
+                }
+            }
+            )
             .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("0"), _productKeyboardMessage("Выберите продукт"))
             .addTransition("choose_product_to_see_description", "start", _MessageKeyboardComparisonPredicate(null), 
                     new Function<TelegramInputMessage,OutputMessage>() {
