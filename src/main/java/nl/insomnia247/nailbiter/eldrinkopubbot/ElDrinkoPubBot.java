@@ -1,4 +1,5 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -10,7 +11,8 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputArrayMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONObject;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -31,7 +33,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
     private JSONObject _config = null;
     private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
     private final long _masterChatId;
-    private static Logger _Log = Logger.getLogger(ElDrinkoPubBot.class);
+    private static Logger _Log = LogManager.getLogger(ElDrinkoPubBot.class);
     private PersistentStorage _persistentStorage = null;
     @Override 
     public void accept(String o) {
@@ -75,14 +77,24 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
             for(OutputMessage omm: ((OutputArrayMessage)om).getMessages()) {
                 _execute(omm);
             }
-        } else {
+        } else if (om instanceof SendMessage) {
             SendMessage sendMessage = (SendMessage) om;
             try {
 		        sendMessage.setParseMode("Markdown");
+                sendMessage.enableMarkdown(true);
                 execute(sendMessage);
             } catch(TelegramApiException tae) {
                 _Log.info(String.format("here %s\n","05f6e0757caf298b"));
             }
+        } else if (om instanceof SendPhoto) {
+            SendPhoto sendPhoto = (SendPhoto) om;
+            try {
+                execute(sendPhoto);
+            } catch(TelegramApiException tae) {
+                _Log.info(" 30517df9663111bd \n");
+            }
+        } else {
+            _Log.info(" 3c269b0998783662 \n");
         }
     }
     ElDrinkoPubBot(String dbpass, String botname) {
@@ -98,6 +110,10 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
         _botname = botname;
         _masterChatId = (long)_config.getJSONObject("telegram").getInt("masterChatId");
         _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
+        _Log.info("test");
+        _Log.debug("test");
+        _Log.warn("test");
+        _Log.error("test");
     }
 
     @Override

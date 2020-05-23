@@ -11,4 +11,12 @@ public class OutputArrayMessage implements OutputMessage {
     public OutputMessage[] getMessages() {
         return _msgs;
     }
+    @Override
+    public String toString() {
+        String res = "";
+        for(OutputMessage msg:_msgs) {
+            res += msg.toString()+",";
+        }
+        return String.format("[%s]",res);
+    }
 }

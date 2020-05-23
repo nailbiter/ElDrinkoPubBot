@@ -22,6 +22,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachine;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramImageOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboardAnswer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramOutputMessage;
@@ -31,7 +32,8 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.JSONTools;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.Tsv;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,14 +50,14 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private final Consumer<String>  _sendOrderCallback;
     private final String[] _PAYMENT_METHOD = new String[]{
         _GetResource("04a01e8e5b9d67c12e77ac9b"),
-        _GetResource("3bb515ee38b009362e946b37")
+            _GetResource("3bb515ee38b009362e946b37")
     };
     private final String[] _D1343B2D16FF152D = new String[] {
         _GetResource("9c6abf272ea0b6c0acbefa27"),
-        _GetResource("6c0fe50efe214e5ae28b0d99"),
-        _GetResource("458ea57833f558fd9063c425")
+            _GetResource("6c0fe50efe214e5ae28b0d99"),
+            _GetResource("458ea57833f558fd9063c425")
     };
-    private static Logger _Log = Logger.getLogger(ElDrinkoStateMachine.class);
+    private static Logger _Log = LogManager.getLogger(ElDrinkoStateMachine.class);
     private static MongoCollection<Document> _LogDb = null;
     private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
         @Override
@@ -108,11 +110,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         _Log.info(String.format("_GetResource(%s)",templateName));
         String template = null;
         try {
-          InputStream in 
-              = ElDrinkoStateMachine.class.getClassLoader().getResource(templateName+".txt").openStream();
-		  template = IOUtils.toString( in );
+            InputStream in 
+                = ElDrinkoStateMachine.class.getClassLoader().getResource(templateName+".txt").openStream();
+            template = IOUtils.toString( in );
         } catch(Exception e) {
-          _Log.info(" 60a93278bbe5f78d \n");
+            _Log.info(" 60a93278bbe5f78d \n");
         }
         _Log.info(String.format("res: %s",template));
         return template;
@@ -134,10 +136,10 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                     continue;
                 }
                 float beerPrice = Float.parseFloat(products.stream()
-                    .filter(r -> r.get(1).equals(obj.getString("name")))
-                    .findAny()
-                    .orElse(null)
-                    .get(3));
+                        .filter(r -> r.get(1).equals(obj.getString("name")))
+                        .findAny()
+                        .orElse(null)
+                        .get(3));
                 sum += beerPrice * obj.getDouble("amount");
             }
             orderMap.put("sum",sum);
@@ -150,7 +152,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         String template = _GetResource(templateName);
         _Log.info(String.format("template: %s",template));
         String renderedTemplate = _GetResource(templateName);
-		renderedTemplate = jinjava.render(template, context);	
+        renderedTemplate = jinjava.render(template, context);	
         _Log.info(String.format("renderedTemplate: %s",renderedTemplate));
         return renderedTemplate;
     }
@@ -209,9 +211,13 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         public OutputMessage apply(TelegramInputMessage im) {
                             TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im;
                             Tsv tsv = new Tsv(_SafeUrl(_BEERLIST));
+                            String msg 
+                                = tsv.getColumn("description").get(Integer.parseInt(tka.getMsg()));
+                            String imgUrl 
+                                = tsv.getColumn("image link").get(Integer.parseInt(tka.getMsg()));
+                            _Log.info(String.format("msg: %s\nimgUrl: %s",msg,imgUrl));
                             return new OutputArrayMessage(new OutputMessage[]{
-                                new TelegramTextOutputMessage(_ud,
-                                        tsv.getColumn("description").get(Integer.parseInt(tka.getMsg()))),
+                                new TelegramImageOutputMessage(_ud, msg, _SafeUrl(imgUrl)),
                                     new TelegramKeyboard(_ud, 
                                             _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null),
                                             new String[]{_GetResource("0780c061af50729a89c0197b"),
@@ -219,9 +225,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             });
                         }
                     })
-            .addTransition("start","choose_product_to_make_order",
-                    _MessageKeyboardComparisonPredicate("1"),
-                    _productKeyboardMessage(_GetResource("67c31fcc0fa6566a955c1792")))
+        .addTransition("start","choose_product_to_make_order",
+                _MessageKeyboardComparisonPredicate("1"),
+                _productKeyboardMessage(_GetResource("67c31fcc0fa6566a955c1792")))
             .addTransition("choose_product_to_make_order","choose_amount",_MessageKeyboardComparisonPredicate(null),
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
@@ -283,8 +289,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                 new String[]{_GetResource("d28703745c047d0c0fdaad71"),
                                     _GetResource("52fa52f003446458b55512e0"),
                                     _GetResource("2c2e02a2cd6ef6958fc10cdd")
-                                }
-                                );
+                        }
+                        );
                     }
                 })
         .addTransition("confirm","choose_product_to_make_order",_MessageKeyboardComparisonPredicate("0"),_productKeyboardMessage("давайте добавим еще"))
@@ -329,15 +335,15 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         .addTransition("confirm","choose_address",
                 _MessageKeyboardComparisonPredicate("1"),
                 _textMessage(_GetResource("054edccc65c193f7583a5773")))
-        .addTransition("choose_address","choose_payment",_IS_TEXT_MESSAGE,
-                new Function<TelegramInputMessage,OutputMessage>() {
-                    @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
-                        _persistentStorage.set("address",im.getMsg());
-                        return new TelegramKeyboard(_ud,_GetResource("1dc02faec7377fc537510e30"),
-                                _PAYMENT_METHOD);
-                    }
-        })
+            .addTransition("choose_address","choose_payment",_IS_TEXT_MESSAGE,
+                    new Function<TelegramInputMessage,OutputMessage>() {
+                        @Override
+                        public OutputMessage apply(TelegramInputMessage im) {
+                            _persistentStorage.set("address",im.getMsg());
+                            return new TelegramKeyboard(_ud,_GetResource("1dc02faec7377fc537510e30"),
+                                    _PAYMENT_METHOD);
+                        }
+                    })
         .addTransition("choose_payment","send",_MessageKeyboardComparisonPredicate(null),
                 new Function<TelegramInputMessage,OutputMessage>() {
                     @Override
@@ -350,18 +356,18 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                 _ProcessTemplate("eb34fa7ee27d1192ef20f960",order),
                                 _D1343B2D16FF152D);
                     }
-        })
+                })
         .addTransition("send","edit_address",_MessageComparisonPredicate("2"),_textMessage("введите адрес"))
-        .addTransition("edit_address","send",_IS_TEXT_MESSAGE,
-                new Function<TelegramInputMessage,OutputMessage>() {
-                    @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
-                        _persistentStorage.set("address",im.getMsg());
-                        return new TelegramKeyboard(_ud,
-                                _ProcessTemplate("eb34fa7ee27d1192ef20f960",_GetOrder(_persistentStorage)),
-                                _D1343B2D16FF152D);
-                    }
-        })
+            .addTransition("edit_address","send",_IS_TEXT_MESSAGE,
+                    new Function<TelegramInputMessage,OutputMessage>() {
+                        @Override
+                        public OutputMessage apply(TelegramInputMessage im) {
+                            _persistentStorage.set("address",im.getMsg());
+                            return new TelegramKeyboard(_ud,
+                                    _ProcessTemplate("eb34fa7ee27d1192ef20f960",_GetOrder(_persistentStorage)),
+                                    _D1343B2D16FF152D);
+                        }
+                    })
         .addTransition("send","choose_payment",_MessageComparisonPredicate("1"),
                 new Function<TelegramInputMessage,OutputMessage>() {
                     @Override
@@ -370,7 +376,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         return new TelegramKeyboard(_ud,_GetResource("1dc02faec7377fc537510e30"),
                                 _PAYMENT_METHOD);
                     }
-        })
+                })
         .addTransition("send","start",_MessageComparisonPredicate("0"),
                 new Function<TelegramInputMessage,OutputMessage>() {
                     @Override
@@ -383,8 +389,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         _persistentStorage.set("order","");
                         return new TelegramKeyboard(_ud,"Благодарим за заказ!",new String[]{"Посмотреть описание","Сформировать заказ покупку"});
                     }
-        })
-            ;
+                })
+        ;
         if(_persistentStorage.contains("state")) {
             _Log.info(String.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state")));
             this._currentState = _persistentStorage.get("state");
