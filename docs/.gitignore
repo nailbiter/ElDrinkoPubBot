@@ -1,0 +1,9 @@
+# vim files
+*.swp
+*.swo
+
+# secrets
+secret.txt
+
+# docs
+*.html
