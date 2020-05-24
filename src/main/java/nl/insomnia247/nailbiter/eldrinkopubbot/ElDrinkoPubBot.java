@@ -41,13 +41,19 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
     private PersistentStorage _persistentStorage = null;
     @Override 
     public void accept(String o) {
+        _sendMessageToMasters(o,false);
+    }
+    private void _sendMessageToMasters(String msg,boolean isMarkdown) {
         for(Long masterChatId : _masterChatIds) {
             SendMessage sendMessage = new SendMessage();
             String chatId = Long.toString(masterChatId);
             sendMessage.setChatId(chatId);
-            sendMessage.setText(o);
+            sendMessage.setText(msg);
+            if(isMarkdown) {
+                sendMessage.enableMarkdown(true);
+            }
             try {
-                _Log.info(String.format("sending %s to %s\n",o.toString(),chatId));
+                _Log.info(String.format("sending %s to %s\n",msg,chatId));
                 execute(sendMessage);
             } catch(Exception e) {
                 _Log.info(String.format(" f531ae90faad7adb \n"));
@@ -103,7 +109,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
             _Log.info(" 3c269b0998783662 \n");
         }
     }
-    ElDrinkoPubBot(String dbpass, String botname) {
+    ElDrinkoPubBot(String dbpass,String commit_hash, String botname) {
         _mongoClient = _GetMongoClient(dbpass);
         _config = _MergeJsonObjects(new JSONObject[] {
             new JSONObject(
@@ -127,6 +133,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
             _masterChatIds.add( (long)_config.getJSONObject("telegram").getJSONArray("masterChatIds").getInt(i) );
         }
         _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
+        this._sendMessageToMasters(String.format("updated! now at %s",commit_hash),true);
     }
 
     private static JSONObject _MergeJsonObjects(JSONObject[] objs) {
