@@ -1,4 +1,5 @@
 # ElDrinkoPubBot
+
 ElDrinkoPubBot
 
 ## build
@@ -20,3 +21,7 @@ mvn install
 ./bin/reset_db.pl # if needed
 ./bin/testmode.sh
 ```
+
+## docs
+
+[https://nailbiter.github.io/ElDrinkoPubBot/docs/](https://nailbiter.github.io/ElDrinkoPubBot/docs/)
