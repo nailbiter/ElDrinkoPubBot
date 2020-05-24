@@ -30,6 +30,10 @@
 ```
 Вітаємо!
 Сьогодні ми пропонуємо:
+
+```
+
+```
 {%-for r in products%}
 {{(r[0]|int) + 1}}. {{r[1]}} ({{r[3]}}.00 грн./л.)
 {%-endfor%}
@@ -47,8 +51,6 @@
 ```
 
 ```
-Вітаємо!
-Сьогодні ми пропонуємо:
 {%-for r in products%}
 {{(r[0]|int) + 1}}. {{r[1]}} ({{r[3]}}.00 грн./л.)
 {%-endfor%}
@@ -142,12 +144,6 @@
 ## transition 15
 
 ```
-Замовлення №{{order.count}}; {{order.timestamp}}
-Покупець: {{order.uid}}
-Замовив: {%for r in order.cart%}{{r.name}}-{{r.amount}} л{%if not loop.last%}; {%endif%}{%endfor%}
-Адреса замовлення: {{order.address}}
-Форма сплати: {{order.payment}}
-Сумма до сплати {{order.sum + order.delivery_fee}} грн.
-
+Благодарим за заказ!
 ```
 

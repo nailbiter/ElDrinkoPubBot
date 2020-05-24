@@ -1,5 +1,5 @@
 [
-  ["_","start",["fdb3ef9a7dcc8e36c4fa489f"]],
+  ["_","start",["ae784befe1f1bac4d5929a4a","fdb3ef9a7dcc8e36c4fa489f"]],
   ["start","choose_product_to_see_description",["(кнопки с продуктами)"]],
   ["choose_product_to_see_description","start",["(описание продукта с изображением)","fdb3ef9a7dcc8e36c4fa489f"]],
   ["start","choose_product_to_make_order",["67c31fcc0fa6566a955c1792"]],
@@ -14,5 +14,5 @@
   ["send","edit_address",["введите адрес"]],
   ["edit_address","send",["eb34fa7ee27d1192ef20f960"]],
   ["send","choose_payment",["1dc02faec7377fc537510e30"]],
-  ["send","start",["3804e512b18b339fe8786dbd"]]
+  ["send","start",["Благодарим за заказ!"]]
 ]
