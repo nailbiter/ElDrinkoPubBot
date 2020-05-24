@@ -1,0 +1,18 @@
+digraph {
+  _ -> start;
+  start -> choose_product_to_see_description;
+  choose_product_to_see_description -> start;
+  start -> choose_product_to_make_order;
+  choose_product_to_make_order -> choose_amount;
+  choose_amount -> confirm;
+  confirm -> choose_product_to_make_order;
+  confirm -> delete;
+  delete -> confirm;
+  confirm -> choose_address;
+  choose_address -> choose_payment;
+  choose_payment -> send;
+  send -> edit_address;
+  edit_address -> send;
+  send -> choose_payment;
+  send -> start;
+}
