@@ -32,3 +32,4 @@ my $uri = sprintf("mongodb+srv://%s:%s\@cluster0-ta3pc.gcp.mongodb.net/%s?retryW
 my $client = MongoDB->connect($uri);
 $client->ns("beerbot.data")->delete_one({id=>"340880765"});
 $client->ns("beerbot.proto_data")->delete_one({id=>"340880765"});
+$client->ns("beerbot.dev_data")->delete_one({id=>"340880765"});
