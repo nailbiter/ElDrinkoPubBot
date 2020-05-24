@@ -209,14 +209,15 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         new TelegramKeyboard(_ud, 
                                 _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null), 
                                 new String[]{
-                                    _GetResource("0780c061af50729a89c0197b"),
-                                    _GetResource("3275901e049dae508d9794bd")}
+                                    _GetResource("3275901e049dae508d9794bd"),
+                                    _GetResource("0780c061af50729a89c0197b")
+                                }
                                 )
                     });
                 }
             }
             )
-            .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("0"), _productKeyboardMessage("Выберите продукт"))
+            .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("1"), _productKeyboardMessage("Выберите продукт"))
             .addTransition("choose_product_to_see_description", "start", _MessageKeyboardComparisonPredicate(null), 
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
@@ -238,7 +239,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         }
                     })
         .addTransition("start","choose_product_to_make_order",
-                _MessageKeyboardComparisonPredicate("1"),
+                _MessageKeyboardComparisonPredicate("0"),
                 _productKeyboardMessage(_GetResource("67c31fcc0fa6566a955c1792")))
             .addTransition("choose_product_to_make_order","choose_amount",_MessageKeyboardComparisonPredicate(null),
                     new Function<TelegramInputMessage,OutputMessage>() {

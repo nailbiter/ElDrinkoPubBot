@@ -1,7 +1,11 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
+import java.util.stream.Collectors;
 import com.mongodb.MongoClient;
+import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.model.Filters;
 import java.util.HashMap;
@@ -32,20 +36,22 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
     private String _botname = null;
     private JSONObject _config = null;
     private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
-    private final long _masterChatId;
+    private final List<Long> _masterChatIds = new ArrayList<>();
     private static Logger _Log = LogManager.getLogger(ElDrinkoPubBot.class);
     private PersistentStorage _persistentStorage = null;
     @Override 
     public void accept(String o) {
-        SendMessage sendMessage = new SendMessage();
-        String chatId = Long.toString(_masterChatId);
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(o);
-        try {
-            _Log.info(String.format("sending %s to %s\n",o.toString(),chatId));
-            execute(sendMessage);
-        } catch(Exception e) {
-            _Log.info(String.format(" f531ae90faad7adb \n"));
+        for(Long masterChatId : _masterChatIds) {
+            SendMessage sendMessage = new SendMessage();
+            String chatId = Long.toString(masterChatId);
+            sendMessage.setChatId(chatId);
+            sendMessage.setText(o);
+            try {
+                _Log.info(String.format("sending %s to %s\n",o.toString(),chatId));
+                execute(sendMessage);
+            } catch(Exception e) {
+                _Log.info(String.format(" f531ae90faad7adb \n"));
+            }
         }
     }
     @Override
@@ -99,21 +105,47 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
     }
     ElDrinkoPubBot(String dbpass, String botname) {
         _mongoClient = _GetMongoClient(dbpass);
-        _config = new JSONObject(
+        _config = _MergeJsonObjects(new JSONObject[] {
+            new JSONObject(
                 _mongoClient
                 .getDatabase("beerbot")
                 .getCollection("_keyring")
                 .find(Filters.eq("id",botname))
                 .first()
-                .toJson());
+                .toJson()),
+            new JSONObject(
+                _mongoClient
+                .getDatabase("beerbot")
+                .getCollection("_settings")
+                .find(Filters.eq("id",botname))
+                .first()
+                .toJson())
+        });
         _Log.info(String.format("_config: %s\n",_config.toString()));
         _botname = botname;
-        _masterChatId = (long)_config.getJSONObject("telegram").getInt("masterChatId");
+        for(int i = 0; i < _config.getJSONObject("telegram").getJSONArray("masterChatIds").length(); i++) {
+            _masterChatIds.add( (long)_config.getJSONObject("telegram").getJSONArray("masterChatIds").getInt(i) );
+        }
         _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
-        _Log.info("test");
-        _Log.debug("test");
-        _Log.warn("test");
-        _Log.error("test");
+    }
+
+    private static JSONObject _MergeJsonObjects(JSONObject[] objs) {
+        JSONObject res = new JSONObject(objs[0].toString());
+        for(int i = 1; i < objs.length; i++) {
+            for(String key:objs[i].keySet()) {
+                if(res.has(key) && res.get(key) instanceof JSONObject && objs[i].get(key) instanceof JSONObject) {
+                    JSONObject combinedObj 
+                        = _MergeJsonObjects(new JSONObject[]{
+                            (JSONObject)res.get(key),
+                                (JSONObject)objs[i].get(key)
+                        });
+                    res.put(key,combinedObj);
+                } else {
+                    res.put(key,objs[i].get(key));
+                }
+            }
+        }
+        return res;
     }
 
     @Override

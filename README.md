@@ -15,11 +15,18 @@ mvn install
 ./bin/start.sh
 ```
 
-## run test
+## run staging
 
 ```sh
 ./bin/reset_db.pl # if needed
 ./bin/testmode.sh
+```
+
+## run private dev
+
+```sh
+./bin/reset_db.pl # if needed
+./bin/run_dev.sh
 ```
 
 ## docs
