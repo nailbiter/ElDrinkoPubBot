@@ -126,8 +126,8 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
         return _config.getJSONObject("telegram").getString("token");
     }
 	private static MongoClient _GetMongoClient(String password) {
-		String url = String.format("mongodb+srv://%s:%s@cluster0-ta3pc.gcp.mongodb.net/%s?retryWrites=true&w=majority", 
-	            "nailbiter",password,"beerbot");
+        String mongo = "mongodb+srv://nailbiter:%s@cluster0-ta3pc.gcp.mongodb.net/test?retryWrites=true&w=majority";
+		String url = String.format(mongo,password);
 		MongoClientURI uri = null;
 		try {
 			uri = new MongoClientURI(url);
