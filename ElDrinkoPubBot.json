@@ -1,0 +1,10 @@
+{
+  "id": "ElDrinkoPubBot",
+  "telegram":{
+    "masterChatIds":["145766172"]
+  },
+  "mongodb": {
+    "data": "data",
+    "logs": "logs"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "ProtoElDrinkoPubBot",
+  "telegram":{
+    "masterChatIds":["145766172","340880765"]
+  },
+  "mongodb": {
+    "data": "proto_data",
+    "logs": "proto_logs"
+  }
+}
