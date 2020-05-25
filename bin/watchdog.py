@@ -3,9 +3,11 @@ from argparse import ArgumentParser
 from daemonize import Daemonize
 from random import choices
 import string
-from os import system, getcwd, fork, kill
+from os import system, getcwd, fork, kill, _exit, execv
 from time import sleep
 from signal import signal, SIGINT, SIGKILL
+import os
+from subprocess import call
 
 
 #global const's
@@ -47,14 +49,22 @@ shouldRestartCallback = GithubChecker()
 while True:
     pid = fork()
     if(pid==0):
-        system(args.command)
-        exit(0)
+        #retcode = call(args.command,shell=True)
+        execv(args.command,[args.command])
+        print(f"retcode: {retcode}")
+        _exit(0)
     else:
         while True:
             sleep(REFRESH_PERIOD_SECONDS)
             if shouldRestartCallback():
                 print(f"pid: {pid}")
-                kill(pid, SIGKILL)
+                pgrp = os.getpgid(pid)
+                print(f"pgrp: {pgrp}")
+                mypid = os.getpid()
+                mypgrp = os.getpgid(mypid)
+                print((mypid,mypgrp))
+                os.killpg(pgrp, SIGINT)
+                #kill(pid, SIGKILL)
                 break
 
 #action = Action(args.command,getcwd())
