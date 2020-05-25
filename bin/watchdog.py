@@ -22,14 +22,6 @@ class GithubChecker:
     def __call__(self):
         print("should restart callback")
         return True
-class Action:    
-    def __init__(self,command,curdir):
-        self.command = command
-        self.curdir = curdir
-        print(f"Action.init: {self.command} {self.curdir}")
-    def __call__(self,**kwargs):
-        print(f"command: {self.command}")
-        system(f"cd {self.curdir} && {self.command}")
 def kill_child(p):
     print(f"pid: {p}")
     pgrp = os.getpgid(p)
