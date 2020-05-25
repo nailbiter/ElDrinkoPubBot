@@ -3,14 +3,14 @@ from argparse import ArgumentParser
 from daemonize import Daemonize
 from random import choices
 import string
-from os import system, getcwd
+from os import system, getcwd, fork, kill
 from time import sleep
-from signal import signal, SIGINT
+from signal import signal, SIGINT, SIGKILL
 
 
 #global const's
 PID = f"/tmp/{''.join(choices(list('_-'+string.ascii_lowercase+string.ascii_uppercase+string.digits),k=12))}.pid"
-REFRESH_PERIOD_SECONDS = 2
+REFRESH_PERIOD_SECONDS = 30
 #global var's
 #procedures
 class GithubChecker:
@@ -42,13 +42,27 @@ parser.add_argument("branch",help="branch name")
 parser.add_argument("command",help="command to execute on hash change")
 args = parser.parse_args()
 print(f"getcwd: {getcwd()}")
-action = Action(args.command,getcwd())
-daemon = Daemonize(app="test_app", pid=PID, action=action)
-signal(SIGINT,OnSigterm(daemon))
 shouldRestartCallback = GithubChecker()
-daemon.start()
+
 while True:
-    sleep(REFRESH_PERIOD_SECONDS)
-    if(shouldRestartCallback()):
-        daemon.exit()
-        daemon.start()
+    pid = fork()
+    if(pid==0):
+        system(args.command)
+        exit(0)
+    else:
+        while True:
+            sleep(REFRESH_PERIOD_SECONDS)
+            if shouldRestartCallback():
+                print(f"pid: {pid}")
+                kill(pid, SIGKILL)
+                break
+
+#action = Action(args.command,getcwd())
+#daemon = Daemonize(app="test_app", pid=PID, action=action)
+#signal(SIGINT,OnSigterm(daemon))
+#daemon.start()
+#while True:
+#    sleep(REFRESH_PERIOD_SECONDS)
+#    if(shouldRestartCallback()):
+#        daemon.exit()
+#        daemon.start()
