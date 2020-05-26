@@ -195,14 +195,6 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         }
         return url;
     }
-    private Function<TelegramInputMessage,OutputMessage> _message(OutputMessage om) {
-        return new Function<TelegramInputMessage,OutputMessage>() {
-            @Override
-            public OutputMessage apply(TelegramInputMessage im) {
-                return om;
-            }
-        };
-    }
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
             .addTransition("_", "start", _TRIVIAL_PREDICATE, new Function<TelegramInputMessage,OutputMessage>() {
