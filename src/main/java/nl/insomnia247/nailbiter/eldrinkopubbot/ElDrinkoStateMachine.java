@@ -195,14 +195,6 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         }
         return url;
     }
-    private Function<TelegramInputMessage,OutputMessage> _message(OutputMessage om) {
-        return new Function<TelegramInputMessage,OutputMessage>() {
-            @Override
-            public OutputMessage apply(TelegramInputMessage im) {
-                return om;
-            }
-        };
-    }
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
             .addTransition("_", "start", _TRIVIAL_PREDICATE, new Function<TelegramInputMessage,OutputMessage>() {
@@ -222,7 +214,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 }
             }
             )
-            .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("1"), _productKeyboardMessage("Выберите продукт"))
+            .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("1"), _productKeyboardMessage(_GetResource("a96f38cbc06abbd47de38fe3")))
             .addTransition("choose_product_to_see_description", "start", _MessageKeyboardComparisonPredicate(null), 
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
@@ -308,7 +300,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         );
                     }
                 })
-        .addTransition("confirm","choose_product_to_make_order",_MessageKeyboardComparisonPredicate("0"),_productKeyboardMessage("давайте добавим еще"))
+            .addTransition("confirm","choose_product_to_make_order",_MessageKeyboardComparisonPredicate("0"),_productKeyboardMessage("давайте добавим еще"))
             .addTransition("confirm","delete",_MessageKeyboardComparisonPredicate("2"),
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
