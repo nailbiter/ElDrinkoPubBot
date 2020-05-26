@@ -11,6 +11,7 @@ import sys
 from urllib import request
 import json
 import re
+from datetime import datetime
 
 
 #global const's
@@ -35,7 +36,7 @@ class GithubChecker:
         self.branch = branch
         self.sha = GithubChecker.__Get_sha(self.login,self.repo,self.branch)
     def __call__(self):
-        print("should restart callback")
+        print(f"should restart callback {datetime.now().isoformat()}")
         new_sha = GithubChecker.__Get_sha(self.login,self.repo,self.branch)
         if(self.sha!=new_sha):
             self.sha = new_sha
