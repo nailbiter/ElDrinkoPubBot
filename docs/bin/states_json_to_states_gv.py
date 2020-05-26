@@ -11,6 +11,9 @@ digraph {
     {%-for d in data%}
     {{state_name_to_num[d[0]]}} -> {{state_name_to_num[d[1]]}};
     {%-endfor%}
+    {%-for name in state_name_to_num%}
+    {{state_name_to_num[name]}} [label="{{name}} (#{{state_name_to_num[name]}})"]
+    {%-endfor%}
 }
 """
 #global var's
