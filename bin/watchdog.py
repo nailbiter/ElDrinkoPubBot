@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
-from daemonize import Daemonize
 from random import choices
 import string
 from os import system, getcwd, fork, kill, _exit, execv
