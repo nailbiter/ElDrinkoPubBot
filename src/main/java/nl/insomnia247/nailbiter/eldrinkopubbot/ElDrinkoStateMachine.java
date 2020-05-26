@@ -230,8 +230,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                 new TelegramImageOutputMessage(_ud, msg, _SafeUrl(imgUrl)),
                                     new TelegramKeyboard(_ud, 
                                             _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null),
-                                            new String[]{_GetResource("0780c061af50729a89c0197b"),
-                                                _GetResource("3275901e049dae508d9794bd")}),
+                                            new String[]{
+                                                _GetResource("3275901e049dae508d9794bd"),
+                                                _GetResource("0780c061af50729a89c0197b")
+                                }
+                                                ),
                             });
                         }
                     })
