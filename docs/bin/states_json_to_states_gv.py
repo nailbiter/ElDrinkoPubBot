@@ -8,8 +8,8 @@ from jinja2 import Template
 #global const's
 GV_TEMPLATE = """
 digraph {
-    {%-for d in data%}
-    {{state_name_to_num[d[0]]}} -> {{state_name_to_num[d[1]]}};
+    {%for i in range(data|length)-%}
+        {{state_name_to_num[data[i][0]]}} -> {{state_name_to_num[data[i][1]]}} [label="t{{i}}"];
     {%-endfor%}
     {%-for name in state_name_to_num%}
     {{state_name_to_num[name]}} [label="{{name}} (#{{state_name_to_num[name]}})"]
