@@ -63,10 +63,6 @@ print(f"getcwd: {getcwd()}")
 shouldRestartCallback = GithubChecker(args.repo_url,args.branch)
 signal(SIGINT, signal_handler)
 
-sleep(30)
-print(shouldRestartCallback())
-exit(1)
-
 while True:
     Child_pid = fork()
     if(Child_pid==0):
