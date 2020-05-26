@@ -214,7 +214,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 }
             }
             )
-            .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("1"), _productKeyboardMessage("Выберите продукт"))
+            .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("1"), _productKeyboardMessage(_GetResource("a96f38cbc06abbd47de38fe3")))
             .addTransition("choose_product_to_see_description", "start", _MessageKeyboardComparisonPredicate(null), 
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
