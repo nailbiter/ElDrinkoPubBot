@@ -403,11 +403,18 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         order.put("uid",_ud.getUserName());
                         order.put("count",_IncrementOrderCount(_masterPersistentStorage));
                         order.put("timestamp", _ORDER_REPORT_FORMATTER.format(new Date()));
-                        _sendOrderCallback.accept(_ProcessTemplate("3804e512b18b339fe8786dbd",order));
+                        _sendOrderCallback.accept(
+                                _ProcessTemplate("3804e512b18b339fe8786dbd",order));
                         _persistentStorage.set("order","");
-                        return new TelegramKeyboard(_ud,"Благодарим за заказ!",new String[]{"Посмотреть описание","Сформировать заказ покупку"});
-                    }
-                })
+                        return new TelegramKeyboard(_ud, 
+                                _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null), 
+                                new String[]{
+                                    _GetResource("3275901e049dae508d9794bd"),
+                                    _GetResource("0780c061af50729a89c0197b")
+                                }
+                        );
+                }
+            })
         ;
         if(_persistentStorage.contains("state")) {
             _Log.info(String.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state")));
