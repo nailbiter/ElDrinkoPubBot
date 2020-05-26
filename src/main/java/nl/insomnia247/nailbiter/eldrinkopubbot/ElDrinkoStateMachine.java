@@ -57,6 +57,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             _GetResource("6c0fe50efe214e5ae28b0d99"),
             _GetResource("458ea57833f558fd9063c425")
     };
+    private final String[] _CDB9E516E47123128F30C596 = new String[] {
+        _GetResource("d28703745c047d0c0fdaad71"),
+            _GetResource("52fa52f003446458b55512e0"),
+            _GetResource("2c2e02a2cd6ef6958fc10cdd")
+    };
     private static Logger _Log = LogManager.getLogger(ElDrinkoStateMachine.class);
     private static MongoCollection<Document> _LogDb = null;
     private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
@@ -299,10 +304,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         _persistentStorage.set("order",order.toString());
                         return new TelegramKeyboard(_ud,
                                 _ProcessTemplate("7a70873a5685da4f9cb2c609",order),
-                                new String[]{_GetResource("d28703745c047d0c0fdaad71"),
-                                    _GetResource("52fa52f003446458b55512e0"),
-                                    _GetResource("2c2e02a2cd6ef6958fc10cdd")
-                        }
+                                _CDB9E516E47123128F30C596
                         );
                     }
                 })
@@ -342,9 +344,12 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         _persistentStorage.set("order",order.toString());
                         return new TelegramKeyboard(_ud,
                                 String.format("удалили \"%s\". Что дальше?",m),
-                                cart.length()>0 ? _D1343B2D16FF152D: new String[]{_D1343B2D16FF152D[0]});
+                                cart.length()>0 ? 
+                                    _CDB9E516E47123128F30C596: 
+                                    new String[]{_CDB9E516E47123128F30C596[0]});
                     }
                 })
+                                
         .addTransition("confirm","choose_address",
                 _MessageKeyboardComparisonPredicate("1"),
                 _textMessage(_GetResource("054edccc65c193f7583a5773")))
