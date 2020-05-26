@@ -15,7 +15,8 @@ from datetime import datetime
 
 
 #global const's
-REFRESH_PERIOD_SECONDS = 30
+REFRESH_PERIOD_SECONDS = 90
+assert( REFRESH_PERIOD_SECONDS > 60 ) #https://developer.github.com/v3/#rate-limiting
 #global var's
 Child_pid = 0
 #procedures
