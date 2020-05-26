@@ -15,7 +15,7 @@ import re
 
 
 #global const's
-REFRESH_PERIOD_SECONDS = 30
+REFRESH_PERIOD_SECONDS = 20
 #global var's
 Child_pid = 0
 #procedures
