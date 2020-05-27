@@ -101,43 +101,44 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         };
     }
-    private Function<TelegramInputMessage,OutputMessage> _keyboardMessage(String msg, String[] categories) {
-        return new Function<TelegramInputMessage,OutputMessage>() {
-            @Override
-            public OutputMessage apply(TelegramInputMessage im) {
-                return new TelegramKeyboard(_ud, _ProcessTemplate(msg,null), categories);
-            }
-        };
-    }
-    private String _ProcessTemplate(String templateName, JSONObject order) {
-        Jinjava jinjava = new Jinjava();
+    private static Map<String,Object> _OrderObjectToJinjaContext(JSONObject order) {
         Map<String, Object> context = new HashMap<String,Object>();
         Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
         List<List<String>> products = tsv.getRecords();
-        context.put("products", products);
-        if(order!=null) {
-            Map<String,Object> orderMap = JSONTools.JSONObjectToMap(order);
-            //FIXME: try to compute `sum` in templates
-            float sum = 0;
-            JSONArray cart = order.getJSONArray("cart");
-            for(int i = 0; i < cart.length(); i++) {
-                JSONObject obj = cart.getJSONObject(i);
-                if(!obj.has("amount")) {
-                    continue;
-                }
-                float beerPrice = Float.parseFloat(products.stream()
-                        .filter(r -> r.get(1).equals(obj.getString("name")))
-                        .findAny()
-                        .orElse(null)
-                        .get(3));
-                sum += beerPrice * obj.getDouble("amount");
+        Map<String,Object> orderMap = JSONTools.JSONObjectToMap(order);
+        //FIXME: try to compute `sum` in templates
+        float sum = 0;
+        JSONArray cart = order.getJSONArray("cart");
+        for(int i = 0; i < cart.length(); i++) {
+            JSONObject obj = cart.getJSONObject(i);
+            if(!obj.has("amount")) {
+                continue;
             }
-            orderMap.put("sum",sum);
-            orderMap.put("delivery_fee",(double)20.0);
-            _Log.info(orderMap.toString());
-            context.put("order",orderMap);
+            float beerPrice = Float.parseFloat(products.stream()
+                    .filter(r -> r.get(1).equals(obj.getString("name")))
+                    .findAny()
+                    .orElse(null)
+                    .get(3));
+            sum += beerPrice * obj.getDouble("amount");
         }
+        orderMap.put("sum",sum);
+        orderMap.put("delivery_fee",(double)20.0);
+        _Log.info(orderMap.toString());
+        context.put("order",orderMap);
         _Log.info(String.format("context: %s",context));
+        return context;
+    }
+    private static String _ProcessTemplate(String templateName, Map<String, Object> additionalContext) {
+        Jinjava jinjava = new Jinjava();
+        Map<String,Object> context = new HashMap<>();
+        Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
+        List<List<String>> products = tsv.getRecords();
+        context.put("products",products);
+        if(additionalContext!=null) {
+            for(String k:additionalContext.keySet()) {
+                context.put(k,additionalContext.get(k));
+            }
+        }
 
         String template = MiscUtils.GetResource(templateName);
         _Log.info(String.format("template: %s",template));
@@ -162,6 +163,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         };
     }
+    /**
+     * @deprecated
+     */
     private Function<TelegramInputMessage,OutputMessage> _productKeyboardMessage(String msg) {
         return new Function<TelegramInputMessage,OutputMessage>() {
             @Override
@@ -171,6 +175,12 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         };
     }
+    private static TelegramKeyboard _InflateTelegramKeyboard(UserData ud, Map<String,Object> env,String msgTemplateResName, String keysTemplateResName) {
+        String keyboardKeys = _ProcessTemplate(keysTemplateResName,env);
+        return new TelegramKeyboard(ud,
+                _ProcessTemplate(msgTemplateResName,env),
+                keyboardKeys.split("\n"));
+    }
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
             .addTransition("_", "start", _TRIVIAL_PREDICATE, new Function<TelegramInputMessage,OutputMessage>() {
@@ -178,14 +188,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 public OutputMessage apply(TelegramInputMessage im) {
                     return new OutputArrayMessage(new OutputMessage[]{
                         new TelegramTextOutputMessage(_ud,
-                                _ProcessTemplate("ae784befe1f1bac4d5929a4a",null)),
-                        new TelegramKeyboard(_ud, 
-                                _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null), 
-                                new String[]{
-                                    MiscUtils.GetResource("3275901e049dae508d9794bd"),
-                                    MiscUtils.GetResource("0780c061af50729a89c0197b")
-                                }
-                                )
+                            _ProcessTemplate("ae784befe1f1bac4d5929a4a",null)),
+                            _InflateTelegramKeyboard(_ud,null,"fdb3ef9a7dcc8e36c4fa489f","16c4082080253eee262c9cf2")
                     });
                 }
             }
@@ -237,7 +241,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             order.getJSONArray("cart").put(obj);
                             _persistentStorage.set("order",order.toString());
                             return new TelegramTextOutputMessage(_ud,
-                                    _ProcessTemplate("ec779e4315ccf36a38c2d470",order));
+                                    _ProcessTemplate("ec779e4315ccf36a38c2d470",
+                                        _OrderObjectToJinjaContext(order)));
                         }
                     })
         .addTransition("choose_amount","confirm",
@@ -274,7 +279,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         obj.put("amount",amount);
                         _persistentStorage.set("order",order.toString());
                         return new TelegramKeyboard(_ud,
-                                _ProcessTemplate("7a70873a5685da4f9cb2c609",order),
+                                _ProcessTemplate("7a70873a5685da4f9cb2c609",
+                                    _OrderObjectToJinjaContext(order)),
                                 _CDB9E516E47123128F30C596
                         );
                     }
@@ -342,7 +348,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         _persistentStorage.set("payment",_PAYMENT_METHOD[i]);
                         JSONObject order = _GetOrder(_persistentStorage);
                         return new TelegramKeyboard(_ud,
-                                _ProcessTemplate("eb34fa7ee27d1192ef20f960",order),
+                                _ProcessTemplate("eb34fa7ee27d1192ef20f960",
+                                    _OrderObjectToJinjaContext(order)),
                                 _D1343B2D16FF152D);
                     }
                 })
@@ -353,7 +360,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         public OutputMessage apply(TelegramInputMessage im) {
                             _persistentStorage.set("address",im.getMsg());
                             return new TelegramKeyboard(_ud,
-                                    _ProcessTemplate("eb34fa7ee27d1192ef20f960",_GetOrder(_persistentStorage)),
+                                    _ProcessTemplate("eb34fa7ee27d1192ef20f960",
+                                        _OrderObjectToJinjaContext(_GetOrder(_persistentStorage))),
                                     _D1343B2D16FF152D);
                         }
                     })
@@ -375,7 +383,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         order.put("count",_IncrementOrderCount(_masterPersistentStorage));
                         order.put("timestamp", _ORDER_REPORT_FORMATTER.format(new Date()));
                         _sendOrderCallback.accept(
-                                _ProcessTemplate("3804e512b18b339fe8786dbd",order));
+                                _ProcessTemplate("3804e512b18b339fe8786dbd",
+                                    _OrderObjectToJinjaContext(order)));
                         _persistentStorage.set("order","");
                         return new TelegramKeyboard(_ud, 
                                 _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null), 
