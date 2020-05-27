@@ -16,3 +16,6 @@ buildNumber.properties
 
 # secrets
 secret.txt
+
+#mongo
+.*.flag.txt

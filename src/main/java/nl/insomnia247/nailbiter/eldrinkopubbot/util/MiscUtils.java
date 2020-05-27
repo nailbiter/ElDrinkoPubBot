@@ -24,11 +24,14 @@ public class MiscUtils {
         return url;
     }
     public static String GetResource(String templateName) {
-        _Log.info(String.format("MiscUtils.GetResource(%s)",templateName));
+        return GetResource(templateName,".txt");
+    }
+    public static String GetResource(String templateName, String ext) {
+        _Log.info(String.format("MiscUtils.GetResource(%s,%s)",templateName,ext));
         String template = null;
         try {
             InputStream in 
-                = MiscUtils.class.getClassLoader().getResource(templateName+".txt").openStream();
+                = MiscUtils.class.getClassLoader().getResource(templateName+ext).openStream();
             template = IOUtils.toString( in );
         } catch(Exception e) {
             _Log.info(" 60a93278bbe5f78d \n");
