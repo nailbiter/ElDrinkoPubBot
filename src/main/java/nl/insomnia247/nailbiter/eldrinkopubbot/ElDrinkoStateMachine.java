@@ -2,7 +2,6 @@ package nl.insomnia247.nailbiter.eldrinkopubbot;
 import com.hubspot.jinjava.Jinjava;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramImageOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboardAnswer;
-import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
@@ -46,20 +44,6 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private final PersistentStorage _persistentStorage;
     private final PersistentStorage _masterPersistentStorage;
     private final Consumer<String>  _sendOrderCallback;
-    private final String[] _PAYMENT_METHOD = new String[]{
-        MiscUtils.GetResource("04a01e8e5b9d67c12e77ac9b"),
-            MiscUtils.GetResource("3bb515ee38b009362e946b37")
-    };
-    private final String[] _D1343B2D16FF152D = new String[] {
-        MiscUtils.GetResource("9c6abf272ea0b6c0acbefa27"),
-            MiscUtils.GetResource("6c0fe50efe214e5ae28b0d99"),
-            MiscUtils.GetResource("458ea57833f558fd9063c425")
-    };
-    private final String[] _CDB9E516E47123128F30C596 = new String[] {
-        MiscUtils.GetResource("d28703745c047d0c0fdaad71"),
-            MiscUtils.GetResource("52fa52f003446458b55512e0"),
-            MiscUtils.GetResource("2c2e02a2cd6ef6958fc10cdd")
-    };
     private static Logger _Log = LogManager.getLogger(ElDrinkoStateMachine.class);
     private static MongoCollection<Document> _LogDb = null;
     private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
@@ -139,6 +123,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 context.put(k,additionalContext.get(k));
             }
         }
+        _Log.info(String.format("_ProcessTemplate: context before rendering: %s",context));
 
         String template = MiscUtils.GetResource(templateName);
         _Log.info(String.format("template: %s",template));
@@ -163,23 +148,12 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         };
     }
-    /**
-     * @deprecated
-     */
-    private Function<TelegramInputMessage,OutputMessage> _productKeyboardMessage(String msg) {
-        return new Function<TelegramInputMessage,OutputMessage>() {
-            @Override
-            public OutputMessage apply(TelegramInputMessage im) {
-                Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
-                return new TelegramKeyboard(_ud, msg, tsv.getColumn("name").toArray(new String[]{}));
-            }
-        };
-    }
     private static TelegramKeyboard _InflateTelegramKeyboard(UserData ud, Map<String,Object> env,String msgTemplateResName, String keysTemplateResName) {
         String keyboardKeys = _ProcessTemplate(keysTemplateResName,env);
-        return new TelegramKeyboard(ud,
-                _ProcessTemplate(msgTemplateResName,env),
-                keyboardKeys.split("\n"));
+        String keyboardMsg = _ProcessTemplate(msgTemplateResName,env);
+        _Log.info(String.format("keyboardMsg: %s",keyboardMsg));
+        _Log.info(String.format("keyboardKeys: %s",keyboardKeys));
+        return new TelegramKeyboard(ud,keyboardMsg,keyboardKeys.split("\n"));
     }
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
@@ -194,7 +168,16 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 }
             }
             )
-            .addTransition("start", "choose_product_to_see_description", _MessageKeyboardComparisonPredicate("1"), _productKeyboardMessage(MiscUtils.GetResource("a96f38cbc06abbd47de38fe3")))
+            .addTransition("start", "choose_product_to_see_description", 
+                    _MessageKeyboardComparisonPredicate("1"), 
+                    new Function<TelegramInputMessage,OutputMessage>() {
+                        @Override
+                        public OutputMessage apply(TelegramInputMessage im) {
+                            return _InflateTelegramKeyboard(_ud,null,
+                                    "a96f38cbc06abbd47de38fe3","76a5127e87e48a4e6759d248");
+                        }
+                    }
+                    )
             .addTransition("choose_product_to_see_description", "start", _MessageKeyboardComparisonPredicate(null), 
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
@@ -208,19 +191,20 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             _Log.info(String.format("msg: %s\nimgUrl: %s",msg,imgUrl));
                             return new OutputArrayMessage(new OutputMessage[]{
                                 new TelegramImageOutputMessage(_ud, msg, MiscUtils.SafeUrl(imgUrl)),
-                                    new TelegramKeyboard(_ud, 
-                                            _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null),
-                                            new String[]{
-                                                MiscUtils.GetResource("3275901e049dae508d9794bd"),
-                                                MiscUtils.GetResource("0780c061af50729a89c0197b")
-                                }
-                                                ),
+                                _InflateTelegramKeyboard(_ud,null,
+                                        "fdb3ef9a7dcc8e36c4fa489f","16c4082080253eee262c9cf2")
                             });
                         }
                     })
         .addTransition("start","choose_product_to_make_order",
                 _MessageKeyboardComparisonPredicate("0"),
-                _productKeyboardMessage(MiscUtils.GetResource("67c31fcc0fa6566a955c1792")))
+                new Function<TelegramInputMessage,OutputMessage>() {
+                    @Override
+                    public OutputMessage apply(TelegramInputMessage im) {
+                        return _InflateTelegramKeyboard(_ud,null,
+                                "67c31fcc0fa6566a955c1792","76a5127e87e48a4e6759d248");
+                    }
+                })
             .addTransition("choose_product_to_make_order","choose_amount",_MessageKeyboardComparisonPredicate(null),
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
@@ -278,31 +262,32 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         JSONObject obj = cart.getJSONObject(cart.length()-1);
                         obj.put("amount",amount);
                         _persistentStorage.set("order",order.toString());
-                        return new TelegramKeyboard(_ud,
-                                _ProcessTemplate("7a70873a5685da4f9cb2c609",
-                                    _OrderObjectToJinjaContext(order)),
-                                _CDB9E516E47123128F30C596
-                        );
+                        return _InflateTelegramKeyboard(_ud,_OrderObjectToJinjaContext(order),
+                                "7a70873a5685da4f9cb2c609","494f92141fc09881489ff307"
+                                );
                     }
                 })
-            .addTransition("confirm","choose_product_to_make_order",_MessageKeyboardComparisonPredicate("0"),_productKeyboardMessage("давайте добавим еще"))
+            .addTransition("confirm","choose_product_to_make_order",
+                    _MessageKeyboardComparisonPredicate("0"),
+                    new Function<TelegramInputMessage,OutputMessage>() {
+                        @Override
+                        public OutputMessage apply(TelegramInputMessage im) {
+                            return _IncrementOrderCount(_ud,null,
+                                    "5ab45bdbebe1bd5cdaccb425",
+                                    "76a5127e87e48a4e6759d248"
+                                    );
+                        }
+            })
             .addTransition("confirm","delete",_MessageKeyboardComparisonPredicate("2"),
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
                         public OutputMessage apply(TelegramInputMessage im) {
-                            _Log.info(String.format(" 1ee9068eb4441ddd \n"));
-                            JSONArray cart = new JSONObject(_persistentStorage.get("order")).getJSONArray("cart");
-                            _Log.info(String.format(" 17694b345db033db \n"));
-                            _Log.info(String.format("cart: %s\n",cart));
-                            ArrayList<String> res = new ArrayList<String>();
-                            for(int i = 0; i < cart.length(); i++) {
-                                res.add(String.format("%.1f литров пива \"%s\"",
-                                            cart.getJSONObject(i).getDouble("amount"),
-                                            cart.getJSONObject(i).getString("name")
-                                            ));
-                            }
-                            _Log.info(String.format("res: %s\n",res));
-                            return new TelegramKeyboard(_ud,"что будем удалять?",res.toArray(new String[]{}));
+                            JSONObject order = new JSONObject(_persistentStorage.get("order"));
+                            _Log.info(String.format("order: %s\n",order));
+                            return _InflateTelegramKeyboard(_ud,
+                                    _OrderObjectToJinjaContext(order),
+                                    "2ae6c7859b755abf51a3289b",
+                                    "ac9a00c3bc0e96735b047a7e");
                         }
                     })
         .addTransition("delete","confirm",_MessageKeyboardComparisonPredicate(null),
@@ -313,20 +298,15 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         int i = Integer.parseInt(tka.getMsg());
                         JSONObject order = new JSONObject(_persistentStorage.get("order"));
                         JSONArray cart = order.getJSONArray("cart");
-                        String m = String.format("%.1f литров пива \"%s\"",
-                                cart.getJSONObject(i).getDouble("amount"),
-                                cart.getJSONObject(i).getString("name")
-                                );
+                        JSONObject removed = cart.getJSONObject(i);
                         cart.remove(i);
                         _persistentStorage.set("order",order.toString());
-                        return new TelegramKeyboard(_ud,
-                                String.format("удалили \"%s\". Что дальше?",m),
-                                cart.length()>0 ? 
-                                    _CDB9E516E47123128F30C596: 
-                                    new String[]{_CDB9E516E47123128F30C596[0]});
+                        Map<String,Object> orderMap = _OrderObjectToJinjaContext(order);
+                        orderMap.put("removed",JSONTools.JSONObjectToMap(removed));
+                        return _InflateTelegramKeyboard(_ud,orderMap,
+                                "754a44a81961ac43dda890e7","494f92141fc09881489ff307");
                     }
                 })
-                                
         .addTransition("confirm","choose_address",
                 _MessageKeyboardComparisonPredicate("1"),
                 _textMessage(MiscUtils.GetResource("054edccc65c193f7583a5773")))
@@ -335,8 +315,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         @Override
                         public OutputMessage apply(TelegramInputMessage im) {
                             _persistentStorage.set("address",im.getMsg());
-                            return new TelegramKeyboard(_ud,MiscUtils.GetResource("1dc02faec7377fc537510e30"),
-                                    _PAYMENT_METHOD);
+                            return _InflateTelegramKeyboard(_ud,null,"1dc02faec7377fc537510e30",
+                                    "4ea9a63509e8ed5826a37f8a");
                         }
                     })
         .addTransition("choose_payment","send",_MessageKeyboardComparisonPredicate(null),
@@ -347,22 +327,24 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         int i = Integer.parseInt(tka.getMsg());
                         _persistentStorage.set("payment",_PAYMENT_METHOD[i]);
                         JSONObject order = _GetOrder(_persistentStorage);
-                        return new TelegramKeyboard(_ud,
-                                _ProcessTemplate("eb34fa7ee27d1192ef20f960",
-                                    _OrderObjectToJinjaContext(order)),
-                                _D1343B2D16FF152D);
+                        return _InflateTelegramKeyboard(_ud,_OrderObjectToJinjaContext(order),
+                                "eb34fa7ee27d1192ef20f960",
+                                "a203791aec81dfaf5a187b3d"
+                                );
                     }
                 })
-        .addTransition("send","edit_address",_MessageComparisonPredicate("2"),_textMessage("введите адрес"))
+        .addTransition("send","edit_address",_MessageComparisonPredicate("2"),
+                _textMessage("введите адрес"))
             .addTransition("edit_address","send",_IS_TEXT_MESSAGE,
                     new Function<TelegramInputMessage,OutputMessage>() {
                         @Override
                         public OutputMessage apply(TelegramInputMessage im) {
                             _persistentStorage.set("address",im.getMsg());
-                            return new TelegramKeyboard(_ud,
-                                    _ProcessTemplate("eb34fa7ee27d1192ef20f960",
-                                        _OrderObjectToJinjaContext(_GetOrder(_persistentStorage))),
-                                    _D1343B2D16FF152D);
+                            return _InflateTelegramKeyboard(_ud,
+                                    _OrderObjectToJinjaContext(_GetOrder(_persistentStorage)),
+                                    "eb34fa7ee27d1192ef20f960",
+                                    "a203791aec81dfaf5a187b3d"
+                                    );
                         }
                     })
         .addTransition("send","choose_payment",_MessageComparisonPredicate("1"),
@@ -370,8 +352,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                     @Override
                     public OutputMessage apply(TelegramInputMessage im) {
                         _persistentStorage.set("address",im.getMsg());
-                        return new TelegramKeyboard(_ud,MiscUtils.GetResource("1dc02faec7377fc537510e30"),
-                                _PAYMENT_METHOD);
+                        return _InflateTelegramKeyboard(_ud,null,"1dc02faec7377fc537510e30",
+                                "4ea9a63509e8ed5826a37f8a");
                     }
                 })
         .addTransition("send","start",_MessageComparisonPredicate("0"),
@@ -386,13 +368,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                 _ProcessTemplate("3804e512b18b339fe8786dbd",
                                     _OrderObjectToJinjaContext(order)));
                         _persistentStorage.set("order","");
-                        return new TelegramKeyboard(_ud, 
-                                _ProcessTemplate("fdb3ef9a7dcc8e36c4fa489f",null), 
-                                new String[]{
-                                    MiscUtils.GetResource("3275901e049dae508d9794bd"),
-                                    MiscUtils.GetResource("0780c061af50729a89c0197b")
-                                }
-                        );
+                        return _InflateTelegramKeyboard(_ud,null,
+                                "fdb3ef9a7dcc8e36c4fa489f","16c4082080253eee262c9cf2")
                 }
             })
         ;
