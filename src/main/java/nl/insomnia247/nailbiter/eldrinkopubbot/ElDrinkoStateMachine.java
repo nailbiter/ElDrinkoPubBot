@@ -1,5 +1,6 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
 import com.hubspot.jinjava.Jinjava;
+import org.apache.commons.collections4.ListUtils;
 import com.mongodb.MongoClient;
 import java.net.URL;
 import com.mongodb.client.MongoCollection;
@@ -150,24 +151,29 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         _Log.info(String.format("keyboardKeys: %s",keyboardKeys));
         return new TelegramKeyboard(ud,keyboardMsg,keyboardKeys.split("\n"));
     }
+    private static int _CorrespondenceSearch(String startState,String endState) {
+        return ListUtils.indexOf(
+                JSONTools.JSONArrayToList(_TRANSITIONS.getJSONArray("correspondence")),
+                new org.apache.commons.collections4.Predicate<Object>() {
+                    @Override
+                    public boolean evaluate(Object o) {
+                        List<Object> l = (List<Object>)o;
+                        return l.get(0).equals(startState) && l.get(1).equals(endState);
+                    }
+                });
+    }
     private static OutputMessage _InflateOutputMessage(String startState, String endState, 
             UserData ud,Map<String,Object> env, Object obj) {
         _Log.info(String.format("start _InflateOutputMessageFromJson(%s,%s,%s,%s,%s)",
                     startState,endState,ud,env,obj
                     ));
         JSONArray correspondence = _TRANSITIONS.getJSONArray("correspondence");
-        _Log.info(correspondence);
-        String code = null;
-        for(int i = 0; i < correspondence.length(); i++) {
-            if(correspondence.getJSONArray(i).getString(0).equals(startState) && correspondence.getJSONArray(i).getString(1).equals(endState)) {
-                code = correspondence.getJSONArray(i).getString(2);
-                break;
-            }
-        }
-        assert code!=null;
+        int i = _CorrespondenceSearch(startState,endState);
+        assert i>0;
+        String code = correspondence.getJSONArray(i).getString(3);
         _Log.info(code);
-        return _InflateOutputMessageFromJson(_TRANSITIONS.getJSONObject("transitions").get(code),
-                ud,env,obj);
+        return _InflateOutputMessageFromJson(
+                _TRANSITIONS.getJSONObject("transitions").get(code),ud,env,obj);
     }
     private static OutputMessage _InflateOutputMessageFromJson(Object m, UserData ud, Map<String,Object>env, Object obj) {
         assert m instanceof JSONObject || m instanceof JSONArray;
@@ -200,12 +206,26 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private ElDrinkoStateMachine _addTransition(String start,String end,
             Predicate<TelegramInputMessage> pred,
             Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>> f) {
-        return (ElDrinkoStateMachine) addTransition(start,end,pred, new Function<TelegramInputMessage,OutputMessage>(){
-            @Override
-            public OutputMessage apply(TelegramInputMessage im) {
-                ImmutablePair<Map<String,Object>,Object> pair = f.apply(im);
-                return _InflateOutputMessage(start,end,_ud,pair.left,pair.right);
+        if(pred==null) {
+            int idx = _CorrespondenceSearch(start,end);
+            JSONArray correspondence = _TRANSITIONS.getJSONArray("correspondence");
+            JSONObject obj = correspondence.getJSONArray(idx).getJSONObject(2);
+            if(obj.getString("tag").equals("MessageComparisonPredicate")) {
+                pred = _MessageComparisonPredicate(obj.getString("value"));
+            } else if(obj.getString("tag").equals("MessageKeyboardComparisonPredicate")) {
+                pred = _MessageKeyboardComparisonPredicate(obj.getString("value"));
+            } else {
+                pred = null;
             }
+        }
+        assert pred != null;
+        return (ElDrinkoStateMachine) addTransition(start,end,pred
+                , new Function<TelegramInputMessage,OutputMessage>(){
+                    @Override
+                    public OutputMessage apply(TelegramInputMessage im) {
+                        ImmutablePair<Map<String,Object>,Object> pair = f.apply(im);
+                        return _InflateOutputMessage(start,end,_ud,pair.left,pair.right);
+                    }
         });
     }
     private static Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>> _NM
@@ -297,9 +317,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                 _OrderObjectToJinjaContext(order),null);
                     }
                 })
-            ._addTransition("confirm","choose_product_to_make_order",
-                    _MessageKeyboardComparisonPredicate("0"),_NM)
-            ._addTransition("confirm","delete",_MessageKeyboardComparisonPredicate("2"),
+            ._addTransition("confirm","choose_product_to_make_order",null,_NM)
+            ._addTransition("confirm","delete",null,
                     new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                         @Override
                         public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
@@ -325,7 +344,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         return new ImmutablePair<Map<String,Object>,Object>(orderMap,null);
                     }
                 })
-        ._addTransition("confirm","choose_address",_MessageKeyboardComparisonPredicate("1"),_NM)
+        ._addTransition("confirm","choose_address",null,_NM)
         ._addTransition("choose_address","choose_payment",_IS_TEXT_MESSAGE,
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override

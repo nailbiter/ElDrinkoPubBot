@@ -74,81 +74,106 @@
     [
       "_",
       "start",
+      null,
       "75f676187e00dd85"
     ],
     [
       "start",
       "choose_product_to_see_description",
+      null,
       "950c3e4921e05d14"
     ],
     [
       "choose_product_to_see_description",
       "start",
+      null,
       "72aa7197071b6503"
     ],
     [
       "start",
       "choose_product_to_make_order",
+      null,
       "f4a78dc2c6339be1"
     ],
     [
       "choose_product_to_make_order",
       "choose_amount",
+      null,
       "f02480c016715289"
     ],
     [
       "choose_amount",
       "confirm",
+      null,
       "5e11c9696e9b38f0"
     ],
     [
       "confirm",
       "choose_product_to_make_order",
+      {
+        "tag": "MessageKeyboardComparisonPredicate",
+        "value": "0"
+      },
       "f4a78dc2c6339be1"
     ],
     [
       "confirm",
       "delete",
+      {
+        "tag": "MessageKeyboardComparisonPredicate",
+        "value": "1"
+      },
       "04dc388df66f8e8c"
     ],
     [
       "delete",
       "confirm",
+      null,
       "5e11c9696e9b38f0"
     ],
     [
       "confirm",
       "choose_address",
+      {
+        "tag": "MessageKeyboardComparisonPredicate",
+        "value": "2"
+      },
       "0f13e63d9cd69630"
     ],
     [
       "choose_address",
       "choose_payment",
+      null,
       "8e0edde4a3199d0c"
     ],
     [
       "choose_payment",
       "send",
+      null,
       "fa702a44b70ddcae"
     ],
     [
       "send",
       "edit_address",
+      null,
       "177680903e499486"
     ],
     [
       "edit_address",
       "send",
+      null,
       "fa702a44b70ddcae"
     ],
     [
       "send",
       "choose_payment",
+      null,
       "8e0edde4a3199d0c"
     ],
     [
       "send",
       "start",
+      null,
       "48c6907046b03db8"
     ]
   ]

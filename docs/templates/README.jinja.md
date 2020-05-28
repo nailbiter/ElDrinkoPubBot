@@ -7,7 +7,7 @@
 ## transitions
 
 {%for c in correspondence-%}
-* [{{c[0]}} -> {{c[1]}} (transition `t_{{c[2][:cut]}}`)](#transition-t_{{c[2][:cut]}})
+* [{{c[0]}} -> {{c[1]}} (transition `t_{{c[3][:cut]}}`)](#transition-t_{{c[3][:cut]}})
 {%endfor-%}
 
 

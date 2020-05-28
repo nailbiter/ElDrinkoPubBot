@@ -5,7 +5,7 @@ import sys
 
 with open(sys.argv[1]) as f:
     d = json.load(f)
-    transition_codes_set = {c[2] for c in d["correspondence"]}
+    transition_codes_set = {c[3] for c in d["correspondence"]}
     cut = 0
     while(len({s[:cut] for s in transition_codes_set})<len(transition_codes_set)):
         cut += 1
