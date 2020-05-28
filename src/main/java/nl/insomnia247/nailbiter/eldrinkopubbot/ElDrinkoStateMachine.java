@@ -270,7 +270,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         TelegramTextInputMessage ttim = (TelegramTextInputMessage) tim;
                         float amount = 0;
                         try {
-                            amount = Float.parseFloat(ttim.getMsg());
+                            amount = MiscUtils.ParseFloat(ttim.getMsg());
                         } catch(Exception e) {
                             return false;
                         }
