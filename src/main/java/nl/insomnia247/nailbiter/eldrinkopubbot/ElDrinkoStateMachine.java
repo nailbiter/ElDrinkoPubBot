@@ -102,7 +102,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             sum += beerPrice * obj.getDouble("amount");
         }
         orderMap.put("sum",sum);
-        orderMap.put("delivery_fee",(double)20.0);
+        orderMap.put("delivery_fee",sum>=250 ? (double)0.0 : (double)20.0);
         _Log.info(orderMap.toString());
         context.put("order",orderMap);
         _Log.info(String.format("context: %s",context));
