@@ -1,0 +1,3 @@
+{%for p in products-%}
+{{p[1]}}
+{%endfor-%}

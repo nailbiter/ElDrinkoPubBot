@@ -27,4 +27,8 @@ public class TelegramInputMessage implements InputMessage {
             return null;
         }
     }
+    @Override
+    public String toString() {
+        return String.format("TelegramInputMessage(%s)",_msg);
+    }
 }
