@@ -25,12 +25,16 @@ public class MiscUtilsTest extends TestCase {
         float f = 0.0f;
         try {
             f = MiscUtils.ParseFloat("3.5");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            fail(String.format("fail: %s",e.getMessage()));
+        }
         assertEquals(f,3.5f);
         try {
-            f = MiscUtils.ParseFloat("4,9");
-        } catch (Exception e) {}
-        assertEquals(f,4.9f);
+            f = MiscUtils.ParseFloat("1,5");
+        } catch (Exception e) {
+            fail(String.format("fail: %s",e.getMessage()));
+        }
+        assertEquals(f,1.5f);
         try {
             f = MiscUtils.ParseFloat("abc");
             fail("missing exception");

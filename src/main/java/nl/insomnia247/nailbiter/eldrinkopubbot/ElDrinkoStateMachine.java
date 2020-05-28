@@ -286,7 +286,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         TelegramTextInputMessage ttim = (TelegramTextInputMessage) im;
                         float amount = 0;
                         try {
-                            amount = Float.parseFloat(ttim.getMsg());
+                            amount = MiscUtils.ParseFloat(ttim.getMsg());
                         } catch(Exception e) {}
                         JSONObject order = new JSONObject(_persistentStorage.get("order"));
                         JSONArray cart = order.getJSONArray("cart");
