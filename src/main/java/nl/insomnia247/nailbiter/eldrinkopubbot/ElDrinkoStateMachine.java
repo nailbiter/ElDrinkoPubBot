@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.KeyboardAnswer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputArrayMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
@@ -79,14 +80,6 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 return true;
             }
         };
-    private Function<TelegramInputMessage,OutputMessage> _textMessage(String msg) {
-        return new Function<TelegramInputMessage,OutputMessage>() {
-            @Override
-            public OutputMessage apply(TelegramInputMessage im) {
-                return new TelegramTextOutputMessage(_ud, msg);
-            }
-        };
-    }
     private static Map<String,Object> _OrderObjectToJinjaContext(JSONObject order) {
         Map<String, Object> context = new HashMap<String,Object>();
         Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
@@ -159,7 +152,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     private static OutputMessage _InflateOutputMessage(String startState, String endState, 
             UserData ud,Map<String,Object> env, Object obj) {
-        _Log.info("start _InflateOutputMessageFromJson");
+        _Log.info(String.format("start _InflateOutputMessageFromJson(%s,%s,%s,%s,%s)",
+                    startState,endState,ud,env,obj
+                    ));
         JSONArray correspondence = _TRANSITIONS.getJSONArray("correspondence");
         _Log.info(correspondence);
         String code = null;
@@ -202,29 +197,33 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         }
     }
+    private ElDrinkoStateMachine _addTransition(String start,String end,
+            Predicate<TelegramInputMessage> pred,
+            Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>> f) {
+        return (ElDrinkoStateMachine) addTransition(start,end,pred, new Function<TelegramInputMessage,OutputMessage>(){
+            @Override
+            public OutputMessage apply(TelegramInputMessage im) {
+                ImmutablePair<Map<String,Object>,Object> pair = f.apply(im);
+                return _InflateOutputMessage(start,end,_ud,pair.left,pair.right);
+            }
+        });
+    }
+    private static Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>> _NM
+        = new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>(){
+            @Override
+            public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                return new ImmutablePair <Map<String,Object>,Object>(null,null);
+            }
+        };
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
-            .addTransition("_", "start", _TRIVIAL_PREDICATE, new Function<TelegramInputMessage,OutputMessage>() {
-                @Override
-                public OutputMessage apply(TelegramInputMessage im) {
-                    return _InflateOutputMessage("_","start",_ud,null,null);
-                }
-            }
-            )
-            .addTransition("start", "choose_product_to_see_description", 
-                    _MessageKeyboardComparisonPredicate("1"), 
-                    new Function<TelegramInputMessage,OutputMessage>() {
+            ._addTransition("_", "start", _TRIVIAL_PREDICATE, _NM)
+            ._addTransition("start", "choose_product_to_see_description", 
+                    _MessageKeyboardComparisonPredicate("1"), _NM)
+            ._addTransition("choose_product_to_see_description", "start", _MessageKeyboardComparisonPredicate(null), 
+                    new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                         @Override
-                        public OutputMessage apply(TelegramInputMessage im) {
-                            return _InflateOutputMessage("start",
-                                    "choose_product_to_see_description",_ud,null,null);
-                        }
-                    }
-                    )
-            .addTransition("choose_product_to_see_description", "start", _MessageKeyboardComparisonPredicate(null), 
-                    new Function<TelegramInputMessage,OutputMessage>() {
-                        @Override
-                        public OutputMessage apply(TelegramInputMessage im) {
+                        public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                             TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im;
                             Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
                             String imgUrl 
@@ -232,23 +231,16 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             Map<String,Object> map = new HashMap<>();
                             map.put("i",Integer.parseInt(tka.getMsg()));
                             _Log.info(String.format("imgUrl: %s",imgUrl));
-                            return _InflateOutputMessage("choose_product_to_see_description",
-                                    "start",_ud,map,MiscUtils.SafeUrl(imgUrl));
+                            return new ImmutablePair<Map<String,Object>,Object>(map,
+                                    MiscUtils.SafeUrl(imgUrl));
                         }
                     })
-        .addTransition("start","choose_product_to_make_order",
-                _MessageKeyboardComparisonPredicate("0"),
-                new Function<TelegramInputMessage,OutputMessage>() {
-                    @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
-                        return _InflateOutputMessage("start","choose_product_to_make_order",
-                                _ud,null,null);
-                    }
-                })
-            .addTransition("choose_product_to_make_order","choose_amount",_MessageKeyboardComparisonPredicate(null),
-                    new Function<TelegramInputMessage,OutputMessage>() {
+            ._addTransition("start","choose_product_to_make_order",
+                    _MessageKeyboardComparisonPredicate("0"),_NM)
+            ._addTransition("choose_product_to_make_order","choose_amount",_MessageKeyboardComparisonPredicate(null),
+                    new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                         @Override
-                        public OutputMessage apply(TelegramInputMessage im) {
+                        public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                             TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im;
                             int i = Integer.parseInt(tka.getMsg());
                             Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
@@ -264,11 +256,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             obj.put("name",name);
                             order.getJSONArray("cart").put(obj);
                             _persistentStorage.set("order",order.toString());
-                            return _InflateOutputMessage("choose_product_to_make_order",
-                                    "choose_amount",_ud,_OrderObjectToJinjaContext(order),null);
+                            return new ImmutablePair<Map<String,Object>,Object>(
+                                    _OrderObjectToJinjaContext(order),null);
                         }
                     })
-        .addTransition("choose_amount","confirm",
+        ._addTransition("choose_amount","confirm",
                 new Predicate<TelegramInputMessage>() {
                     @Override
                     public boolean test(TelegramInputMessage tim) {
@@ -288,9 +280,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         return true;
                     }
                 },
-                new Function<TelegramInputMessage,OutputMessage>() {
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                         TelegramTextInputMessage ttim = (TelegramTextInputMessage) im;
                         float amount = 0;
                         try {
@@ -301,33 +293,26 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         JSONObject obj = cart.getJSONObject(cart.length()-1);
                         obj.put("amount",amount);
                         _persistentStorage.set("order",order.toString());
-                        return _InflateOutputMessage("choose_amount","confirm",
-                                _ud,_OrderObjectToJinjaContext(order),null);
+                        return new ImmutablePair<Map<String,Object>,Object>(
+                                _OrderObjectToJinjaContext(order),null);
                     }
                 })
-            .addTransition("confirm","choose_product_to_make_order",
-                    _MessageKeyboardComparisonPredicate("0"),
-                    new Function<TelegramInputMessage,OutputMessage>() {
+            ._addTransition("confirm","choose_product_to_make_order",
+                    _MessageKeyboardComparisonPredicate("0"),_NM)
+            ._addTransition("confirm","delete",_MessageKeyboardComparisonPredicate("2"),
+                    new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                         @Override
-                        public OutputMessage apply(TelegramInputMessage im) {
-                            return _InflateOutputMessage("confirm","choose_product_to_make_order",
-                                    _ud,null,null);
-                        }
-            })
-            .addTransition("confirm","delete",_MessageKeyboardComparisonPredicate("2"),
-                    new Function<TelegramInputMessage,OutputMessage>() {
-                        @Override
-                        public OutputMessage apply(TelegramInputMessage im) {
+                        public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                             JSONObject order = new JSONObject(_persistentStorage.get("order"));
                             _Log.info(String.format("order: %s\n",order));
-                            return _InflateOutputMessage("confirm","delete",
-                                    _ud,_OrderObjectToJinjaContext(order),null);
+                            return new ImmutablePair<Map<String,Object>,Object>(
+                                    _OrderObjectToJinjaContext(order),null);
                         }
                     })
-        .addTransition("delete","confirm",_MessageKeyboardComparisonPredicate(null),
-                new Function<TelegramInputMessage,OutputMessage>() {
+        ._addTransition("delete","confirm",_MessageKeyboardComparisonPredicate(null),
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                         TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im;
                         int i = Integer.parseInt(tka.getMsg());
                         JSONObject order = new JSONObject(_persistentStorage.get("order"));
@@ -337,31 +322,22 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         _persistentStorage.set("order",order.toString());
                         Map<String,Object> orderMap = _OrderObjectToJinjaContext(order);
                         orderMap.put("removed",JSONTools.JSONObjectToMap(removed));
-                        return _InflateOutputMessage("delete","confirm",_ud,orderMap,null);
+                        return new ImmutablePair<Map<String,Object>,Object>(orderMap,null);
                     }
                 })
-        .addTransition("confirm","choose_address",
-                _MessageKeyboardComparisonPredicate("1"),
-                    new Function<TelegramInputMessage,OutputMessage>() {
-                        @Override
-                        public OutputMessage apply(TelegramInputMessage im) {
-                            return _InflateOutputMessage("confirm","choose_address",_ud,null,null);
-                        }
-                    }
-                )
-            .addTransition("choose_address","choose_payment",_IS_TEXT_MESSAGE,
-                    new Function<TelegramInputMessage,OutputMessage>() {
-                        @Override
-                        public OutputMessage apply(TelegramInputMessage im) {
-                            _persistentStorage.set("address",im.getMsg());
-                            return _InflateOutputMessage("choose_address","choose_payment",
-                                    _ud,null,null);
-                        }
-                    })
-        .addTransition("choose_payment","send",_MessageKeyboardComparisonPredicate(null),
-                new Function<TelegramInputMessage,OutputMessage>() {
+        ._addTransition("confirm","choose_address",_MessageKeyboardComparisonPredicate("1"),_NM)
+        ._addTransition("choose_address","choose_payment",_IS_TEXT_MESSAGE,
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                        _persistentStorage.set("address",im.getMsg());
+                        return new ImmutablePair<Map<String,Object>,Object>(null,null);
+                    }
+        }        )
+        ._addTransition("choose_payment","send",_MessageKeyboardComparisonPredicate(null),
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
+                    @Override
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                         _Log.info(" b7aec7c9b5d9a3b2 \n");
                         TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im;
                         _Log.info(tka);
@@ -371,39 +347,31 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         _persistentStorage.set("payment", paymentMethods.split("\n")[i]);
                         JSONObject order = _GetOrder(_persistentStorage);
                         Map<String,Object> orderMap = _OrderObjectToJinjaContext(order);
-                        return _InflateOutputMessage("choose_payment","send",_ud,orderMap,null);
+                        return new ImmutablePair<Map<String,Object>,Object>(orderMap,null);
                     }
                 })
-        .addTransition("send","edit_address",_MessageComparisonPredicate("2"),
-                new Function<TelegramInputMessage,OutputMessage>() {
+        ._addTransition("send","edit_address",_MessageComparisonPredicate("2"),_NM)
+        ._addTransition("edit_address","send",_IS_TEXT_MESSAGE,
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
-                        return _InflateOutputMessage("send","edit_address",_ud,null,null);
-                    }
-                })
-            .addTransition("edit_address","send",_IS_TEXT_MESSAGE,
-                    new Function<TelegramInputMessage,OutputMessage>() {
-                        @Override
-                        public OutputMessage apply(TelegramInputMessage im) {
-                            _persistentStorage.set("address",im.getMsg());
-                            return _InflateOutputMessage("edit_address","send",_ud,
-                                    _OrderObjectToJinjaContext(_GetOrder(_persistentStorage)),
-                                    null);
-                        }
-                    })
-        .addTransition("send","choose_payment",_MessageComparisonPredicate("1"),
-                new Function<TelegramInputMessage,OutputMessage>() {
-                    @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                         _persistentStorage.set("address",im.getMsg());
-                        return _InflateOutputMessage("send","choose_product_to_see_description",
-                                _ud,null,null);
+                        return new ImmutablePair<Map<String,Object>,Object>(
+                                _OrderObjectToJinjaContext(_GetOrder(_persistentStorage)),null);
                     }
                 })
-        .addTransition("send","start",_MessageComparisonPredicate("0"),
-                new Function<TelegramInputMessage,OutputMessage>() {
+        ._addTransition("send","choose_payment",_MessageComparisonPredicate("1"),
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
-                    public OutputMessage apply(TelegramInputMessage im) {
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                        _persistentStorage.set("address",im.getMsg());
+                        return new ImmutablePair<Map<String,Object>,Object>(null,null);
+                    }
+                })
+        ._addTransition("send","start",_MessageComparisonPredicate("0"),
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
+                    @Override
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                         JSONObject order = _GetOrder(_persistentStorage);
                         order.put("uid",_ud.getUserName());
                         order.put("count",_IncrementOrderCount(_masterPersistentStorage));
@@ -412,7 +380,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                                 _ProcessTemplate("3804e512b18b339fe8786dbd",
                                     _OrderObjectToJinjaContext(order)));
                         _persistentStorage.set("order","");
-                        return _InflateOutputMessage("send","state",_ud,null,null);
+                        return new ImmutablePair<Map<String,Object>,Object>(null,null);
                 }
             })
         ;
