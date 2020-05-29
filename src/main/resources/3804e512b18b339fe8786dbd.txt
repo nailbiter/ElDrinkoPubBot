@@ -3,4 +3,4 @@
 Замовив: {%for r in order.cart%}{{r.name}}-{{r.amount}} л{%if not loop.last%}; {%endif%}{%endfor%}
 Адреса замовлення: {{order.address}}
 Форма сплати: {{order.payment}}
-Сумма до сплати {{order.sum + order.delivery_fee}} грн.
+Сума до сплати {{(order.sum + order.delivery_fee)|myprintf}} грн.

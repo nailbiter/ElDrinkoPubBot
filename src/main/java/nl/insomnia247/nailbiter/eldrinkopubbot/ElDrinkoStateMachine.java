@@ -1,5 +1,4 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
-import com.hubspot.jinjava.Jinjava;
 import org.apache.commons.collections4.ListUtils;
 import com.mongodb.MongoClient;
 import java.net.URL;
@@ -22,6 +21,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachine;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.TemplateEngine;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramImageOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
@@ -109,7 +109,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         return context;
     }
     private static String _ProcessTemplate(String templateName, Map<String, Object> additionalContext) {
-        Jinjava jinjava = new Jinjava();
+        TemplateEngine _jinjava = new TemplateEngine();
         Map<String,Object> context = new HashMap<>();
         Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
         List<List<String>> products = tsv.getRecords();
@@ -124,7 +124,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         String template = MiscUtils.GetResource(templateName);
         _Log.info(String.format("template: %s",template));
         String renderedTemplate = MiscUtils.GetResource(templateName);
-        renderedTemplate = jinjava.render(template, context);	
+        renderedTemplate = _jinjava.render(template, context);	
         _Log.info(String.format("renderedTemplate: %s",renderedTemplate));
         return renderedTemplate;
     }
