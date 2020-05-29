@@ -23,6 +23,7 @@
 * [send -> choose_payment (transition `t_8e`)](#transition-t_8e)
 * [send -> idle (transition `t_48`)](#transition-t_48)
 * [idle -> start (transition `t_19`)](#transition-t_19)
+* [(any state) -> start (transition `t_75`)](#transition-t_75)
 
 ## transition t_04
 
@@ -77,10 +78,10 @@
 ### `7a70873a5685da4f9cb2c609`
 
 ```
-Ви замовили {{(order.cart|last)['amount']}} л {{(order.cart|last)['name']}}.
-Сума замовлення: {{order.sum}} грн.
-Сума за доставку: {{order.delivery_fee}} грн.
-Сума до сплати: {{order.sum + order.delivery_fee}} грн.
+Ви замовили {%for r in order.cart%}{{r.name}}-{{r.amount}} л{%if not loop.last%}; {%endif%}{%endfor%}.
+Сума замовлення: {{order.sum|myprintf}} грн.
+Сума за доставку: {{order.delivery_fee|myprintf}} грн.
+Сума до сплати: {{(order.sum + order.delivery_fee)|myprintf}} грн.
 
 Що робимо далі?
 
@@ -167,7 +168,7 @@
 Ви замовили: {%for r in order.cart%}{{r.name}}-{{r.amount}} л{%if not loop.last%}; {%endif%}{%endfor%}
 Адреса замовлення: {{order.address}}
 Форма сплати: {{order.payment}}
-Сумма до сплати {{order.sum + order.delivery_fee}} грн.
+Сума до сплати {{(order.sum + order.delivery_fee)|myprintf}} грн.
 
 ```
 

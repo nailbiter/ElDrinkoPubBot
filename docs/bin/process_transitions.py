@@ -1,20 +1,33 @@
 import json
 import sys
+from logging import basicConfig, INFO, info
 
-#main
 
-with open(sys.argv[1]) as f:
-    d = json.load(f)
-    transition_codes_set = {c[3] for c in d["correspondence"]}
+#global const's
+SRC_WILDCASE_STATE="(any state)"
+#procedures
+def add_fields(d):
+    res = dict()
+    correspondence = d["correspondence"]
+    for c in correspondence:
+        if c[0] is None:
+            c[0] = SRC_WILDCASE_STATE
+    transition_codes_set = {c[3] for c in correspondence}
     cut = 0
     while(len({s[:cut] for s in transition_codes_set})<len(transition_codes_set)):
         cut += 1
-    d["cut"] = cut
-    d["correspondence_code_to_i"] = {n:i for i,n in enumerate(sorted(list(transition_codes_set)))}
-    
-    d["state_name_to_i"] = {n:i 
+    res["cut"] = cut
+    res["correspondence_code_to_i"] = {
+            n:i 
             for i,n 
-            in enumerate(sorted(list(set.union(*[set(c[:2]) for c in d["correspondence"]]))))
+            in enumerate(sorted(list(transition_codes_set)))
+            }
+    
+    state_set = set.union(*[set(c[:2]) for c in correspondence])
+    res["SRC_WILDCASE_STATE"] = SRC_WILDCASE_STATE
+    res["state_name_to_i"] = {n:i 
+            for i,n 
+            in enumerate(sorted(list(state_set)))
             }
     for k in d["transitions"]:
         if type(d["transitions"][k]) is dict:
@@ -27,5 +40,11 @@ with open(sys.argv[1]) as f:
     for code in res_codes_set:        
         with open(f"../src/main/resources/{code}.txt") as f:
             res_files[code] = f.read()
-    d["res_files"] = res_files
-    print(json.dumps(d,sort_keys=True,indent=2))
+    res["res_files"] = res_files
+    return res
+
+#main
+basicConfig(level=INFO)
+with open(sys.argv[1]) as f:
+    d = json.load(f)
+    print(json.dumps({**add_fields(d),**d},sort_keys=True,indent=2))
