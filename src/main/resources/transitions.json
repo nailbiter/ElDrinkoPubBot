@@ -160,7 +160,10 @@
     [
       "send",
       "edit_address",
-      null,
+      {
+        "tag": "MessageKeyboardComparisonPredicate",
+        "value": "2"
+      },
       "177680903e499486"
     ],
     [
@@ -192,6 +195,15 @@
         "value": "0"
       },
       "19ed501387d9bc4d"
+    ],
+    [
+      null,
+      "start",
+      {
+        "tag": "MessageComparisonPredicate",
+        "value": "/start"
+      },
+      "75f676187e00dd85"
     ]
   ]
 }

@@ -1,5 +1,7 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
 import org.apache.commons.collections4.ListUtils;
+import java.util.Set;
+import java.util.HashSet;
 import com.mongodb.MongoClient;
 import java.net.URL;
 import com.mongodb.client.MongoCollection;
@@ -53,13 +55,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     static {
         _ORDER_REPORT_FORMATTER.setTimeZone(TimeZone.getTimeZone("Ukraine/Kiev"));
     }
-    private static final JSONObject _TRANSITIONS = new JSONObject(MiscUtils.GetResource("transitions",".json"));
-    private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
-        @Override
-        public boolean test(TelegramInputMessage im) {
-            return im instanceof TelegramTextInputMessage;
-        }
-    };
+    private static final JSONObject _TRANSITIONS 
+        = new JSONObject(MiscUtils.GetResource("transitions",".json"));
     public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient, Consumer<String> sendOrderCallback, JSONObject config, PersistentStorage masterPersistentStorage) {
         super("_");
         _ud = ud;
@@ -136,6 +133,12 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         };
     }
+    private final Predicate<TelegramInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
+        @Override
+        public boolean test(TelegramInputMessage im) {
+            return im instanceof TelegramTextInputMessage;
+        }
+    };
     private static Predicate<TelegramInputMessage> _MessageKeyboardComparisonPredicate(String msg) {
         return new Predicate<TelegramInputMessage>(){
             @Override
@@ -203,9 +206,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         }
     }
+    private final Set<ImmutablePair<String,String>> _inflatedTransitions = new HashSet<>();
     private ElDrinkoStateMachine _addTransition(String start,String end,
             Predicate<TelegramInputMessage> pred,
             Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>> f) {
+        _inflatedTransitions.add(new ImmutablePair<String,String>(start,end));
         if(pred==null) {
             int idx = _CorrespondenceSearch(start,end);
             JSONArray correspondence = _TRANSITIONS.getJSONArray("correspondence");
@@ -219,14 +224,35 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
             }
         }
         assert pred != null;
-        return (ElDrinkoStateMachine) addTransition(start,end,pred
-                , new Function<TelegramInputMessage,OutputMessage>(){
+
+        Function<TelegramInputMessage,OutputMessage> t = new Function<>(){
                     @Override
                     public OutputMessage apply(TelegramInputMessage im) {
                         ImmutablePair<Map<String,Object>,Object> pair = f.apply(im);
                         return _InflateOutputMessage(start,end,_ud,pair.left,pair.right);
                     }
-        });
+        };
+
+        StateMachine res = this;
+        if(start!=null && end!=null) {
+            res = this.addTransition(start,end,pred, t);
+        } else if (start==null && end!=null) {
+            for(String _start:this._states) {
+                res = this.addTransition(_start,end,pred,t);
+            }
+        } else {
+            assert false;
+        }
+        return (ElDrinkoStateMachine) res;
+    }
+    private ElDrinkoStateMachine _finalize() {
+        JSONArray correspondence = _TRANSITIONS.getJSONArray("correspondence");
+        for(int i = 0; i < correspondence.length(); i++) {
+            JSONArray t = correspondence.getJSONArray(i);
+            assert(_inflatedTransitions.contains(
+                        new ImmutablePair<String,String>(t.getString(0),t.getString(1))));
+        }
+        return this;
     }
     private static Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>> _NM
         = new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>(){
@@ -369,7 +395,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         return new ImmutablePair<Map<String,Object>,Object>(orderMap,null);
                     }
                 })
-        ._addTransition("send","edit_address",_MessageComparisonPredicate("2"),_NM)
+        ._addTransition("send","edit_address",null,_NM)
         ._addTransition("edit_address","send",_IS_TEXT_MESSAGE,
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
@@ -403,6 +429,15 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 }
             })
         ._addTransition("idle","start",null,_NM)
+        ._addTransition(null,"start",null, 
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>(){
+                    @Override
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im){
+                        _persistentStorage.set("order","");
+                        return new ImmutablePair<Map<String,Object>,Object>(null,null);
+                    }
+                }) //606c386ce22ad7d0
+        ._finalize()    
         ;
         if(_persistentStorage.contains("state")) {
             _Log.info(String.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state")));

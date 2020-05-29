@@ -9,4 +9,8 @@ public class TelegramKeyboardAnswer extends TelegramInputMessage implements Keyb
     public TelegramKeyboardAnswer(String ans) {
         super(ans);
     }
+    @Override
+    public String toString() {
+        return String.format("TelegramKeyboardAnswer(%s)",_msg);
+    }
 }
