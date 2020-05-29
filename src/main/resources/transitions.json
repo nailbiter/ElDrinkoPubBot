@@ -37,11 +37,17 @@
       "message": "67c31fcc0fa6566a955c1792",
       "keyboard": "76a5127e87e48a4e6759d248"
     },
-    "48c6907046b03db8": {
-      "tag": "TelegramKeyboard",
-      "message": "fdb3ef9a7dcc8e36c4fa489f",
-      "keyboard": "16c4082080253eee262c9cf2"
-    },
+    "48c6907046b03db8": [
+      {
+        "tag": "TelegramTextOutputMessage",
+        "message": "6e3ec3f7345ed7115141f355"
+      },
+      {
+        "tag": "TelegramKeyboard",
+        "message": "fdb3ef9a7dcc8e36c4fa489f",
+        "keyboard": "16c4082080253eee262c9cf2"
+      }
+    ],
     "72aa7197071b6503": [
       {
         "tag": "TelegramImageOutputMessage",
