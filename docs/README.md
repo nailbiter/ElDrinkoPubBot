@@ -21,7 +21,8 @@
 * [send -> edit_address (transition `t_17`)](#transition-t_17)
 * [edit_address -> send (transition `t_fa`)](#transition-t_fa)
 * [send -> choose_payment (transition `t_8e`)](#transition-t_8e)
-* [send -> start (transition `t_48`)](#transition-t_48)
+* [send -> idle (transition `t_48`)](#transition-t_48)
+* [idle -> start (transition `t_19`)](#transition-t_19)
 
 ## transition t_04
 
@@ -50,15 +51,7 @@
 
 ```
 
-## transition t_48
-
-### `6e3ec3f7345ed7115141f355`
-
-```
-Дякуємо за замовлення!
-Якщо у нас будуть питання ми напишемо Вам, або зателефонуємо.
-
-```
+## transition t_19
 
 ### `fdb3ef9a7dcc8e36c4fa489f`
 
@@ -66,6 +59,16 @@
 {%-for r in products%}
 {{(r[0]|int) + 1}}. {{r[1]}} ({{r[3]}}.00 грн/л)
 {%-endfor%}
+
+```
+
+## transition t_48
+
+### `6e3ec3f7345ed7115141f355`
+
+```
+Дякуємо за замовлення!
+Якщо у нас будуть питання ми напишемо Вам, або зателефонуємо.
 
 ```
 
