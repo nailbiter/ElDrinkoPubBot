@@ -387,7 +387,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         return new ImmutablePair<Map<String,Object>,Object>(null,null);
                     }
                 })
-        ._addTransition("send","start",_MessageComparisonPredicate("0"),
+        ._addTransition("send","idle",null,
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
                     public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
@@ -402,6 +402,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         return new ImmutablePair<Map<String,Object>,Object>(null,null);
                 }
             })
+        ._addTransition("idle","start",null,_NM)
         ;
         if(_persistentStorage.contains("state")) {
             _Log.info(String.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state")));
