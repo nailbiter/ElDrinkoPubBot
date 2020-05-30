@@ -12,6 +12,9 @@ from urllib import request
 import json
 import re
 from datetime import datetime
+from requests import get
+from pymongo import MongoClient
+from pprint import pprint
 
 
 #global const's
@@ -22,12 +25,12 @@ Child_pid = 0
 #procedures
 class GithubChecker:
     @staticmethod
-    def __Get_sha(login,repo,branch):
+    def __Get_sha(login,repo,branch,github_pass):
         url = f"https://api.github.com/repos/{login}/{repo}/branches/{branch}"
+        r = get(url,auth=('nailbiter',github_pass))
+        data = json.loads(r.text)    
+        return data["commit"]["sha"]
         print(f"url: {url}")
-        with request.urlopen(url) as f:
-            data = json.loads(f.read())    
-            return data["commit"]["sha"]
     def __init__(self,repo_url,branch):
         m = re.match("https://github.com/([a-zA-Z]+)/([a-zA-Z]+)",repo_url)
         assert(m is not None)
@@ -35,14 +38,24 @@ class GithubChecker:
         self.login = m.group(1)
         self.repo = m.group(2)
         self.branch = branch
-        self.sha = GithubChecker.__Get_sha(self.login,self.repo,self.branch)
+
+        secret = ""
+        with open("secret.txt") as f: secret = f.read().strip()
+        mongo_uri = f"mongodb+srv://nailbiter:{secret}@cluster0-ta3pc.gcp.mongodb.net/beerbot?retryWrites=true&w=majority"
+        mongo_client = MongoClient(mongo_uri)
+        doc = mongo_client["beerbot"]["_passwords"].find_one({"key":"github_token"})
+        self.github_pass = doc["value"]
+
+        self.sha = GithubChecker.__Get_sha(self.login,self.repo,self.branch,self.github_pass)
     def __call__(self):
         print(f"should restart callback {datetime.now().isoformat()}")
-        new_sha = GithubChecker.__Get_sha(self.login,self.repo,self.branch)
+        new_sha = GithubChecker.__Get_sha(self.login,self.repo,self.branch,self.github_pass)
         if(self.sha!=new_sha):
+            print(f"{self.sha}!={new_sha} => reload")
             self.sha = new_sha
             return True
         else:
+            print(f"{self.sha}=={new_sha} => no reload")
             return False
 def kill_child(p):
     print(f"pid: {p}")
