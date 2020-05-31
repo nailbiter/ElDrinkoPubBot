@@ -118,6 +118,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         }
         _Log.info(String.format("_ProcessTemplate: context before rendering: %s",context));
 
+        _Log.info(String.format("getting resource %s",templateName));
         String template = MiscUtils.GetResource(templateName);
         _Log.info(String.format("template: %s",template));
         String renderedTemplate = MiscUtils.GetResource(templateName);

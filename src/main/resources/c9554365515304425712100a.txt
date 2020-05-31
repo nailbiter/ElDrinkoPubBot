@@ -1,1 +1,1 @@
-{{products[i].description}}
+{{products[i][2]}}

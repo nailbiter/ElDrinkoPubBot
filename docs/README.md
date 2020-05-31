@@ -92,7 +92,7 @@
 ### [`c9554365515304425712100a`](../src/main/resources/c9554365515304425712100a.txt)
 
 ```
-{{products[i].description}}
+{{products[i][2]}}
 
 ```
 
