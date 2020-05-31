@@ -17,7 +17,7 @@
 
 {%-for c in transitions[c]%}
 
-### `{{c.message}}`
+### [`{{c.message}}`](../src/main/resources/{{c.message}}.txt)
 
 ```
 {{res_files[c.message]}}

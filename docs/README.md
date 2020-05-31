@@ -27,7 +27,7 @@
 
 ## transition t_04
 
-### `2ae6c7859b755abf51a3289b`
+### [`2ae6c7859b755abf51a3289b`](../src/main/resources/2ae6c7859b755abf51a3289b.txt)
 
 ```
 что будем удалять?
@@ -36,7 +36,7 @@
 
 ## transition t_0f
 
-### `054edccc65c193f7583a5773`
+### [`054edccc65c193f7583a5773`](../src/main/resources/054edccc65c193f7583a5773.txt)
 
 ```
 Введіть адресу в межах Петрівського Кварталу.
@@ -45,7 +45,7 @@
 
 ## transition t_17
 
-### `5d0c256b4a776245fee81385`
+### [`5d0c256b4a776245fee81385`](../src/main/resources/5d0c256b4a776245fee81385.txt)
 
 ```
 введите адрес
@@ -54,7 +54,7 @@
 
 ## transition t_19
 
-### `fdb3ef9a7dcc8e36c4fa489f`
+### [`fdb3ef9a7dcc8e36c4fa489f`](../src/main/resources/fdb3ef9a7dcc8e36c4fa489f.txt)
 
 ```
 {%-for r in products%}
@@ -65,7 +65,7 @@
 
 ## transition t_48
 
-### `6e3ec3f7345ed7115141f355`
+### [`6e3ec3f7345ed7115141f355`](../src/main/resources/6e3ec3f7345ed7115141f355.txt)
 
 ```
 Дякуємо за замовлення!
@@ -75,7 +75,7 @@
 
 ## transition t_5e
 
-### `7a70873a5685da4f9cb2c609`
+### [`7a70873a5685da4f9cb2c609`](../src/main/resources/7a70873a5685da4f9cb2c609.txt)
 
 ```
 Ви замовили {%for r in order.cart%}{{r.name}}-{{r.amount}} л{%if not loop.last%}; {%endif%}{%endfor%}.
@@ -89,14 +89,14 @@
 
 ## transition t_72
 
-### `c9554365515304425712100a`
+### [`c9554365515304425712100a`](../src/main/resources/c9554365515304425712100a.txt)
 
 ```
 {{products[i].description}}
 
 ```
 
-### `fdb3ef9a7dcc8e36c4fa489f`
+### [`fdb3ef9a7dcc8e36c4fa489f`](../src/main/resources/fdb3ef9a7dcc8e36c4fa489f.txt)
 
 ```
 {%-for r in products%}
@@ -107,7 +107,7 @@
 
 ## transition t_75
 
-### `ae784befe1f1bac4d5929a4a`
+### [`ae784befe1f1bac4d5929a4a`](../src/main/resources/ae784befe1f1bac4d5929a4a.txt)
 
 ```
 Вітаємо!
@@ -115,7 +115,7 @@
 
 ```
 
-### `fdb3ef9a7dcc8e36c4fa489f`
+### [`fdb3ef9a7dcc8e36c4fa489f`](../src/main/resources/fdb3ef9a7dcc8e36c4fa489f.txt)
 
 ```
 {%-for r in products%}
@@ -126,7 +126,7 @@
 
 ## transition t_8e
 
-### `1dc02faec7377fc537510e30`
+### [`1dc02faec7377fc537510e30`](../src/main/resources/1dc02faec7377fc537510e30.txt)
 
 ```
 Оберіть форму сплати
@@ -135,7 +135,7 @@
 
 ## transition t_95
 
-### `a96f38cbc06abbd47de38fe3`
+### [`a96f38cbc06abbd47de38fe3`](../src/main/resources/a96f38cbc06abbd47de38fe3.txt)
 
 ```
 Зробіть вибір
@@ -144,7 +144,7 @@
 
 ## transition t_f0
 
-### `ec779e4315ccf36a38c2d470`
+### [`ec779e4315ccf36a38c2d470`](../src/main/resources/ec779e4315ccf36a38c2d470.txt)
 
 ```
 Ви замовили {{(order.cart|last)['name']}}. Введіть кількість в літрах кратну 0,5 літра.
@@ -153,7 +153,7 @@
 
 ## transition t_f4
 
-### `67c31fcc0fa6566a955c1792`
+### [`67c31fcc0fa6566a955c1792`](../src/main/resources/67c31fcc0fa6566a955c1792.txt)
 
 ```
 Покласти в кошик
@@ -162,7 +162,7 @@
 
 ## transition t_fa
 
-### `eb34fa7ee27d1192ef20f960`
+### [`eb34fa7ee27d1192ef20f960`](../src/main/resources/eb34fa7ee27d1192ef20f960.txt)
 
 ```
 Ви замовили: {%for r in order.cart%}{{r.name}}-{{r.amount}} л{%if not loop.last%}; {%endif%}{%endfor%}
