@@ -36,6 +36,31 @@ public class TemplateEngine {
                 return "myprintf";
             }
         });
+        _jinjava.getGlobalContext().registerFilter(new Filter(){
+            @Override
+            public Object filter(Object var, JinjavaInterpreter interpreter, String... args) {
+                _Log.info(var.getClass().getName());
+                _Log.info(var);
+                int d = 0;
+                if(var instanceof String) {
+                    d = Integer.parseInt((String)var);
+                } else if(var instanceof Integer) {
+                    d = ((Integer)var).intValue();
+                } else if(var instanceof Float) {
+                    d = ((Float)var).intValue();
+                } else if(var instanceof Double) {
+                    d = ((Double)var).intValue();
+                } else if(var instanceof Long) {
+                    d = ((Long)var).intValue();
+                } else {
+                    d = (int)var;
+                }
+                return String.format("%02d",d);
+            }
+            public String getName() {
+                return "myprintf_int";
+            }
+        });
     }
     public String render(String template, Map<String,Object> context) {
         return _jinjava.render(template,context);

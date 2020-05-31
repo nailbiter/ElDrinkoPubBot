@@ -41,10 +41,13 @@ public class TemplateEngineTest
         env.put("x",3);
         env.put("y",3.5678);
         env.put("z",3.5678f);
+        env.put("w",43);
 
         assertEquals( te.render("{{x}}",env), "3");
         assertEquals( te.render("{{x|myprintf}}",env), "3,00");
         assertEquals( te.render("{{y|myprintf}}",env), "3,57");
         assertEquals( te.render("{{z|myprintf}}",env), "3,57");
+        assertEquals( te.render("{{x|myprintf_int}}",env), "03");
+        assertEquals( te.render("{{w|myprintf_int}}",env), "43");
     }
 }
