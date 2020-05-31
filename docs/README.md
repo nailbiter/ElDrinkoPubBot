@@ -57,6 +57,7 @@
 ### [`fdb3ef9a7dcc8e36c4fa489f`](../src/main/resources/fdb3ef9a7dcc8e36c4fa489f.txt)
 
 ```
+Сьогодні ми пропонуємо:
 {%-for r in products%}
 {{(r[0]|int) + 1}}. {{r[1]}} ({{r[3]}}.00 грн/л)
 {%-endfor%}
@@ -99,6 +100,7 @@
 ### [`fdb3ef9a7dcc8e36c4fa489f`](../src/main/resources/fdb3ef9a7dcc8e36c4fa489f.txt)
 
 ```
+Сьогодні ми пропонуємо:
 {%-for r in products%}
 {{(r[0]|int) + 1}}. {{r[1]}} ({{r[3]}}.00 грн/л)
 {%-endfor%}
@@ -111,13 +113,13 @@
 
 ```
 Вітаємо!
-Сьогодні ми пропонуємо:
 
 ```
 
 ### [`fdb3ef9a7dcc8e36c4fa489f`](../src/main/resources/fdb3ef9a7dcc8e36c4fa489f.txt)
 
 ```
+Сьогодні ми пропонуємо:
 {%-for r in products%}
 {{(r[0]|int) + 1}}. {{r[1]}} ({{r[3]}}.00 грн/л)
 {%-endfor%}
