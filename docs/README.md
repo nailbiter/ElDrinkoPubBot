@@ -171,6 +171,5 @@
 Адреса замовлення: {{order.address}}
 Форма сплати: {{order.payment}}
 Сума до сплати {{(order.sum + order.delivery_fee)|myprintf}} грн.
-
 ```
 
