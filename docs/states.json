@@ -1,5 +1,5 @@
 [
-  ["_","start",["fdb3ef9a7dcc8e36c4fa489f"]],
+  ["_","start",["ae784befe1f1bac4d5929a4a","fdb3ef9a7dcc8e36c4fa489f"]],
   ["start","choose_product_to_see_description",["(кнопки с продуктами)"]],
   ["choose_product_to_see_description","start",["(описание продукта с изображением)","fdb3ef9a7dcc8e36c4fa489f"]],
   ["start","choose_product_to_make_order",["67c31fcc0fa6566a955c1792"]],

@@ -1,5 +1,7 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.state_machine;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
@@ -16,24 +18,27 @@ import java.lang.StringBuilder;
 public class StateMachine<InputMessage,OutputMessage> implements Function<InputMessage,OutputMessage> {
     protected String _currentState = null;
     protected Set<String> _states = new HashSet<>();
-    protected Map<ImmutablePair<String,String>,ImmutablePair<Predicate<InputMessage>,Function<InputMessage,OutputMessage>>> _transitions = new HashMap<>();
+    protected Map<ImmutablePair<String,String>,List<ImmutablePair<Predicate<InputMessage>,Function<InputMessage,OutputMessage>>>> _transitions = new HashMap<>();
     public StateMachine(String state) {
         _currentState = state;
         _states.add(state);
     }
-    public StateMachine addTransition(String from, String to, Predicate<InputMessage> transitionCondition, Function<InputMessage,OutputMessage> transitionAction) {
-        if(!_states.contains(to)) {
-            _states.add(to);
+    public StateMachine addTransition(String from, String to, 
+            Predicate<InputMessage> transitionCondition, 
+            Function<InputMessage,OutputMessage> transitionAction) {
+        assert from != null;
+        assert to != null;
+        _states.add(to);
+        _states.add(from);
+        ImmutablePair<String,String> key = new ImmutablePair<>(from,to);
+        if( !_transitions.containsKey(key) ) {
+            _transitions.put(key,new ArrayList<ImmutablePair<Predicate<InputMessage>,Function<InputMessage,OutputMessage>>>());
         }
-        if(!_states.contains(from)) {
-            _states.add(from);
-        }
-        _transitions.put(
-                new ImmutablePair<String,String>(from,to),
-                new ImmutablePair<Predicate<InputMessage>, Function<InputMessage,OutputMessage>>(
+        _transitions
+            .get(key)
+            .add(new ImmutablePair<Predicate<InputMessage>, Function<InputMessage,OutputMessage>>(
                     transitionCondition,transitionAction
-                    )
-                );
+                    ));
         return this;
     }
     protected void _log(String msg) {
@@ -50,19 +55,22 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
     public OutputMessage apply(InputMessage im) {
         _log(String.format("apply: state: \"%s\"\nim: \"%s\"",_currentState,im));
         for(String to:_states) {
-            ImmutablePair<Predicate<InputMessage>, Function<InputMessage,OutputMessage>> p = null;
+            List<ImmutablePair<Predicate<InputMessage>, Function<InputMessage,OutputMessage>>> pl
+                = null;
             _log(String.format("checking %s -> %s",_currentState,to));
-            if( (p=_transitions.get(new ImmutablePair<String,String>(_currentState,to))) != null ) {
-                if(p.left.test(im)) {
-                    _log(String.format("active transition: %s -> %s",_currentState,to));
-                    try {
-                      _setState(to);
-                    } catch (StateMachineException sme) {
-                        return null;
+            if( (pl=_transitions.get(new ImmutablePair<String,String>(_currentState,to))) != null ) {
+                for(ImmutablePair<Predicate<InputMessage>, Function<InputMessage,OutputMessage>> p:pl) {
+                    if(p.left.test(im)) {
+                        _log(String.format("active transition: %s -> %s",_currentState,to));
+                        try {
+                          _setState(to);
+                        } catch (StateMachineException sme) {
+                            return null;
+                        }
+                        OutputMessage om = p.right.apply(im);
+                        _log(String.format("om: \"%s\"",om));
+                        return om;
                     }
-                    OutputMessage om = p.right.apply(im);
-                    _log(String.format("om: \"%s\"",om));
-                    return om;
                 }
             }
         }
@@ -77,10 +85,5 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
             res.append(String.format("\"%s\" -> \"%s\"\n",p.left,p.right));
         }
         return res.toString();
-    }
-    public StateMachine addStateMachine(StateMachine anotherStateMachine) {
-        _states.addAll(anotherStateMachine._states);
-        _transitions.putAll(anotherStateMachine._transitions);
-        return this;
     }
 }

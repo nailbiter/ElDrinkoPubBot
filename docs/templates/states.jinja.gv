@@ -1,0 +1,12 @@
+digraph {
+  {%for c in correspondence-%}
+  "{{c[0]}}" -> "{{c[1]}}" [label="t_{{c[3][:cut]}}"];
+  {%endfor-%}
+  {%for s in state_name_to_i-%}
+  {%if s==SRC_WILDCASE_STATE-%}
+  "{{s}}" [label="(any state)",shape="doublecircle"]
+  {%else-%}
+  "{{s}}" [label="{{s}} (#{{state_name_to_i[s]}})"]
+  {%endif-%}
+  {%endfor-%}
+}

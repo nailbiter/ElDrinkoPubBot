@@ -11,7 +11,9 @@ README.md: states.svg
 	pandoc -s --css=$(HOME)/for/misc/formarkdown.css  -V lang=en $<  -o $@
 %.svg: %.gv
 	dot -Tsvg $< > $@
-states.gv: bin/states_json_to_states_gv.py states.json
-	./$^ > $@
-README.md: bin/states_json_to_readme_md.py states.json
-	./$^ > $@
+transitions.json: ./bin/process_transitions.py ../src/main/resources/transitions.json
+	python3 $^ > $@
+%.gv: templates/%.jinja.gv transitions.json
+	jinja2 $^ > $@
+%.md: templates/%.jinja.md transitions.json
+	jinja2 $< transitions.json > $@
