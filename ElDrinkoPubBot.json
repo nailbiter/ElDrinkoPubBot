@@ -1,7 +1,7 @@
 {
   "id": "ElDrinkoPubBot",
   "telegram":{
-    "masterChatIds":["145766172"]
+    "masterChatIds":["145766172","340880765"]
   },
   "mongodb": {
     "data": "data",
