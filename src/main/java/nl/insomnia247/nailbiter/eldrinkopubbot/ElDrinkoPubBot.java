@@ -46,7 +46,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     }
     private void _sendMessageToMasters(String msg, boolean isMarkdown, String key) {
         if(key.equals("developerChatIds")) {
-            msg = String.format("(%s)",msg);
+            msg = String.format("(> %s <)",msg);
             isMarkdown = true;
         }
         for(Long masterChatId : _masterChatIds.get(key)) {
