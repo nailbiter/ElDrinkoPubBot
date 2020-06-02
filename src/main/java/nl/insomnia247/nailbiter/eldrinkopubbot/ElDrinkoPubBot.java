@@ -144,6 +144,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             }
         }
         _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
+        ElDrinkoStateMachine.PreloadImages();
         this._sendMessageToMasters(String.format("updated! now at %s",commit_hash),true,"developerChatIds");
     }
 
