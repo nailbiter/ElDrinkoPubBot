@@ -27,7 +27,7 @@ public class JSONTools {
             }
         }
 
-        _Log.info(String.format("JSONObjectToMap: %s -> %s",o,res));
+//        _Log.info(String.format("JSONObjectToMap: %s -> %s",o,res));
         return res;
     }
     public static List<Object> JSONArrayToList(JSONArray a) {
@@ -43,7 +43,7 @@ public class JSONTools {
             }
         }
 
-        _Log.info(String.format("JSONArrayToList: %s -> %s",a,res));
+//        _Log.info(String.format("JSONArrayToList: %s -> %s",a,res));
         return res;
     }
 }

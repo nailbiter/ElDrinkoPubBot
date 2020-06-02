@@ -48,23 +48,19 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private final UserData _ud;
     private final PersistentStorage _persistentStorage;
     private final PersistentStorage _masterPersistentStorage;
-    private final Consumer<String>  _sendOrderCallback;
+    private final Consumer<ImmutablePair<String,String>>  _sendOrderCallback;
     private static Logger _Log = LogManager.getLogger(ElDrinkoStateMachine.class);
-    private static MongoCollection<Document> _LogDb = null;
     private static final DateFormat _ORDER_REPORT_FORMATTER = new SimpleDateFormat("dd.mm.yy HH:MM");
     static {
         _ORDER_REPORT_FORMATTER.setTimeZone(TimeZone.getTimeZone("Ukraine/Kiev"));
     }
     private static final JSONObject _TRANSITIONS 
         = new JSONObject(MiscUtils.GetResource("transitions",".json"));
-    public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient, Consumer<String> sendOrderCallback, JSONObject config, PersistentStorage masterPersistentStorage) {
+    public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient, Consumer<ImmutablePair<String,String>> sendOrderCallback, JSONObject config, PersistentStorage masterPersistentStorage) {
         super("_");
         _ud = ud;
         _masterPersistentStorage = masterPersistentStorage;
         _sendOrderCallback = sendOrderCallback;
-        if( _LogDb == null ) {
-            _LogDb = mongoClient.getDatabase("beerbot").getCollection(config.getJSONObject("mongodb").getString("logs"));
-        }
         _persistentStorage = new PersistentStorage(
                 mongoClient.getDatabase("beerbot").getCollection(config.getJSONObject("mongodb").getString("data")), 
                 "id",
@@ -422,9 +418,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         order.put("uid",_ud.getUserName());
                         order.put("count",_IncrementOrderCount(_masterPersistentStorage));
                         order.put("timestamp", _ORDER_REPORT_FORMATTER.format(new Date()));
-                        _sendOrderCallback.accept(
-                                _ProcessTemplate("3804e512b18b339fe8786dbd",
-                                    _OrderObjectToJinjaContext(order)));
+                        _sendOrderCallback.accept(new ImmutablePair<String,String>(
+                                _ProcessTemplate("3804e512b18b339fe8786dbd",_OrderObjectToJinjaContext(order))
+                                    ,"salesmanChatIds"));
                         _persistentStorage.set("order","");
                         return new ImmutablePair<Map<String,Object>,Object>(null,null);
                 }
@@ -471,14 +467,10 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         _persistentStorage.set("state",state);
     }
     @Override
-    protected void _log(String msg) {
-        _Log.info(msg);
-        if(_LogDb!=null && _ud!=null && false) {
-            Date now = new Date();
-            _LogDb.insertOne(new Document("_ud",_ud.toString())
-                    .append("date",now.toGMTString())
-                    .append("msg",msg)
-                    );
-        }
+    protected void _didNotFoundSuitableTransition(TelegramInputMessage im) {
+        _sendOrderCallback.accept(new ImmutablePair<String,String>(
+                    String.format("cannot found suitable transition \"%s\" \"%s\"",_currentState,im),
+                    "developerChatIds"
+                    ));
     }
 }

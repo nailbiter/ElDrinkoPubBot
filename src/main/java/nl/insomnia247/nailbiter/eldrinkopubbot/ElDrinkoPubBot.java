@@ -29,22 +29,27 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRem
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 
-public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<String>{
+public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<ImmutablePair<String,String>>{
     private MongoClient _mongoClient = null;
     private String _botname = null;
     private JSONObject _config = null;
     private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
-    private final List<Long> _masterChatIds = new ArrayList<>();
+    private final Map<String,List<Long>> _masterChatIds = new HashMap<>();
     private static Logger _Log = LogManager.getLogger(ElDrinkoPubBot.class);
     private PersistentStorage _persistentStorage = null;
     @Override 
-    public void accept(String o) {
-        _sendMessageToMasters(o,false);
+    public void accept(ImmutablePair<String,String> o) {
+        _sendMessageToMasters(o.left,false,o.right);
     }
-    private void _sendMessageToMasters(String msg,boolean isMarkdown) {
-        for(Long masterChatId : _masterChatIds) {
+    private void _sendMessageToMasters(String msg, boolean isMarkdown, String key) {
+        if(key.equals("developerChatIds")) {
+            msg = String.format("(> %s <)",msg);
+            isMarkdown = true;
+        }
+        for(Long masterChatId : _masterChatIds.get(key)) {
             SendMessage sendMessage = new SendMessage();
             String chatId = Long.toString(masterChatId);
             sendMessage.setChatId(chatId);
@@ -129,11 +134,17 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<S
         });
         _Log.info(String.format("_config: %s\n",_config.toString()));
         _botname = botname;
-        for(int i = 0; i < _config.getJSONObject("telegram").getJSONArray("masterChatIds").length(); i++) {
-            _masterChatIds.add( (long)_config.getJSONObject("telegram").getJSONArray("masterChatIds").getInt(i) );
+
+        String[] MASTER_CHAT_IDS = new String[] {"salesmanChatIds","developerChatIds"};
+        for(String s:MASTER_CHAT_IDS) {
+            List<Long> l = new ArrayList<Long>();
+            _masterChatIds.put(s, l);
+            for(int i = 0; i < _config.getJSONObject("telegram").getJSONArray(s).length(); i++) {
+                l.add( (long)_config.getJSONObject("telegram").getJSONArray(s).getInt(i) );
+            }
         }
         _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
-        this._sendMessageToMasters(String.format("updated! now at %s",commit_hash),true);
+        this._sendMessageToMasters(String.format("updated! now at %s",commit_hash),true,"developerChatIds");
     }
 
     private static JSONObject _MergeJsonObjects(JSONObject[] objs) {
