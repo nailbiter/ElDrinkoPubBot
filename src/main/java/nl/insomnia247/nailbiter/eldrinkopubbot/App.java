@@ -23,13 +23,15 @@ public class App
         File file = new File("./secret.txt");
         String content = FileUtils.readFileToString(file, "utf-8").trim();
 
-        _Log.info(String.format("args(%d): [%s]",args.length,String.join(",",Arrays.asList(args))));
+        _Log.info(String.format("COMMIT_DATA: %s",System.getenv().get("COMMIT_DATA")));
+        _Log.info(String.format("BOT_NAME: %s",System.getenv().get("BOT_NAME")));
 
 		ApiContextInitializer.init();
 		TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-		telegramBotsApi.registerBot(new ElDrinkoPubBot(content 
-                    , args[0]
-                    ,args.length>1 ? args[1] : "ElDrinkoPubBot"
-                    ));
+        ElDrinkoPubBot edpb = new ElDrinkoPubBot(content 
+                    , System.getenv().get("COMMIT_DATA")
+                    , System.getenv().getOrDefault("BOT_NAME", "ElDrinkoPubBot")
+                    );
+		telegramBotsApi.registerBot(edpb);
     }
 }

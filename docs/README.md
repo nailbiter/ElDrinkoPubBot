@@ -5,7 +5,6 @@
 ![](./states.svg)
 
 ## transitions
-
 * [_ -> start (transition `t_75f`)](#transition-t_75f)
 * [start -> choose_product_to_see_description (transition `t_950`)](#transition-t_950)
 * [choose_product_to_see_description -> start (transition `t_72a`)](#transition-t_72a)
@@ -26,6 +25,18 @@
 * [send -> idle (transition `t_48c`)](#transition-t_48c)
 * [idle -> start (transition `t_19e`)](#transition-t_19e)
 * [(any state) -> start (transition `t_75f`)](#transition-t_75f)
+
+## transition conditions legend
+
+* `KEY(0)`, `KEY(1)` etc. means that you have to press on first (resp. second etc.) button of the keyboard; note that
+keyboard currently consists of two columns and we count buttons [row-wise](https://www.geeksforgeeks.org/row-wise-vs-column-wise-traversal-matrix/);
+* `KEY(ANY)` means that for the transition, you just need to press *any* button;
+* `HI` means that for the transition, you need to enter half-integer, i.e. `1.5` or `1,5` or `1.0` or `1,0` or `1`;
+* `PN` means that for the transition, you need to enter phone number (i.e. `34589345`);
+* `T` means that for the transition, you need to enter any text;
+* `M(...)` means that for the transition, you need to enter text `...`;
+
+
 
 ## transition t_04d
 

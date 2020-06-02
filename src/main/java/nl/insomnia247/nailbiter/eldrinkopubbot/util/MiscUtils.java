@@ -1,4 +1,5 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.util;
+import java.util.Map;
 import java.net.URL;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -6,6 +7,8 @@ import org.apache.commons.io.IOUtils;
 import java.io.InputStream;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -13,6 +16,7 @@ import java.util.regex.Matcher;
  */
 public class MiscUtils {
     private static Logger _Log = LogManager.getLogger(MiscUtils.class);
+    private static final String _BEERLIST = MiscUtils.GetResource("beerlist",".txt");
     private static final Pattern PARSE_FLOAT_PATTERN 
         = Pattern.compile("(?<sign>-)?(?<intpart>\\d+)((.|,)(?<fracpart>\\d+))?");
     public static class ParseFloatException extends Exception {
@@ -53,5 +57,26 @@ public class MiscUtils {
         }
         _Log.info(String.format("res: %s",template));
         return template;
+    }
+    public static String ProcessTemplate(String templateName, Map<String, Object> additionalContext) {
+        TemplateEngine _jinjava = new TemplateEngine();
+        Map<String,Object> context = new HashMap<>();
+        Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
+        List<List<String>> products = tsv.getRecords();
+        context.put("products",products);
+        if(additionalContext!=null) {
+            for(String k:additionalContext.keySet()) {
+                context.put(k,additionalContext.get(k));
+            }
+        }
+        _Log.info(String.format("_ProcessTemplate: context before rendering: %s",context));
+
+        _Log.info(String.format("getting resource %s",templateName));
+        String template = MiscUtils.GetResource(templateName);
+        _Log.info(String.format("template: %s",template));
+        String renderedTemplate = MiscUtils.GetResource(templateName);
+        renderedTemplate = _jinjava.render(template, context);	
+        _Log.info(String.format("renderedTemplate: %s",renderedTemplate));
+        return renderedTemplate;
     }
 }

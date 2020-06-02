@@ -1,19 +1,28 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
+import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachineException;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
+import org.bson.Document;
 import java.util.stream.Collectors;
 import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 import com.mongodb.MongoClientURI;
-import com.mongodb.client.model.Filters;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputArrayMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboardAnswer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +31,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ForceReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -30,15 +40,20 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 
-public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<ImmutablePair<String,String>>{
+public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<ImmutablePair<String,String>> {
     private MongoClient _mongoClient = null;
     private String _botname = null;
     private JSONObject _config = null;
-    private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
     private final Map<String,List<Long>> _masterChatIds = new HashMap<>();
     private static Logger _Log = LogManager.getLogger(ElDrinkoPubBot.class);
+    private Map<String,Integer> _lastSentKeyboardHash = new HashMap<>();
+    ElDrinkoStateMachine _edsm = null;
+    ElDrinkoActionInflator _actionInflator = null;
+    ElDrinkoConditionInflator _conditionInflator = null;
     private PersistentStorage _persistentStorage = null;
     @Override 
     public void accept(ImmutablePair<String,String> o) {
@@ -49,8 +64,17 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             msg = String.format("`(> %s <)`",msg);
             isMarkdown = true;
         }
-        for(Long masterChatId : _masterChatIds.get(key)) {
-            SendMessage sendMessage = new SendMessage();
+
+        List<Long> list = new ArrayList<>();
+        if( _masterChatIds.containsKey(key) ) {
+            list.addAll(_masterChatIds.get(key));
+        } else {
+            list.add(Long.parseLong(key));
+        }
+
+        for(Long masterChatId : list) {
+            SendMessage sendMessage = null;
+            sendMessage = new SendMessage();
             String chatId = Long.toString(masterChatId);
             sendMessage.setChatId(chatId);
             sendMessage.setText(msg);
@@ -61,67 +85,135 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 _Log.info(String.format("sending %s to %s\n",msg,chatId));
                 execute(sendMessage);
             } catch(Exception e) {
-                _Log.info(String.format("f531ae90faad7adb: \"%s\" \"%s\" \"%s\" \"%s\"\n",
+                _Log.error(String.format("f531ae90faad7adb: \"%s\" \"%s\" \"%s\" \"%s\"\n",
                             e.getMessage(),
                             e.getClass().getName(),
-//                            ((TelegramApiException)e).getApiResponse(),
                             "no",
                             e
                             ));
             }
         }
     }
+    private TelegramInputMessage _createInputMessage(Update u) {
+        if (u.hasMessage()) {
+            Message m = u.getMessage();
+            _Log.info("CreateInputMessage: %s\n",m.getText());
+            return new TelegramTextInputMessage(m.getText());
+        } else if(u.hasCallbackQuery()) {
+            Integer replyMessageId = null;
+		    String call_data = u.getCallbackQuery().getData();
+            if(u.getCallbackQuery().getMessage().getReplyMarkup()!=null && u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard()!=null) {
+                _Log.info(String.format("inline markup: %s\n",u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard()));
+                List<List<InlineKeyboardButton>> buttons = u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard();
+                for(int i = 0, idx = 0;i<buttons.size();i++) {
+                    List<InlineKeyboardButton> row = buttons.get(i);
+                    for(int j = 0; j<row.size();j++,idx++) {
+                        if(idx==Integer.parseInt(call_data)) {
+                            SendMessage sendMessage = new SendMessage();
+                            String chatId = Long.toString(u.getCallbackQuery().getMessage().getChatId());
+                            sendMessage.setChatId(chatId);
+                            sendMessage.setText(row.get(j).getText());
+                            sendMessage.enableMarkdown(true);
+
+                            UserData ud = new UserData(u);
+                            replyMessageId = u.getCallbackQuery().getMessage().getMessageId();
+                            if( _lastSentKeyboardHash.containsKey(ud.toString()) &&  !_lastSentKeyboardHash.get(ud.toString()).equals(replyMessageId)) {
+                                _Log.info("it's old, so we ignore it");
+                                return null;
+                            }
+                            
+                            _Log.info(sendMessage);
+                            try {
+                                execute(new DeleteMessage(u.getCallbackQuery().getMessage().getChatId(),u.getCallbackQuery().getMessage().getMessageId()));
+                                execute(sendMessage);
+                            } catch(Exception e) {
+                                _Log.error(e);
+                            }
+                        }
+                    }
+                }
+            }
+
+            _Log.info(String.format("call_data: %s",call_data));
+            _Log.info(String.format("TelegramKeyboardAnswer(%s) to %s",call_data,replyMessageId));
+            return new TelegramKeyboardAnswer(call_data);
+        } else {
+            return null;
+        }
+    }
     @Override
     public void onUpdateReceived(Update update) {
-        TelegramInputMessage tim = TelegramInputMessage.CreateInputMessage(update);
-        _Log.info(String.format(" c4aa6c56bd61a895 \n"));
+        TelegramInputMessage tim = _createInputMessage(update);
         if(tim != null) {
-            _Log.info(String.format(" 78cbf16ed274bfe5 \n"));
             UserData ud = new UserData(update);
-            ElDrinkoStateMachine edsm = null;
-            _Log.info(String.format("here %s\n","fc4721b74e5c861c"));
-            if( !_data.containsKey(ud.toString()) ) {
-                _Log.info(String.format("here %s\n","abbfe7d43f0ae807"));
-                edsm = new ElDrinkoStateMachine(ud, _mongoClient, this, _config, _persistentStorage)
-                    .setUp()
-                    ;
-                _data.put(ud.toString(),edsm);
+            _Log.info(String.format("config: %s",_config));
+            MongoCollection<Document> statesColl = _mongoClient
+                .getDatabase("beerbot")
+                .getCollection(_config.getJSONObject("mongodb").getString("state_machine_states"));
+            Document doc = statesColl.find(Filters.eq("id",ud.toString())).first();
+            _Log.info(String.format("doc: %s",doc));
+            String state = null;
+            if( doc == null ) {
+                state = "_";
             } else {
-                _Log.info(String.format("here %s\n","d6948b5130d382da"));
-                edsm = _data.get(ud.toString());
+                state = new JSONObject(doc.toJson()).getString("state");
             }
-            _Log.info(String.format("%s\n",edsm));
-            _Log.info(String.format("here %s\n","52b2688632dd0b0b"));
-            _execute(edsm.apply(tim));
+            _Log.info(String.format("state: %s",state));
+            try {
+                _edsm.setState(state);
+            } catch (Exception e) {
+                _Log.error(e);
+                return;
+            }
+
+            Document data = _mongoClient
+                .getDatabase("beerbot")
+                .getCollection(_config.getJSONObject("mongodb").getString("data"))
+                .find(Filters.eq("id",ud.toString())).first();
+            ElDrinkoInputMessage im = new ElDrinkoInputMessage(tim, data==null ? new JSONObject() : new JSONObject(data.toJson()).getJSONObject("data"), ud);
+
+            _Log.info(String.format("ss(%s): %s",im.userData,_edsm.getState()));
+            _Log.info(String.format("im(%s): %s",im.userData,im));
+            ImmutablePair<OutputMessage,JSONObject> om = _edsm.apply(im);
+            _Log.info(String.format("es(%s): %s",im.userData,_edsm.getState()));
+            _Log.info(String.format("om(%s): %s",im.userData,om));
+
+            _mongoClient.getDatabase("beerbot").getCollection(_config.getJSONObject("mongodb").getString("data"))
+                .updateOne(Filters.eq("id",ud.toString()),Updates.set("data",Document.parse(om.right.toString())),new UpdateOptions().upsert(true));
+            statesColl.updateOne(Filters.eq("id",ud.toString()),Updates.set("state",_edsm.getState()),new UpdateOptions().upsert(true));
+            _execute(om.left,ud);
         }
     }
-    void _execute(OutputMessage om) {
-        if( om instanceof OutputArrayMessage ) {
-            for(OutputMessage omm: ((OutputArrayMessage)om).getMessages()) {
-                _execute(omm);
-            }
-        } else if (om instanceof SendMessage) {
-            SendMessage sendMessage = (SendMessage) om;
-            try {
-		        sendMessage.setParseMode("Markdown");
+    void _execute(OutputMessage om, UserData ud) {
+        try {
+            if( om instanceof OutputArrayMessage ) {
+                for(OutputMessage omm: ((OutputArrayMessage)om).getMessages()) {
+                    _execute(omm,ud);
+                }
+            } else if (om instanceof SendMessage) {
+                SendMessage sendMessage = (SendMessage) om;
+                sendMessage.setParseMode("Markdown");
                 sendMessage.enableMarkdown(true);
-                execute(sendMessage);
-            } catch(TelegramApiException tae) {
-                _Log.info(String.format("here %s\n","05f6e0757caf298b"));
-            }
-        } else if (om instanceof SendPhoto) {
-            SendPhoto sendPhoto = (SendPhoto) om;
-            try {
+                sendMessage.setChatId(ud.getChatId().toString());
+                Message resMessage = execute(sendMessage);
+                _Log.info(String.format("after execute(%s) as %s",sendMessage,resMessage.getMessageId()));
+                if( om instanceof TelegramKeyboard ) {
+                    _lastSentKeyboardHash.put(ud.toString(),resMessage.getMessageId());
+                }
+            } else if (om instanceof SendPhoto) {
+                SendPhoto sendPhoto = (SendPhoto) om;
+                sendPhoto.setChatId(ud.getChatId().toString());
                 execute(sendPhoto);
-            } catch(TelegramApiException tae) {
-                _Log.info(" 30517df9663111bd \n");
+            } else {
+                throw new ElDrinkoStateMachine.ElDrinkoStateMachineException(String.format("cannot _execute(%s,%s)",om,ud));
             }
-        } else {
-            _Log.info(" 3c269b0998783662 \n");
+        } catch(Exception e) {
+            _Log.error(e);
         }
     }
-    ElDrinkoPubBot(String dbpass,String commit_hash, String botname) {
+    ElDrinkoPubBot(String dbpass,String commit_hash, String botname) throws ElDrinkoStateMachine.ElDrinkoStateMachineException, StateMachineException {
         _mongoClient = _GetMongoClient(dbpass);
+        _Log.info(String.format("botname: %s",botname));
         _config = _MergeJsonObjects(new JSONObject[] {
             new JSONObject(
                 _mongoClient
@@ -151,6 +243,12 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
         }
         _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
         ElDrinkoStateMachine.PreloadImages();
+        _edsm = new ElDrinkoStateMachine(this);
+        _actionInflator = new ElDrinkoActionInflator(this,_persistentStorage);
+        _conditionInflator = new ElDrinkoConditionInflator();
+        _edsm.inflateTransitionsFromJSON(_conditionInflator,_actionInflator, 
+                new JSONObject(MiscUtils.GetResource("transitions",".json")).getJSONArray("correspondence"));
+        _Log.info(String.format("edsm: %s\n",_edsm));
         this._sendMessageToMasters(String.format("updated! now at %s",commit_hash),true,"developerChatIds");
     }
 

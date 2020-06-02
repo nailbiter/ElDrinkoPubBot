@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import java.lang.StringBuilder;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.json.JSONArray;
 
 
 /**
@@ -25,6 +26,26 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
     public StateMachine(String state) {
         _currentState = state;
         _states.add(state);
+    }
+    public void inflateTransitionsFromJSON(Function<Object,Predicate<InputMessage>> conditionInflator, Function<Object,Function<InputMessage,OutputMessage>> actionInflator, JSONArray source) throws StateMachineException {
+        for(int i = 0; i < source.length(); i++) {
+            JSONArray a = source.getJSONArray(i);
+            String start = a.isNull(0) ? null : a.getString(0)
+                , end = a.isNull(1) ? null : a.getString(1);
+            Predicate<InputMessage> pred = conditionInflator.apply(a.get(2));
+            Function<InputMessage,OutputMessage> action = actionInflator.apply(a.get(3));
+
+            _Log.info(String.format("start: %s, end: %s",start,end));
+            if(start!=null && end!=null) {
+                this.addTransition(start,end,pred, action);
+            } else if (start==null && end!=null) {
+                for(String _start:this._states) {
+                    this.addTransition(_start,end,pred,action);
+                }
+            } else {
+                throw new StateMachineException("aed8ed251586aa75f5243c3a");
+            }
+        }
     }
     public StateMachine addTransition(String from, String to, 
             Predicate<InputMessage> transitionCondition, 
