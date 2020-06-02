@@ -78,7 +78,8 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
         return null;
     }
     protected void _didNotFoundSuitableTransition(InputMessage im) {
-        _Log.info("did not found suitable transition. returning null");
+        _Log.info(String.format("%s: did not found suitable transition. returning null",im));
+                
     }
     protected void _onSetStateCallback(String state) {}
     @Override
