@@ -8,5 +8,5 @@ COMMIT_DATA="\`$COMMIT_MSG\` (*$COMMIT_HASH*)"
 
 
 mvn clean
-mvn install
+mvn compile
 mvn exec:java -Dexec.mainClass="nl.insomnia247.nailbiter.eldrinkopubbot.App" -Dexec.args="\"$COMMIT_DATA\" $BOT_NAME" -Dfilename=$BOT_NAME
