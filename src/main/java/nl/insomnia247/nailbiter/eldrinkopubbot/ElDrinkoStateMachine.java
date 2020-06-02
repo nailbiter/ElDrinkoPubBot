@@ -1,6 +1,7 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
 import org.apache.commons.collections4.ListUtils;
 import java.util.Set;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.DownloadCache;
 import java.util.HashSet;
 import com.mongodb.MongoClient;
 import java.net.URL;
@@ -49,7 +50,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     private final PersistentStorage _persistentStorage;
     private final PersistentStorage _masterPersistentStorage;
     private final Consumer<ImmutablePair<String,String>>  _sendOrderCallback;
-    private static Logger _Log = LogManager.getLogger(ElDrinkoStateMachine.class);
+    private static final Logger _Log = LogManager.getLogger(ElDrinkoStateMachine.class);
     private static final DateFormat _ORDER_REPORT_FORMATTER = new SimpleDateFormat("dd.mm.yy HH:MM");
     static {
         _ORDER_REPORT_FORMATTER.setTimeZone(TimeZone.getTimeZone("Ukraine/Kiev"));
@@ -436,11 +437,21 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 }) //606c386ce22ad7d0
         ._finalize()    
         ;
+
         if(_persistentStorage.contains("state")) {
             _Log.info(String.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state")));
             this._currentState = _persistentStorage.get("state");
         }
+
         return res;
+    }
+    public static void PreloadImages() {
+        Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
+        for(String imgUrl:tsv.getColumn("image link")) {
+            _Log.info(String.format("start preloading %s",imgUrl));
+            String filePath = new DownloadCache(".png").get(MiscUtils.SafeUrl(imgUrl));
+            _Log.info(String.format("save %s -> %s",imgUrl,filePath));
+        }
     }
     private static int _IncrementOrderCount(PersistentStorage masterPersistentStorage) {
         final String FN = "order_count";
