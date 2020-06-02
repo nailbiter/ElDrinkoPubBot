@@ -1,7 +1,14 @@
 {
   "id": "DevElDrinkoPubBot",
-  "telegram":{
-    "masterChatIds":["340880765"]
+  "telegram": {
+    "salesmanChatIds": [
+      "145766172",
+      "340880765"
+    ],
+    "developerChatIds": [
+      "145766172",
+      "340880765"
+    ]
   },
   "mongodb": {
     "data": "dev_data",

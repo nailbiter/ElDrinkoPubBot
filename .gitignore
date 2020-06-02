@@ -7,3 +7,10 @@ secret.txt
 
 # flags
 .*.flag.txt
+
+# other
+.DS_Store
+.log/${sys:filename}.csv
+.log/DevElDrinkoPubBot.csv
+docs/
+target/
