@@ -474,7 +474,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     @Override
     protected void _onSetStateCallback(String state) {
-        _Log.info(String.format("state: %s\n",state));
+        super._onSetStateCallback(state);
         _persistentStorage.set("state",state);
     }
     @Override
