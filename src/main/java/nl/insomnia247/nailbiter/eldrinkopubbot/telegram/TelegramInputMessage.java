@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  */
 public class TelegramInputMessage implements InputMessage {
     protected String _msg = null;
+    private UserData _ud = null;
     protected TelegramInputMessage(String msg) {
         _msg = msg;
     }
@@ -15,20 +16,24 @@ public class TelegramInputMessage implements InputMessage {
         return _msg;
     }
     public static TelegramInputMessage CreateInputMessage(Update u) {
+        TelegramInputMessage res = null;
         if (u.hasMessage()) {
             Message m = u.getMessage();
             System.err.format("CreateInputMessage: %s\n",m.getText());
-            return new TelegramTextInputMessage(m.getText());
+            res = new TelegramTextInputMessage(m.getText());
         } else if(u.hasCallbackQuery()) {
 		    String call_data = u.getCallbackQuery().getData();
             System.err.format("call_data: %s\n",call_data);
-            return new TelegramKeyboardAnswer(call_data);
-        } else {
-            return null;
+            res = new TelegramKeyboardAnswer(call_data);
         }
+        res._ud = new UserData(u);
+        return res;
     }
     @Override
     public String toString() {
         return String.format("TelegramInputMessage(%s)",_msg);
+    }
+    public UserData getUserData() {
+        return _ud;
     }
 }
