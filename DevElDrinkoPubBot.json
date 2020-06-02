@@ -2,11 +2,9 @@
   "id": "DevElDrinkoPubBot",
   "telegram": {
     "salesmanChatIds": [
-      "145766172",
       "340880765"
     ],
     "developerChatIds": [
-      "145766172",
       "340880765"
     ]
   },
