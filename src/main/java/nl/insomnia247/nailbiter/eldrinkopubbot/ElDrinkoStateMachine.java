@@ -23,6 +23,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputArrayMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachine;
+import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachineException;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.TemplateEngine;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
@@ -46,8 +47,6 @@ import org.json.JSONObject;
  */
 public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,OutputMessage> {
     private static final String _BEERLIST = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGSUiAeapo7eHNfA1v9ov_Cc2oCjWNsmcpadN6crtxJ236uDOKt_C_cR1hsXCyqZucp_lQoeRHlu0k/pub?gid=0&single=true&output=tsv";
-    private final UserData _ud;
-    private final PersistentStorage _persistentStorage;
     private final PersistentStorage _masterPersistentStorage;
     private final Consumer<ImmutablePair<String,String>>  _sendOrderCallback;
     private static final Logger _Log = LogManager.getLogger(ElDrinkoStateMachine.class);
@@ -57,16 +56,14 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     private static final JSONObject _TRANSITIONS 
         = new JSONObject(MiscUtils.GetResource("transitions",".json"));
-    public ElDrinkoStateMachine(UserData ud, MongoClient mongoClient, Consumer<ImmutablePair<String,String>> sendOrderCallback, JSONObject config, PersistentStorage masterPersistentStorage) {
+    private final MongoClient _mongoClient ;
+    private final JSONObject _config;
+    public ElDrinkoStateMachine(MongoClient mongoClient, Consumer<ImmutablePair<String,String>> sendOrderCallback, JSONObject config, PersistentStorage masterPersistentStorage) {
         super("_");
-        _ud = ud;
+        _mongoClient = mongoClient;
         _masterPersistentStorage = masterPersistentStorage;
         _sendOrderCallback = sendOrderCallback;
-        _persistentStorage = new PersistentStorage(
-                mongoClient.getDatabase("beerbot").getCollection(config.getJSONObject("mongodb").getString("data")), 
-                "id",
-                ud.toString()
-                );
+        _config = config;
     }
     private static final Predicate<TelegramInputMessage> _TRIVIAL_PREDICATE
         = new Predicate<TelegramInputMessage>(){
@@ -97,7 +94,6 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         }
         orderMap.put("sum",sum);
         orderMap.put("delivery_fee",sum>=250 ? (double)0.0 : (double)20.0);
-        _Log.info(orderMap.toString());
         context.put("order",orderMap);
         _Log.info(String.format("context: %s",context));
         return context;
@@ -227,7 +223,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                     @Override
                     public OutputMessage apply(TelegramInputMessage im) {
                         ImmutablePair<Map<String,Object>,Object> pair = f.apply(im);
-                        return _InflateOutputMessage(start,end,_ud,pair.left,pair.right);
+                        return _InflateOutputMessage(start,end,im.getUserData(),pair.left,pair.right);
                     }
         };
 
@@ -259,6 +255,15 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 return new ImmutablePair <Map<String,Object>,Object>(null,null);
             }
         };
+    public static PersistentStorage GetPersistentStorage(MongoClient mongoClient,
+            UserData ud, JSONObject config) {
+        PersistentStorage _persistentStorage = new PersistentStorage(
+                mongoClient.getDatabase("beerbot").getCollection(config.getJSONObject("mongodb").getString("data")), 
+                "id",
+                ud.toString()
+                );
+        return _persistentStorage;
+    }
     public ElDrinkoStateMachine setUp() {
         ElDrinkoStateMachine res = (ElDrinkoStateMachine) this
             ._addTransition("_", "start", _TRIVIAL_PREDICATE, _NM)
@@ -289,6 +294,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                             int i = Integer.parseInt(tka.getMsg());
                             Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
                             JSONObject order = null;
+                            PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                             if(_persistentStorage.contains("order") && _persistentStorage.get("order").length()>0) {
                                 order = new JSONObject(_persistentStorage.get("order"));
                             } else {
@@ -332,6 +338,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         try {
                             amount = MiscUtils.ParseFloat(ttim.getMsg());
                         } catch(Exception e) {}
+                        PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                         JSONObject order = new JSONObject(_persistentStorage.get("order"));
                         JSONArray cart = order.getJSONArray("cart");
                         JSONObject obj = cart.getJSONObject(cart.length()-1);
@@ -346,6 +353,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                     new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                         @Override
                         public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                            PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                             JSONObject order = new JSONObject(_persistentStorage.get("order"));
                             _Log.info(String.format("order: %s\n",order));
                             return new ImmutablePair<Map<String,Object>,Object>(
@@ -358,6 +366,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                     public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
                         TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im;
                         int i = Integer.parseInt(tka.getMsg());
+                        PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                         JSONObject order = new JSONObject(_persistentStorage.get("order"));
                         JSONArray cart = order.getJSONArray("cart");
                         JSONObject removed = cart.getJSONObject(i);
@@ -373,6 +382,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
                     public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                        PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                         _persistentStorage.set("address",im.getMsg());
                         return new ImmutablePair<Map<String,Object>,Object>(null,null);
                     }
@@ -387,6 +397,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         int i = Integer.parseInt(tka.getMsg());
                         String paymentMethods 
                             = _ProcessTemplate("4ea9a63509e8ed5826a37f8a",null);
+                        PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                         _persistentStorage.set("payment", paymentMethods.split("\n")[i]);
                         JSONObject order = _GetOrder(_persistentStorage);
                         Map<String,Object> orderMap = _OrderObjectToJinjaContext(order);
@@ -398,6 +409,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
                     public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                        PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                         _persistentStorage.set("address",im.getMsg());
                         return new ImmutablePair<Map<String,Object>,Object>(
                                 _OrderObjectToJinjaContext(_GetOrder(_persistentStorage)),null);
@@ -407,6 +419,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
                     public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                        PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                         _persistentStorage.set("address",im.getMsg());
                         return new ImmutablePair<Map<String,Object>,Object>(null,null);
                     }
@@ -415,7 +428,9 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
                     public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                        PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                         JSONObject order = _GetOrder(_persistentStorage);
+                        UserData _ud = im.getUserData();
                         order.put("uid",_ud.getUserName());
                         order.put("count",_IncrementOrderCount(_masterPersistentStorage));
                         order.put("timestamp", _ORDER_REPORT_FORMATTER.format(new Date()));
@@ -431,17 +446,13 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>(){
                     @Override
                     public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im){
+                        PersistentStorage _persistentStorage = GetPersistentStorage(_mongoClient,im.getUserData(),_config);
                         _persistentStorage.set("order","");
                         return new ImmutablePair<Map<String,Object>,Object>(null,null);
                     }
                 }) //606c386ce22ad7d0
         ._finalize()    
         ;
-
-        if(_persistentStorage.contains("state")) {
-            _Log.info(String.format("setting _currentState to \"%s\"\n",_persistentStorage.get("state")));
-            this._currentState = _persistentStorage.get("state");
-        }
 
         return res;
     }
@@ -473,16 +484,21 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
         return order;
     }
     @Override
-    protected void _onSetStateCallback(String state) {
-        super._onSetStateCallback(state);
-        _persistentStorage.set("state",state);
-    }
-    @Override
     protected void _didNotFoundSuitableTransition(TelegramInputMessage im) {
         super._didNotFoundSuitableTransition(im);
         _sendOrderCallback.accept(new ImmutablePair<String,String>(
                     String.format("cannot found suitable transition \"%s\" \"%s\"",_currentState,im),
                     "developerChatIds"
                     ));
+    }
+    public void setState(String state) {
+        try {
+            _setState(state);
+        } catch (StateMachineException sme) {
+            _Log.error(String.format("setState(%s)",state));
+        }
+    }
+    public String getState() {
+        return _currentState;
     }
 }

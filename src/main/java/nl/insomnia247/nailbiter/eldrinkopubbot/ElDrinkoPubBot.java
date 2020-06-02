@@ -36,7 +36,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     private MongoClient _mongoClient = null;
     private String _botname = null;
     private JSONObject _config = null;
-    private Map<String, ElDrinkoStateMachine> _data = new HashMap<>();
+    ElDrinkoStateMachine _edsm = null;
     private final Map<String,List<Long>> _masterChatIds = new HashMap<>();
     private static Logger _Log = LogManager.getLogger(ElDrinkoPubBot.class);
     private PersistentStorage _persistentStorage = null;
@@ -72,21 +72,17 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
         if(tim != null) {
             _Log.info(String.format(" 78cbf16ed274bfe5 \n"));
             UserData ud = new UserData(update);
-            ElDrinkoStateMachine edsm = null;
-            _Log.info(String.format("here %s\n","fc4721b74e5c861c"));
-            if( !_data.containsKey(ud.toString()) ) {
-                _Log.info(String.format("here %s\n","abbfe7d43f0ae807"));
-                edsm = new ElDrinkoStateMachine(ud, _mongoClient, this, _config, _persistentStorage)
-                    .setUp()
-                    ;
-                _data.put(ud.toString(),edsm);
-            } else {
-                _Log.info(String.format("here %s\n","d6948b5130d382da"));
-                edsm = _data.get(ud.toString());
+            PersistentStorage persistentStorage
+                = ElDrinkoStateMachine.GetPersistentStorage(_mongoClient,ud,_config);
+            ElDrinkoStateMachine edsm = _edsm;
+			if(persistentStorage.contains("state")) {
+				edsm.setState(_persistentStorage.get("state"));
+			} else {
+                edsm.setState("_");
             }
-            _Log.info(String.format("%s\n",edsm));
-            _Log.info(String.format("here %s\n","52b2688632dd0b0b"));
-            _execute(edsm.apply(tim));
+            OutputMessage om = edsm.apply(tim);
+            persistentStorage.set("state",edsm.getState());
+            _execute(om);
         }
     }
     void _execute(OutputMessage om) {
@@ -146,6 +142,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
         _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
         ElDrinkoStateMachine.PreloadImages();
         this._sendMessageToMasters(String.format("updated! now at %s",commit_hash),true,"developerChatIds");
+        _edsm = new ElDrinkoStateMachine(_mongoClient, this, _config, _persistentStorage).setUp();
     }
 
     private static JSONObject _MergeJsonObjects(JSONObject[] objs) {
