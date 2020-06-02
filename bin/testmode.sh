@@ -8,7 +8,7 @@ BRANCH=staging
 git checkout $BRANCH
 git pull
 mvn clean
-mvn install
+mvn compile
 
 COMMIT_MSG=`git log -1 --pretty=%B|head -n1`
 COMMIT_HASH=`git rev-parse --short HEAD`
