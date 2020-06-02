@@ -4,6 +4,9 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %l - %msg%n" />
         </Console>
+        <File name="MyCsvFile" fileName=".log/${sys:filename}.csv" immediateFlush="true" append="false">
+            <CsvLogEventLayout delimiter=","/>
+        </File>
         <File name="MyFile" fileName=".log/${sys:filename}.txt" immediateFlush="true" append="false">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} %-5level %l - %msg%n"/>
         </File>
@@ -12,6 +15,7 @@
         <Root level="debug">
             <AppenderRef ref="Console" />
             <AppenderRef ref="MyFile"/>
+            <AppenderRef ref="MyCsvFile"/>
         </Root>
     </Loggers>
 </Configuration>
