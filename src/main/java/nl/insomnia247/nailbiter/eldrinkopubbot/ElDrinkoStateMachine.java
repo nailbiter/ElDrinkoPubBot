@@ -499,9 +499,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     protected void _didNotFoundSuitableTransition(TelegramInputMessage im) {
         super._didNotFoundSuitableTransition(im);
         _sendOrderCallback.accept(new ImmutablePair<String,String>(
-                    String.format("cannot \"%s\" find suitable transition \"%s\" \"%s\"",
-//                        _ud.getChatId(),
-                        "null",
+                    String.format("%s cannot find suitable transition \"%s\" \"%s\"",
+                        _ud,
                         _currentState,
                         im),
                     "developerChatIds"
