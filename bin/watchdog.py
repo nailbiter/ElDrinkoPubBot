@@ -18,7 +18,7 @@ from pprint import pprint
 
 
 #global const's
-REFRESH_PERIOD_SECONDS = 90
+REFRESH_PERIOD_SECONDS = 45
 assert( REFRESH_PERIOD_SECONDS > 60 ) #https://developer.github.com/v3/#rate-limiting
 #global var's
 Child_pid = 0
