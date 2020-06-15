@@ -1,5 +1,9 @@
 {
   "transitions": {
+    "dd7404e376113591":{
+      "tag": "TelegramTextOutputMessage",
+      "message": "1475a24ceb48b40d809f9082"
+    },
     "72e97b89bcab08c4": {
       "tag": "TelegramTextOutputMessage",
       "message": "fcff2695d806371dab5d7e05"
@@ -154,6 +158,12 @@
       "choose_phone_number",
       null,
       "72e97b89bcab08c4"
+    ],
+    [
+      "choose_phone_number",
+      "choose_phone_number",
+      null,
+      "dd7404e376113591"
     ],
     [
       "choose_phone_number",

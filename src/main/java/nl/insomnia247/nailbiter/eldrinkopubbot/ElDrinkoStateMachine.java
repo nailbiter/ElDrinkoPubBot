@@ -381,6 +381,7 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                     }
             }        
         )
+        ._addTransition("choose_phone_number","choose_phone_number",_TRIVIAL_PREDICATE,_NM)
         ._addTransition("choose_phone_number","choose_payment",
                 new Predicate<TelegramInputMessage>() {
                     @Override

@@ -17,6 +17,7 @@
 * [delete -> confirm (transition `t_5e1`)](#transition-t_5e1)
 * [confirm -> choose_address (transition `t_0f1`)](#transition-t_0f1)
 * [choose_address -> choose_phone_number (transition `t_72e`)](#transition-t_72e)
+* [choose_phone_number -> choose_phone_number (transition `t_dd7`)](#transition-t_dd7)
 * [choose_phone_number -> choose_payment (transition `t_8e0`)](#transition-t_8e0)
 * [choose_payment -> send (transition `t_fa7`)](#transition-t_fa7)
 * [send -> edit_address (transition `t_177`)](#transition-t_177)
@@ -152,6 +153,15 @@
 
 ```
 Зробіть вибір
+
+```
+
+## transition t_dd7
+
+### [`1475a24ceb48b40d809f9082`](../src/main/resources/1475a24ceb48b40d809f9082.txt)
+
+```
+Будь ласка, тільки цифри.
 
 ```
 
