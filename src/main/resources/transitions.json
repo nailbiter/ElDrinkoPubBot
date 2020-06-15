@@ -142,21 +142,21 @@
     ],
     [
       "confirm",
-      "choose_phone_number",
+      "choose_address",
       {
         "tag": "MessageKeyboardComparisonPredicate",
         "value": "2"
       },
-      "72e97b89bcab08c4"
-    ],
-    [
-      "choose_phone_number",
-      "choose_address",
-      null,
       "0f13e63d9cd69630"
     ],
     [
       "choose_address",
+      "choose_phone_number",
+      null,
+      "72e97b89bcab08c4"
+    ],
+    [
+      "choose_phone_number",
       "choose_payment",
       null,
       "8e0edde4a3199d0c"

@@ -370,8 +370,19 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         return new ImmutablePair<Map<String,Object>,Object>(orderMap,null);
                     }
                 })
-        ._addTransition("confirm","choose_phone_number",null,_NM)
-        ._addTransition("choose_phone_number","choose_address",new Predicate<TelegramInputMessage>() {
+        ._addTransition("confirm","choose_address",null,_NM)
+        ._addTransition("choose_address","choose_phone_number",
+                _IS_TEXT_MESSAGE,
+                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
+                    @Override
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                        _persistentStorage.set("address",im.getMsg());
+                        return new ImmutablePair<Map<String,Object>,Object>(null,null);
+                    }
+            }        
+        )
+        ._addTransition("choose_phone_number","choose_payment",
+                new Predicate<TelegramInputMessage>() {
                     @Override
                     public boolean test(TelegramInputMessage tim) {
                         if( !(tim instanceof TelegramTextInputMessage) ) {
@@ -386,15 +397,8 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         _persistentStorage.set("phone_number",im.getMsg());
                         return new ImmutablePair<Map<String,Object>,Object>(null,null);
                     }
-        })
-        ._addTransition("choose_address","choose_payment",_IS_TEXT_MESSAGE,
-                new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
-                    @Override
-                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
-                        _persistentStorage.set("address",im.getMsg());
-                        return new ImmutablePair<Map<String,Object>,Object>(null,null);
-                    }
-        }        )
+            }
+        )
         ._addTransition("choose_payment","send",_MessageKeyboardComparisonPredicate(null),
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
