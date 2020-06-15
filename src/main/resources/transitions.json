@@ -1,5 +1,9 @@
 {
   "transitions": {
+    "72e97b89bcab08c4": {
+      "tag": "TelegramTextOutputMessage",
+      "message": "fcff2695d806371dab5d7e05"
+    },
     "177680903e499486": {
       "tag": "TelegramTextOutputMessage",
       "message": "5d0c256b4a776245fee81385"
@@ -138,11 +142,17 @@
     ],
     [
       "confirm",
-      "choose_address",
+      "choose_phone_number",
       {
         "tag": "MessageKeyboardComparisonPredicate",
         "value": "2"
       },
+      "72e97b89bcab08c4"
+    ],
+    [
+      "choose_phone_number",
+      "choose_address",
+      null,
       "0f13e63d9cd69630"
     ],
     [

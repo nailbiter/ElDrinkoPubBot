@@ -1,6 +1,8 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot;
 import org.apache.commons.collections4.ListUtils;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.DownloadCache;
 import java.util.HashSet;
 import com.mongodb.MongoClient;
@@ -368,7 +370,23 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
                         return new ImmutablePair<Map<String,Object>,Object>(orderMap,null);
                     }
                 })
-        ._addTransition("confirm","choose_address",null,_NM)
+        ._addTransition("confirm","choose_phone_number",null,_NM)
+        ._addTransition("choose_phone_number","choose_address",new Predicate<TelegramInputMessage>() {
+                    @Override
+                    public boolean test(TelegramInputMessage tim) {
+                        if( !(tim instanceof TelegramTextInputMessage) ) {
+                            return false;
+                        }
+                        TelegramTextInputMessage ttim = (TelegramTextInputMessage) tim;
+                        return Pattern.matches("\\d+",ttim.getMsg());
+                    }
+                },new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
+                    @Override
+                    public ImmutablePair<Map<String,Object>,Object> apply(TelegramInputMessage im) {
+                        _persistentStorage.set("phone_number",im.getMsg());
+                        return new ImmutablePair<Map<String,Object>,Object>(null,null);
+                    }
+        })
         ._addTransition("choose_address","choose_payment",_IS_TEXT_MESSAGE,
                 new Function<TelegramInputMessage,ImmutablePair<Map<String,Object>,Object>>() {
                     @Override
@@ -464,11 +482,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     }
     private static JSONObject _GetOrder(PersistentStorage persistentStorage) {
         JSONObject order = new JSONObject(persistentStorage.get("order"));
-        if(persistentStorage.contains("address")) {
-            order.put("address",persistentStorage.get("address"));
-        }
-        if(persistentStorage.contains("payment")) {
-            order.put("payment",persistentStorage.get("payment"));
+        final String[] KEYS = new String[] {"phone_number","address","payment"};
+        for(String k: KEYS) {
+            if(persistentStorage.contains(k)) {
+                order.put(k,persistentStorage.get(k));
+            }
         }
         return order;
     }
@@ -481,7 +499,11 @@ public class ElDrinkoStateMachine extends StateMachine<TelegramInputMessage,Outp
     protected void _didNotFoundSuitableTransition(TelegramInputMessage im) {
         super._didNotFoundSuitableTransition(im);
         _sendOrderCallback.accept(new ImmutablePair<String,String>(
-                    String.format("cannot found suitable transition \"%s\" \"%s\"",_currentState,im),
+                    String.format("cannot \"%s\" find suitable transition \"%s\" \"%s\"",
+//                        _ud.getChatId(),
+                        "null",
+                        _currentState,
+                        im),
                     "developerChatIds"
                     ));
     }
