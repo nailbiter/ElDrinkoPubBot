@@ -18,7 +18,7 @@ from pprint import pprint
 
 
 #global const's
-REFRESH_PERIOD_SECONDS = 45
+REFRESH_PERIOD_SECONDS = 60
 #global var's
 Child_pid = 0
 #procedures
