@@ -46,7 +46,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     }
     private void _sendMessageToMasters(String msg, boolean isMarkdown, String key) {
         if(key.equals("developerChatIds")) {
-            msg = String.format("(> %s <)",msg);
+            msg = String.format("`(> %s <)`",msg);
             isMarkdown = true;
         }
         for(Long masterChatId : _masterChatIds.get(key)) {
@@ -61,7 +61,13 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 _Log.info(String.format("sending %s to %s\n",msg,chatId));
                 execute(sendMessage);
             } catch(Exception e) {
-                _Log.info(String.format(" f531ae90faad7adb \n"));
+                _Log.info(String.format("f531ae90faad7adb: \"%s\" \"%s\" \"%s\" \"%s\"\n",
+                            e.getMessage(),
+                            e.getClass().getName(),
+//                            ((TelegramApiException)e).getApiResponse(),
+                            "no",
+                            e
+                            ));
             }
         }
     }
