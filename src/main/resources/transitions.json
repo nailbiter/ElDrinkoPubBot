@@ -1,6 +1,6 @@
 {
   "transitions": {
-    "dd7404e376113591":{
+    "dd7404e376113591": {
       "tag": "TelegramTextOutputMessage",
       "message": "1475a24ceb48b40d809f9082"
     },
@@ -88,37 +88,61 @@
       "_",
       "start",
       null,
-      "75f676187e00dd85"
+      {
+        "correspondence": "75f676187e00dd85"
+      }
     ],
     [
       "start",
       "choose_product_to_see_description",
-      null,
-      "950c3e4921e05d14"
+      {
+        "tag": "MessageKeyboardComparisonPredicate",
+        "value": "1"
+      },
+      {
+        "correspondence": "950c3e4921e05d14"
+      }
     ],
     [
       "choose_product_to_see_description",
       "start",
-      null,
-      "72aa7197071b6503"
+      {
+        "tag": "MessageKeyboardComparisonPredicate"
+      },
+      {
+        "correspondence": "72aa7197071b6503"
+      }
     ],
     [
       "start",
       "choose_product_to_make_order",
-      null,
-      "f4a78dc2c6339be1"
+      {
+        "tag": "MessageKeyboardComparisonPredicate",
+        "value": "0"
+      },
+      {
+        "correspondence": "f4a78dc2c6339be1"
+      }
     ],
     [
       "choose_product_to_make_order",
       "choose_amount",
-      null,
-      "f02480c016715289"
+      {
+        "tag": "MessageKeyboardComparisonPredicate"
+      },
+      {
+        "correspondence": "f02480c016715289"
+      }
     ],
     [
       "choose_amount",
       "confirm",
-      null,
-      "5e11c9696e9b38f0"
+      {
+        "tag": "IsHalfIntegerFloatPredicate"
+      },
+      {
+        "correspondence": "5e11c9696e9b38f0"
+      }
     ],
     [
       "confirm",
@@ -127,7 +151,9 @@
         "tag": "MessageKeyboardComparisonPredicate",
         "value": "0"
       },
-      "f4a78dc2c6339be1"
+      {
+        "correspondence": "f4a78dc2c6339be1"
+      }
     ],
     [
       "confirm",
@@ -136,13 +162,20 @@
         "tag": "MessageKeyboardComparisonPredicate",
         "value": "1"
       },
-      "04dc388df66f8e8c"
+      {
+        "correspondence": "04dc388df66f8e8c"
+      }
     ],
     [
       "delete",
       "confirm",
-      null,
-      "5e11c9696e9b38f0"
+      {
+        "tag": "MessageKeyboardComparisonPredicate"
+      },
+      {
+        "correspondence": "5e11c9696e9b38f0",
+        "src_state": "delete"
+      }
     ],
     [
       "confirm",
@@ -151,31 +184,47 @@
         "tag": "MessageKeyboardComparisonPredicate",
         "value": "2"
       },
-      "0f13e63d9cd69630"
+      {
+        "correspondence": "0f13e63d9cd69630"
+      }
     ],
     [
       "choose_address",
       "choose_phone_number",
-      null,
-      "72e97b89bcab08c4"
+      {
+        "tag": "IsTextMessagePredicate"
+      },
+      {
+        "correspondence": "72e97b89bcab08c4"
+      }
     ],
     [
       "choose_phone_number",
       "choose_phone_number",
       null,
-      "dd7404e376113591"
+      {
+        "correspondence": "dd7404e376113591"
+      }
     ],
     [
       "choose_phone_number",
       "choose_payment",
-      null,
-      "8e0edde4a3199d0c"
+      {
+        "tag": "IsPhoneNumberPredicate"
+      },
+      {
+        "correspondence": "8e0edde4a3199d0c"
+      }
     ],
     [
       "choose_payment",
       "send",
-      null,
-      "fa702a44b70ddcae"
+      {
+        "tag": "MessageKeyboardComparisonPredicate"
+      },
+      {
+        "correspondence": "fa702a44b70ddcae"
+      }
     ],
     [
       "send",
@@ -184,19 +233,31 @@
         "tag": "MessageKeyboardComparisonPredicate",
         "value": "2"
       },
-      "177680903e499486"
+      {
+        "correspondence": "177680903e499486"
+      }
     ],
     [
       "edit_address",
       "send",
-      null,
-      "fa702a44b70ddcae"
+      {
+        "tag": "IsTextMessagePredicate"
+      },
+      {
+        "correspondence": "fa702a44b70ddcae",
+        "src_state": "edit_address"
+      }
     ],
     [
       "send",
       "choose_payment",
-      null,
-      "8e0edde4a3199d0c"
+      {
+        "tag": "MessageKeyboardComparisonPredicate",
+        "value": "1"
+      },
+      {
+        "correspondence": "8e0edde4a3199d0c"
+      }
     ],
     [
       "send",
@@ -205,7 +266,9 @@
         "tag": "MessageKeyboardComparisonPredicate",
         "value": "0"
       },
-      "48c6907046b03db8"
+      {
+        "correspondence": "48c6907046b03db8"
+      }
     ],
     [
       "idle",
@@ -214,7 +277,9 @@
         "tag": "MessageKeyboardComparisonPredicate",
         "value": "0"
       },
-      "19ed501387d9bc4d"
+      {
+        "correspondence": "19ed501387d9bc4d"
+      }
     ],
     [
       null,
@@ -223,7 +288,10 @@
         "tag": "MessageComparisonPredicate",
         "value": "/start"
       },
-      "75f676187e00dd85"
+      {
+        "correspondence": "75f676187e00dd85",
+        "src_state":"null"
+      }
     ]
   ]
 }

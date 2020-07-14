@@ -12,10 +12,8 @@ import java.io.File;
 public class TelegramImageOutputMessage extends SendPhoto implements OutputMessage {
     String _msg = null;
     URL _image = null;
-    public TelegramImageOutputMessage(UserData ud, String msg, URL image) {
+    public TelegramImageOutputMessage(String msg, URL image) {
         super();
-        this.setChatId(ud.getChatId().toString());
-        //this.setPhoto(image.toString());
         String filePath = new DownloadCache(".png").get(image);
         this.setPhoto(new File(filePath));
         this.setCaption(msg);

@@ -7,8 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
  * @author Alex Leontiev
  */
 public class TelegramOutputMessage extends SendMessage implements OutputMessage {
-    public TelegramOutputMessage(UserData ud) {
+    public TelegramOutputMessage() {
         super();
-        this.setChatId(ud.getChatId().toString());
     }
 }

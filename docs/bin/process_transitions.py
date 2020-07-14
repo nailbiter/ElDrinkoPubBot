@@ -12,7 +12,7 @@ def add_fields(d):
     for c in correspondence:
         if c[0] is None:
             c[0] = SRC_WILDCASE_STATE
-    transition_codes_set = {c[3] for c in correspondence}
+    transition_codes_set = {c[3]["correspondence"] for c in correspondence}
     cut = 0
     while(len({s[:cut] for s in transition_codes_set})<len(transition_codes_set)):
         cut += 1

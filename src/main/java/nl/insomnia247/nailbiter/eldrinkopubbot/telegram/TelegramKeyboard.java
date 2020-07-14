@@ -10,9 +10,12 @@ import java.util.Arrays;
  */
 public class TelegramKeyboard extends TelegramOutputMessage {
     private final static int _COLNUM = 2;
-    public TelegramKeyboard(UserData ud, String msg, String[] categories) {
-        super(ud);
-        System.err.format("TelegramKeyboard: \"%s\" [%s]\n",msg,String.join(",",Arrays.asList(categories)));
+    String _msg;
+    List<String> _categories;
+    public TelegramKeyboard(String msg, String[] categories) {
+        super();
+        _msg = msg;
+        _categories = Arrays.asList(categories);
         setText(msg);
 		List<List<InlineKeyboardButton>> buttons = new ArrayList<List<InlineKeyboardButton>>();
         for(int i = 0; i < categories.length; ) {
@@ -27,5 +30,10 @@ public class TelegramKeyboard extends TelegramOutputMessage {
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         markupInline.setKeyboard(buttons);
         this.setReplyMarkup(markupInline);
+    }
+    @Override
+    public String toString() {
+        String res = super.toString();
+        return String.format("%s(%s,%s)",this.getClass().getSimpleName(),_msg,_categories);
     }
 }

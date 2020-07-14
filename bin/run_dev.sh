@@ -9,4 +9,4 @@ COMMIT_DATA="\`$COMMIT_MSG\` (*$COMMIT_HASH*)"
 
 mvn clean
 mvn compile
-mvn exec:java -Dexec.mainClass="nl.insomnia247.nailbiter.eldrinkopubbot.App" -Dexec.args="\"$COMMIT_DATA\" $BOT_NAME" -Dfilename=$BOT_NAME
+env COMMIT_DATA="$COMMIT_DATA" BOT_NAME="$BOT_NAME" mvn exec:java -Dexec.mainClass="nl.insomnia247.nailbiter.eldrinkopubbot.App" -Dfilename=$BOT_NAME
