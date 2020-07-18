@@ -1,0 +1,206 @@
+{
+  "currentState": "_",
+  "transitions": {
+    "[\"choose_product_to_make_order\",\"choose_amount\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"send\",\"idle\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"confirm\",\"choose_address\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_payment\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"start\",\"choose_product_to_make_order\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_product_to_see_description\",\"start\"]": [
+      [
+        null,
+        null
+      ],
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_address\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_amount\",\"confirm\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"delete\",\"confirm\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"confirm\",\"delete\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"delete\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"start\",\"choose_product_to_see_description\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_payment\",\"send\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"send\",\"choose_payment\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_address\",\"choose_phone_number\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_product_to_make_order\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"idle\",\"start\"]": [
+      [
+        null,
+        null
+      ],
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"send\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_phone_number\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"confirm\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"edit_address\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"start\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"edit_address\",\"send\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_phone_number\",\"choose_payment\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_amount\",\"start\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"choose_phone_number\",\"choose_phone_number\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"confirm\",\"choose_product_to_make_order\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"send\",\"edit_address\"]": [
+      [
+        null,
+        null
+      ]
+    ],
+    "[\"_\",\"start\"]": [
+      [
+        null,
+        null
+      ],
+      [
+        null,
+        null
+      ]
+    ]
+  },
+  "states": {
+    "choose_product_to_see_description": 1,
+    "choose_product_to_make_order": 1,
+    "idle": 1,
+    "choose_payment": 1,
+    "start": 1,
+    "edit_address": 1,
+    "delete": 1,
+    "confirm": 1,
+    "choose_amount": 1,
+    "choose_address": 1,
+    "choose_phone_number": 1,
+    "send": 1,
+    "_": 1
+  }
+}

@@ -1,4 +1,4 @@
-package nl.insomnia247.nailbiter.eldrinkobubbot;
+package nl.insomnia247.nailbiter.eldrinkopubbot;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

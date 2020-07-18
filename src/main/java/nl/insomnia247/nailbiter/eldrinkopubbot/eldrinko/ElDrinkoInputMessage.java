@@ -1,4 +1,4 @@
-package nl.insomnia247.nailbiter.eldrinkopubbot;
+package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
 import org.json.JSONObject;

@@ -5,18 +5,19 @@ import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.json.JSONObject;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.PersistentStorage;
 
 
 /**
  * @author Alex Leontiev
  * assumption: database only gets modified through this object
  */
-public class PersistentStorage {
+public class MongoPersistentStorage implements PersistentStorage {
     private MongoCollection<Document> _mongoCollection = null;
     private JSONObject _obj = null;
     private String _key = null;
     private String _val = null;
-    public PersistentStorage(MongoCollection<Document> mongoCollection, String key, String val) {
+    public MongoPersistentStorage(MongoCollection<Document> mongoCollection, String key, String val) {
         System.err.format(" ad964b5521b11fb9 \n");
         _mongoCollection = mongoCollection;
         _key = key;
@@ -41,12 +42,15 @@ public class PersistentStorage {
             }
         }
     }
+    @Override
     public boolean contains(String key) {
         return _obj.has(key);
     }
+    @Override
     public String get(String key) {
         return _obj.getString(key);
     }
+    @Override
     public PersistentStorage set(String key, String val) {
         _mongoCollection.updateOne(Filters.eq(_key,_val),Updates.set(key,val));
         _obj.put(key,val);

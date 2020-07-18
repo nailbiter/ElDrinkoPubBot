@@ -1,4 +1,5 @@
-package nl.insomnia247.nailbiter.eldrinkopubbot;
+package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
 import java.util.regex.Pattern;
@@ -77,7 +78,7 @@ public class ElDrinkoConditionInflator implements Function<Object,Predicate<ElDr
     }
     @Override
     public Predicate<ElDrinkoInputMessage> apply(Object o) {
-        _Log.info(String.format("o: %s",o));
+        _Log.info(SecureString.format("o: %s",o));
         if(o==JSONObject.NULL) {
             return _TRIVIAL_PREDICATE;
         } else if(((JSONObject)o).getString("tag").equals("IsPhoneNumberPredicate")) {

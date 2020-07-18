@@ -1,4 +1,4 @@
-package nl.insomnia247.nailbiter.eldrinkopubbot;
+package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
 import java.util.function.Function;
 import java.util.Date;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
@@ -25,12 +25,13 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.function.Consumer;
-import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.PersistentStorage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextOutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputArrayMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboardAnswer;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
 
 /**
  * @author Alex Leontiev
@@ -55,7 +56,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
         return new Function<ElDrinkoInputMessage, ImmutablePair<OutputMessage,JSONObject>>() {
             @Override
             public ImmutablePair<OutputMessage,JSONObject> apply(ElDrinkoInputMessage im) {
-                _Log.info(String.format("here with %s,%s",o,im));
+                _Log.info(SecureString.format("here with %s,%s",o,im));
                 if( (((JSONObject)o).getString("correspondence")).equals("f02480c016715289") ) {
                     TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                     int i = Integer.parseInt(tka.getMsg());
@@ -117,12 +118,12 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                     im.right.put("order","");
                 }
 
-                _Log.info(String.format("before _GetOrder(%s)",im.right));
+                _Log.info(SecureString.format("before _GetOrder(%s)",im.right));
                 JSONObject ppo = _GetOrder(im.right);
-                _Log.info(String.format("_OrderObjectToJinjaContext(%s)",ppo));
+                _Log.info(SecureString.format("_OrderObjectToJinjaContext(%s)",ppo));
                 Map<String,Object> map = _OrderObjectToJinjaContext(ppo);
                 Object oo = null;
-                _Log.info(String.format("after _GetOrder(%s)",im.right));
+                _Log.info(SecureString.format("after _GetOrder(%s)",im.right));
 
                 if( (((JSONObject)o).getString("correspondence")).equals("72aa7197071b6503") ) {
                     TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
@@ -133,7 +134,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                     oo = MiscUtils.SafeUrl(imgUrl);
                 }
 
-                _Log.info(String.format("before _InflateOutputMessage(%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.right));
+                _Log.info(SecureString.format("before _InflateOutputMessage(%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.right));
                 return new ImmutablePair<OutputMessage,JSONObject>(_InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo),im.right);
             }
         };
@@ -149,7 +150,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
         if(m instanceof JSONArray) {
             List<OutputMessage> msgs = new ArrayList<>();
 
-            _Log.info(String.format(" %s ",m));
+            _Log.info(SecureString.format(" %s ",m));
             for(int i = 0; i < ((JSONArray)m).length();i++) {
                 msgs.add(_InflateOutputMessageFromJson(((JSONArray)m).get(i),env,obj));
             }
@@ -199,14 +200,14 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
         orderMap.put("delivery_fee",sum>=250 ? (double)0.0 : (double)20.0);
         _Log.info(orderMap.toString());
         context.put("order",orderMap);
-        _Log.info(String.format("context: %s",context));
+        _Log.info(SecureString.format("context: %s",context));
         return context;
     }
     private static TelegramKeyboard _InflateTelegramKeyboard(Map<String,Object> env,String msgTemplateResName, String keysTemplateResName) {
         String keyboardKeys = MiscUtils.ProcessTemplate(keysTemplateResName,env);
         String keyboardMsg = MiscUtils.ProcessTemplate(msgTemplateResName,env);
-        _Log.info(String.format("keyboardMsg: %s",keyboardMsg));
-        _Log.info(String.format("keyboardKeys: %s",keyboardKeys));
+        _Log.info(SecureString.format("keyboardMsg: %s",keyboardMsg));
+        _Log.info(SecureString.format("keyboardKeys: %s",keyboardKeys));
         return new TelegramKeyboard(keyboardMsg,keyboardKeys.split("\n"));
     }
     private static int _IncrementOrderCount(PersistentStorage masterPersistentStorage) {

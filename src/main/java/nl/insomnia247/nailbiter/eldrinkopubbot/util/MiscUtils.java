@@ -38,7 +38,7 @@ public class MiscUtils {
         try {
             url = new URL(u);
         } catch (Exception e) {
-            _Log.info(String.format("malformed url: \"%s\"\n",u));
+            _Log.info(SecureString.format("malformed url: \"%s\"\n",u));
         }
         return url;
     }
@@ -46,7 +46,7 @@ public class MiscUtils {
         return GetResource(templateName,".txt");
     }
     public static String GetResource(String templateName, String ext) {
-        _Log.info(String.format("MiscUtils.GetResource(%s,%s)",templateName,ext));
+        _Log.info(SecureString.format("MiscUtils.GetResource(%s,%s)",templateName,ext));
         String template = null;
         try {
             InputStream in 
@@ -55,7 +55,7 @@ public class MiscUtils {
         } catch(Exception e) {
             _Log.info(" 60a93278bbe5f78d \n");
         }
-        _Log.info(String.format("res: %s",template));
+        _Log.info(SecureString.format("res: %s",template));
         return template;
     }
     public static String ProcessTemplate(String templateName, Map<String, Object> additionalContext) {
@@ -69,14 +69,14 @@ public class MiscUtils {
                 context.put(k,additionalContext.get(k));
             }
         }
-        _Log.info(String.format("_ProcessTemplate: context before rendering: %s",context));
+        _Log.info(SecureString.format("_ProcessTemplate: context before rendering: %s",context));
 
-        _Log.info(String.format("getting resource %s",templateName));
+        _Log.info(SecureString.format("getting resource %s",templateName));
         String template = MiscUtils.GetResource(templateName);
-        _Log.info(String.format("template: %s",template));
+        _Log.info(SecureString.format("template: %s",template));
         String renderedTemplate = MiscUtils.GetResource(templateName);
         renderedTemplate = _jinjava.render(template, context);	
-        _Log.info(String.format("renderedTemplate: %s",renderedTemplate));
+        _Log.info(SecureString.format("renderedTemplate: %s",renderedTemplate));
         return renderedTemplate;
     }
 }

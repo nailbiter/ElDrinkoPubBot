@@ -1,4 +1,5 @@
-package nl.insomnia247.nailbiter.eldrinkopubbot;
+package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
 import com.mongodb.MongoClient;
 import java.util.Random;
 import com.mongodb.client.MongoCollection;
@@ -21,7 +22,7 @@ import java.util.regex.Pattern;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.KeyboardAnswer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputArrayMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
-import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.PersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.ExposedStateMachine;
 import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachineException;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramImageOutputMessage;
@@ -64,9 +65,9 @@ public class ElDrinkoStateMachine extends ExposedStateMachine<ElDrinkoInputMessa
     public static void PreloadImages() {
         Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
         for(String imgUrl:tsv.getColumn("image link")) {
-            _Log.info(String.format("start preloading %s",imgUrl));
+            _Log.info(SecureString.format("start preloading %s",imgUrl));
             String filePath = new DownloadCache(".png").get(MiscUtils.SafeUrl(imgUrl));
-            _Log.info(String.format("save %s -> %s",imgUrl,filePath));
+            _Log.info(SecureString.format("save %s -> %s",imgUrl,filePath));
         }
     }
     @Override
@@ -82,7 +83,7 @@ public class ElDrinkoStateMachine extends ExposedStateMachine<ElDrinkoInputMessa
                     im.userData.getChatId().toString()
                     ));
         _sendOrderCallback.accept(new ImmutablePair<String,String>(
-                    String.format("%s cannot find suitable transition \"%s\" \"%s\"",
+                    SecureString.format("%s cannot find suitable transition \"%s\" \"%s\"",
                         im.userData,
                         _currentState,
                         im),
