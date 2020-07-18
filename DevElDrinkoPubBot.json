@@ -10,6 +10,7 @@
   },
   "mongodb": {
     "data": "dev_data",
-    "logs": "dev_logs"
+    "logs": "dev_logs",
+    "state_machine_states": "dev_state_machine_states"
   }
 }

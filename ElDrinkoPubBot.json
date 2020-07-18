@@ -11,6 +11,7 @@
   },
   "mongodb": {
     "data": "data",
-    "logs": "logs"
+    "logs": "logs",
+    "state_machine_states": "state_machine_states"
   }
 }
