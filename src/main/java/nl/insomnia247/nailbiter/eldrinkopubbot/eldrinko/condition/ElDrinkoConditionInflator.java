@@ -1,4 +1,4 @@
-package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
+package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.ElDrinkoInputMessage;
 
 /**
  * @author Alex Leontiev

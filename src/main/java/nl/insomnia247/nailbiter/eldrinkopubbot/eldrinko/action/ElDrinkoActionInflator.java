@@ -1,5 +1,6 @@
-package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
+package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action;
 import java.util.function.Function;
+import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.ElDrinkoInputMessage;
 import java.util.Date;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramImageOutputMessage;

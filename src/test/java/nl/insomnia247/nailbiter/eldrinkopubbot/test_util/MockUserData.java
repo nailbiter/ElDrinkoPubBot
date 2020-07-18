@@ -1,5 +1,5 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.test_util;
-import nl.insomnia247.nailbiter.eldrinkobubbot.telegram.UserData;
+import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 
 /**
  * @author Alex Leontiev

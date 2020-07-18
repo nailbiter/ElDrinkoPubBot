@@ -1,12 +1,14 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.telegram;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.json.JSONObject;
 
 /**
  * @author Alex Leontiev
  */
 public class UserData {
-    private long _chatId = 0;
-    private String _username = null;
+    protected long _chatId = 0;
+    protected String _username = null;
+    public UserData() {}
     public UserData(Update update) {
         if(update.hasMessage()) {
             _chatId = update.getMessage().getChatId();
@@ -24,5 +26,8 @@ public class UserData {
     @Override
     public String toString() {
         return Long.toString(_chatId);
+    }
+    public String toJsonString() {
+        return new JSONObject().put("chatId",_chatId).put("username",_username).toString();
     }
 }

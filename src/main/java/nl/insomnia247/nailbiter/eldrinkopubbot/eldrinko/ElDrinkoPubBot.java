@@ -44,6 +44,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.ElDrinkoActionInflator;
+import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition.ElDrinkoConditionInflator;
 
 
 public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<ImmutablePair<String,String>> {

@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 /**
  * @author Alex Leontiev
  */
-public class TelegramInputMessage implements InputMessage {
+public abstract class TelegramInputMessage implements InputMessage {
     protected String _msg = null;
     protected TelegramInputMessage(String msg) {
         _msg = msg;
@@ -18,4 +18,5 @@ public class TelegramInputMessage implements InputMessage {
     public String toString() {
         return String.format("TelegramInputMessage(%s)",_msg);
     }
+    public abstract String toJsonString();
 }

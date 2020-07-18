@@ -1,5 +1,6 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.json.JSONObject;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramInputMessage;
 import org.json.JSONObject;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
@@ -19,5 +20,12 @@ public class ElDrinkoInputMessage {
     @Override
     public String toString() {
         return new ImmutablePair<TelegramInputMessage,JSONObject>(left,right).toString();
+    }
+    public String toJsonString() {
+        return new JSONObject()
+            .put("left",new JSONObject(TelegramInputMessage.toJsonString()))
+            .put("right",right)
+            .put("userData",new JSONObject(userData.toJsonString()))
+            .toString();
     }
 }
