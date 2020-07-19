@@ -23,7 +23,7 @@ public class ElDrinkoInputMessage {
     }
     public String toJsonString() {
         return new JSONObject()
-            .put("left",new JSONObject(TelegramInputMessage.toJsonString()))
+            .put("left",new JSONObject(left.toJsonString()))
             .put("right",right)
             .put("userData",new JSONObject(userData.toJsonString()))
             .toString();

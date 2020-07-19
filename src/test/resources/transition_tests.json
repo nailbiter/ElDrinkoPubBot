@@ -1,0 +1,43 @@
+[
+  {
+    "im": {
+      "left": {
+        "tag": "TelegramTextInputMessage",
+        "value": "/start"
+      },
+      "right": {},
+      "userData": {
+        "chatId": 0,
+        "username": "test"
+      }
+    },
+    "ss": "_",
+    "es": "start",
+    "om": {
+      "left": {
+        "tag": "OutputArrayMessage",
+        "value": [
+          {
+            "tag": "TelegramTextOutputMessage",
+            "value": {
+              "msg": "Вітаємо!\n"
+            }
+          },
+          {
+            "tag": "TelegramKeyboard",
+            "value": {
+              "msg": "Сьогодні ми пропонуємо:\n1. Mariposa (83.00 грн/л)\n2. IPA (77.00 грн/л)\n3. Milk Stout (69.00 грн/л)\n4. Wizen (54.00 грн/л)\n5. Pilsner (54.00 грн/л)\n6. Pale Ale (57.00 грн/л)\n7. Mars (72.00 грн/л)\n8. Golden Ale (74.00 грн/л)\n",
+              "categories": [
+                [
+                  "Замовити",
+                  "Дивитись описи"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "right": {"username":"@test"}
+    }
+  }
+]

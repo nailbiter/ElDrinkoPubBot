@@ -135,6 +135,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                     oo = MiscUtils.SafeUrl(imgUrl);
                 }
 
+                im.right.put("username",im.userData.getUserName());
                 _Log.info(SecureString.format("before _InflateOutputMessage(%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.right));
                 return new ImmutablePair<OutputMessage,JSONObject>(_InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo),im.right);
             }

@@ -4,6 +4,7 @@ import java.net.URL;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.DownloadCache;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.json.JSONObject;
 import java.io.File;
 
 /**
@@ -23,5 +24,12 @@ public class TelegramImageOutputMessage extends SendPhoto implements OutputMessa
     @Override
     public String toString() {
         return String.format("TelegramImageOutputMessage(%s,%s)",_msg, _image.toString());
+    }
+    @Override
+    public String toJsonString() {
+        return new JSONObject()
+            .put("tag",getClass().getSimpleName())
+            .put("value", new JSONObject().put("msg",_msg).put("image",_image.toString()))
+            .toString();
     }
 }
