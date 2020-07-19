@@ -37,7 +37,9 @@
           }
         ]
       },
-      "right": {"username":"@test"}
+      "right": {
+        "username": "@test"
+      }
     }
   }
 ]

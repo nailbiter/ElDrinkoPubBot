@@ -18,11 +18,14 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.test_util.MockPersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import org.json.JSONObject;
 import org.json.JSONArray;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Alex Leontiev
  */
 public class ElDrinkoPubBotStateMachineTest extends TestCase {
+    Logger _Log = LogManager.getLogger();
     private MockConsumer _consumer;
     private ElDrinkoStateMachine _edsm;
     private PersistentStorage _persistentStorage;
@@ -40,7 +43,7 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
             _edsm.inflateTransitionsFromJSON(_conditionInflator,_actionInflator, 
                     new JSONObject(MiscUtils.GetResource("transitions",".json")).getJSONArray("correspondence").toString());
         } catch (Exception e) {
-            System.err.println(e);
+            _Log.error(e);
             System.exit(1);
         }
     }
@@ -49,7 +52,7 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
     }
     public void testElDrinkoStateMachineConfig() {
         JSONObject eldrinko_state_machine = new JSONObject(MiscUtils.GetResource("eldrinko_state_machine",".json"));
-        //System.out.println(_edsm.toJsonString());
+        _Log.info(String.format("%s: %s","01c303e27fafdc26",_edsm.toJsonString()));
         assertEquals(eldrinko_state_machine.toString(), new JSONObject(_edsm.toJsonString()).toString());
     }
     private static TelegramInputMessage _ParseTelegramInputMessage(JSONObject o) throws Exception {
@@ -76,7 +79,7 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
                 _edsm.setState(transition.getString("ss"));
                 im = _ParseElDrinkoInputMessage(transition.getJSONObject("im"));
             } catch (Exception e) {
-                System.err.println(e);
+                _Log.error(e);
                 System.exit(1);
             }
             ImmutablePair<OutputMessage,JSONObject> om = _edsm.apply(im);

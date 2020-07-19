@@ -18,83 +18,35 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.ElDrinkoInputMessage;
  * @author Alex Leontiev
  */
 public class ElDrinkoConditionInflator implements Function<Object,Predicate<ElDrinkoInputMessage>>{
-    private static Logger _Log = LogManager.getLogger(ElDrinkoConditionInflator.class);
-    private static final Predicate<ElDrinkoInputMessage> _TRIVIAL_PREDICATE
-        = new Predicate<ElDrinkoInputMessage>(){
-            @Override
-            public boolean test(ElDrinkoInputMessage im) {
-                return true;
-            }
-        };
-    private static Predicate<ElDrinkoInputMessage> _MessageComparisonPredicate(String msg) {
-        return new Predicate<ElDrinkoInputMessage>(){
-            @Override
-            public boolean test(ElDrinkoInputMessage im) {
-                return im.left.getMsg().equals(msg);
-            }
-        };
-    }
-    private final static Predicate<ElDrinkoInputMessage> _IS_TEXT_MESSAGE = new Predicate<>() {
-        @Override
-        public boolean test(ElDrinkoInputMessage im) {
-            return im.left instanceof TelegramTextInputMessage;
-        }
-    };
-    private final static Predicate<ElDrinkoInputMessage> _IS_HALF_INTEGER_PREDICATE = new Predicate<>() {
-        @Override
-        public boolean test(ElDrinkoInputMessage tim) {
-            if( !(tim.left instanceof TelegramTextInputMessage) ) {
-                return false;
-            }
-            TelegramTextInputMessage ttim = (TelegramTextInputMessage) tim.left;
-            float amount = 0;
-            try {
-                amount = MiscUtils.ParseFloat(ttim.getMsg());
-            } catch(Exception e) {
-                return false;
-            }
-            if( !MiscUtils.IsFloatInteger(2*amount) ) {
-                return false;
-            }
-            return true;
-        }
-    };
-    private final static Predicate<ElDrinkoInputMessage> _IS_PHONE_NUMBER_PREDICATE = new Predicate<>() {
-        @Override
-        public boolean test(ElDrinkoInputMessage tim) {
-            if( !(tim.left instanceof TelegramTextInputMessage) ) {
-                return false;
-            }
-            TelegramTextInputMessage ttim = (TelegramTextInputMessage) tim.left;
-            return Pattern.matches("\\d+",ttim.getMsg());
-        }
-    };
-    private static Predicate<ElDrinkoInputMessage> _MessageKeyboardComparisonPredicate(String msg) {
-        return new Predicate<ElDrinkoInputMessage>(){
-            @Override
-            public boolean test(ElDrinkoInputMessage im) {
-                return (im.left instanceof KeyboardAnswer) && (msg==null || im.left.getMsg().equals(msg));
-            }
-        };
-    }
-    @Override
-    public Predicate<ElDrinkoInputMessage> apply(Object o) {
-        _Log.info(SecureString.format("o: %s",o));
-        if(o==JSONObject.NULL) {
-            return _TRIVIAL_PREDICATE;
-        } else if(((JSONObject)o).getString("tag").equals("IsPhoneNumberPredicate")) {
-            return _IS_PHONE_NUMBER_PREDICATE;
-        } else if(((JSONObject)o).getString("tag").equals("IsTextMessagePredicate")) {
-            return _IS_TEXT_MESSAGE;
-        } else if(((JSONObject)o).getString("tag").equals("MessageComparisonPredicate")) {
-            return _MessageComparisonPredicate(((JSONObject)o).getString("value"));
-        } else if(((JSONObject)o).getString("tag").equals("MessageKeyboardComparisonPredicate")) {
-            return _MessageKeyboardComparisonPredicate( ((JSONObject)o).has("value") ? ((JSONObject)o).getString("value") : null );
-        } else if(((JSONObject)o).getString("tag").equals("IsHalfIntegerFloatPredicate")) {
-            return _IS_HALF_INTEGER_PREDICATE;
+    private static Logger _Log = LogManager.getLogger();
+    public static  ElDrinkoCondition ParseElDrinkoCondition(Object oo) {
+        JSONObject o = (JSONObject)oo;
+        if(o.getString("tag").equals("TrivialPredicate")) {
+            return new TrivialPredicate(o.opt("value"));
+        } else if(o.getString("tag").equals("IsPhoneNumberPredicate")) {
+            return new IsPhoneNumberPredicate(o.opt("value"));
+        } else if(o.optString("tag").equals("NegationPredicate")) {
+            return new NegationPredicate(o.opt("value"));
+        } else if(o.optString("tag").equals("IsTextMessagePredicate")) {
+            return new IsTextMessagePredicate(o.opt("value"));
+        } else if(o.optString("tag").equals("MessageComparisonPredicate")) {
+            return new MessageComparisonPredicate(o.opt("value"));
+        } else if(o.optString("tag").equals("MessageKeyboardComparisonPredicate")) {
+            return new MessageKeyboardComparisonPredicate(o.opt("value"));
+        } else if(o.optString("tag").equals("ConjunctionPredicate")) {
+            return new ConjunctionPredicate(o.opt("value"));
+        } else if(o.optString("tag").equals("JsonCheckFieldPredicate")) {
+            return new JsonCheckFieldPredicate(o.opt("value"));
+        } else if(o.optString("tag").equals("IsHalfIntegerFloatPredicate")) {
+            return new IsHalfIntegerFloatPredicate(o.opt("value"));
         } else {
             _Log.error("8c817a6ca72e77d2c42e58aa");
             return null;
         }
+    }
+    @Override
+    public Predicate<ElDrinkoInputMessage> apply(Object o) {
+        _Log.info(SecureString.format("o: %s",o));
+        return ParseElDrinkoCondition(o);
     }
 }

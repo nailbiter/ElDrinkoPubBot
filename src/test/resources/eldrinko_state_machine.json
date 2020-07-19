@@ -3,187 +3,291 @@
   "transitions": {
     "[\"choose_product_to_make_order\",\"choose_amount\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate"
+        },
         null
       ]
     ],
     "[\"send\",\"idle\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "0"
+        },
+        null
+      ]
+    ],
+    "[\"confirm\",\"choose_phone_number\"]": [
+      [
+        {
+          "tag": "ConjunctionPredicate",
+          "value": [
+            "{\"tag\":\"MessageKeyboardComparisonPredicate\",\"value\":\"2\"}",
+            "{\"tag\":\"JsonCheckFieldPredicate\",\"value\":\"$.address\"}"
+          ]
+        },
         null
       ]
     ],
     "[\"confirm\",\"choose_address\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "2"
+        },
         null
       ]
     ],
     "[\"choose_payment\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"start\",\"choose_product_to_make_order\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "0"
+        },
         null
       ]
     ],
     "[\"choose_product_to_see_description\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate"
+        },
         null
       ],
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"choose_address\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"choose_amount\",\"confirm\"]": [
       [
-        null,
+        {
+          "tag": "IsHalfIntegerFloatPredicate",
+          "value": null
+        },
         null
       ]
     ],
     "[\"delete\",\"confirm\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate"
+        },
         null
       ]
     ],
     "[\"confirm\",\"delete\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "1"
+        },
         null
       ]
     ],
     "[\"delete\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"start\",\"choose_product_to_see_description\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "1"
+        },
         null
       ]
     ],
     "[\"choose_payment\",\"send\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate"
+        },
         null
       ]
     ],
     "[\"send\",\"choose_payment\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "1"
+        },
         null
       ]
     ],
     "[\"choose_address\",\"choose_phone_number\"]": [
       [
-        null,
+        {
+          "tag": "IsTextMessagePredicate",
+          "value": null
+        },
         null
       ]
     ],
     "[\"choose_product_to_make_order\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"idle\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "0"
+        },
         null
       ],
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"send\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"choose_phone_number\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"confirm\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"edit_address\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"start\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"edit_address\",\"send\"]": [
       [
-        null,
+        {
+          "tag": "IsTextMessagePredicate",
+          "value": null
+        },
         null
       ]
     ],
     "[\"choose_phone_number\",\"choose_payment\"]": [
       [
-        null,
+        {
+          "tag": "IsPhoneNumberPredicate",
+          "value": null
+        },
         null
       ]
     ],
     "[\"choose_amount\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ],
     "[\"choose_phone_number\",\"choose_phone_number\"]": [
       [
-        null,
+        {
+          "tag": "TrivialPredicate",
+          "value": null
+        },
         null
       ]
     ],
     "[\"confirm\",\"choose_product_to_make_order\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "0"
+        },
         null
       ]
     ],
     "[\"send\",\"edit_address\"]": [
       [
-        null,
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "2"
+        },
         null
       ]
     ],
     "[\"_\",\"start\"]": [
       [
-        null,
+        {
+          "tag": "TrivialPredicate",
+          "value": null
+        },
         null
       ],
       [
-        null,
+        {
+          "tag": "MessageComparisonPredicate",
+          "value": "/start"
+        },
         null
       ]
     ]

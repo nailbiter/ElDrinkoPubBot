@@ -1,6 +1,7 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
 import com.mongodb.MongoClient;
+import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition.ElDrinkoCondition;
 import java.util.Random;
 import com.mongodb.client.MongoCollection;
 import java.net.URL;
@@ -89,5 +90,21 @@ public class ElDrinkoStateMachine extends ExposedStateMachine<ElDrinkoInputMessa
                         im),
                     "developerChatIds"
                     ));
+    }
+    @Override
+    public String toJsonString() {
+        return toJsonString(new Function<Predicate<ElDrinkoInputMessage>,Object>(){
+            @Override
+            public Object apply(Predicate<ElDrinkoInputMessage> p) {
+                ElDrinkoCondition _p = (ElDrinkoCondition)p;
+                _Log.info(SecureString.format("_p: %s",_p.toJsonString()));
+                return new JSONObject(_p.toJsonString());
+            }
+        }, new Function<Function<ElDrinkoInputMessage,ImmutablePair<OutputMessage,JSONObject>>,Object>() {
+            @Override
+            public Object apply(Function<ElDrinkoInputMessage,ImmutablePair<OutputMessage,JSONObject>> f){
+                return JSONObject.NULL;
+            }
+        });
     }
 }

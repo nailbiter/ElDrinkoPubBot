@@ -87,7 +87,9 @@
     [
       "_",
       "start",
-      null,
+      {
+        "tag": "TrivialPredicate"
+      },
       {
         "correspondence": "75f676187e00dd85"
       }
@@ -179,10 +181,46 @@
     ],
     [
       "confirm",
+      "choose_phone_number",
+      {
+        "tag": "ConjunctionPredicate",
+        "value": [
+          {
+            "tag": "MessageKeyboardComparisonPredicate",
+            "value": "2"
+          },
+          {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.address"
+            }
+          }
+        ]
+      },
+      {
+        "correspondence": "72e97b89bcab08c4"
+      }
+    ],
+    [
+      "confirm",
       "choose_address",
       {
-        "tag": "MessageKeyboardComparisonPredicate",
-        "value": "2"
+        "tag": "ConjunctionPredicate",
+        "value": [
+          {
+            "tag": "MessageKeyboardComparisonPredicate",
+            "value": "2"
+          },
+          {
+            "tag": "NegationPredicate",
+            "value": {
+              "tag": "JsonCheckFieldPredicate",
+              "value": {
+                "path": "$.address"
+              }
+            }
+          }
+        ]
       },
       {
         "correspondence": "0f13e63d9cd69630"
@@ -201,7 +239,9 @@
     [
       "choose_phone_number",
       "choose_phone_number",
-      null,
+      {
+        "tag": "TrivialPredicate"
+      },
       {
         "correspondence": "dd7404e376113591"
       }
@@ -290,7 +330,7 @@
       },
       {
         "correspondence": "75f676187e00dd85",
-        "src_state":"null"
+        "src_state": "null"
       }
     ]
   ]
