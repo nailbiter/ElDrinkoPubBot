@@ -1,5 +1,8 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.util;
 import java.io.InputStream;
+import nl.insomnia247.nailbiter.eldrinkopubbot.model.Jsonable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,9 +17,10 @@ import java.net.URL;
 /**
  * @author Alex Leontiev
  */
-public class Tsv {
-    private Map<String,List<String>> _content = new HashMap<>();
-    private List<String> _headers = new ArrayList<>();
+public class Tsv implements Jsonable{
+    protected Map<String,List<String>> _content = new HashMap<>();
+    protected List<String> _headers = new ArrayList<>();
+    protected Tsv() {}
     public Tsv(URL url) {
         InputStream in = null;
         Cache cache = new Cache(60);
@@ -32,9 +36,6 @@ public class Tsv {
         } finally {
             IOUtils.closeQuietly(in);
         }
-    }
-    public Tsv(String content) {
-        _parseContent(content);
     }
     private void _parseContent(String content) {
         String[] lines = content.split("\n+");
@@ -73,5 +74,13 @@ public class Tsv {
     }
     public String toString() {
         return _content.toString();
+    }
+    @Override
+    public String toJsonString() {
+        JSONObject res = new JSONObject();
+        for(String fn: _headers) {
+            res.put(fn, new JSONArray(_content.get(fn)));
+        }
+        return new JSONObject().put("headers",new JSONArray(_headers)).put("content",res).toString();
     }
 }

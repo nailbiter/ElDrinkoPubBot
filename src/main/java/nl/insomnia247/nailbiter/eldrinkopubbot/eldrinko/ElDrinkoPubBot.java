@@ -1,5 +1,6 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.json.JSONArray;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
 import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachineException;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
@@ -177,10 +178,11 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             ElDrinkoInputMessage im = new ElDrinkoInputMessage(tim, data==null ? new JSONObject() : new JSONObject(data.toJson()).getJSONObject("data"), ud);
 
             _Log.info(SecureString.format("ss(%s): %s",im.userData,_edsm.getState()));
-            _Log.info(SecureString.format("im(%s): %s",im.userData,im));
+            _Log.info(SecureString.format("im(%s): %s",im.userData,im.toJsonString()));
             ImmutablePair<OutputMessage,JSONObject> om = _edsm.apply(im);
             _Log.info(SecureString.format("es(%s): %s",im.userData,_edsm.getState()));
-            _Log.info(SecureString.format("om(%s): %s",im.userData,om));
+            _Log.info(SecureString.format("om(%s): %s"
+                        ,im.userData,new JSONArray().put(new JSONObject(om.left.toJsonString())).put(om.right).toString()));
 
             _mongoClient.getDatabase("beerbot").getCollection(_config.getJSONObject("mongodb").getString("data"))
                 .updateOne(Filters.eq("id",ud.toString()),Updates.set("data",Document.parse(om.right.toString())),new UpdateOptions().upsert(true));

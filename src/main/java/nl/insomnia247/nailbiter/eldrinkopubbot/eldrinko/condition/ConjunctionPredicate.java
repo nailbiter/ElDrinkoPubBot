@@ -35,7 +35,7 @@ public class ConjunctionPredicate extends ElDrinkoCondition {
     public String toJsonString() {
         JSONArray value = new JSONArray();
         for(int i = 0; i < _conditions.size(); i++) {
-            value.put(_conditions.get(i).toJsonString());
+            value.put(new JSONObject(_conditions.get(i).toJsonString()));
         }
         return new JSONObject(super.toJsonString()).put("value", value).toString();
     }

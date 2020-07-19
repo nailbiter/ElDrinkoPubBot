@@ -64,7 +64,7 @@ public class ElDrinkoStateMachine extends ExposedStateMachine<ElDrinkoInputMessa
         _sendOrderCallback = sendOrderCallback;
     }
     public static void PreloadImages() {
-        Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
+        Tsv tsv = new Tsv(MiscUtils.SafeUrl(ElDrinkoInputMessage.BEERLIST));
         for(String imgUrl:tsv.getColumn("image link")) {
             _Log.info(SecureString.format("start preloading %s",imgUrl));
             String filePath = new DownloadCache(".png").get(MiscUtils.SafeUrl(imgUrl));
@@ -77,7 +77,7 @@ public class ElDrinkoStateMachine extends ExposedStateMachine<ElDrinkoInputMessa
 
         Map<String,Object> map = new HashMap<>();
         map.put("error_code",new Random().nextInt());
-        String userMessage = MiscUtils.ProcessTemplate("421a419b2a7139c88298f2ce",map);
+        String userMessage = MiscUtils.ProcessTemplate("421a419b2a7139c88298f2ce",map,im.beerlist);
         _Log.info(userMessage);
         _sendOrderCallback.accept(new ImmutablePair<String,String>(
                     userMessage,

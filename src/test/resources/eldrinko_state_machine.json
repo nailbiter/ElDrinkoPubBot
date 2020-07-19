@@ -23,8 +23,16 @@
         {
           "tag": "ConjunctionPredicate",
           "value": [
-            "{\"tag\":\"MessageKeyboardComparisonPredicate\",\"value\":\"2\"}",
-            "{\"tag\":\"JsonCheckFieldPredicate\",\"value\":\"$.address\"}"
+            {
+              "tag": "MessageKeyboardComparisonPredicate",
+              "value": "2"
+            },
+            {
+              "tag": "JsonCheckFieldPredicate",
+              "value": {
+                "path": "$.address"
+              }
+            }
           ]
         },
         null
@@ -33,8 +41,22 @@
     "[\"confirm\",\"choose_address\"]": [
       [
         {
-          "tag": "MessageKeyboardComparisonPredicate",
-          "value": "2"
+          "tag": "ConjunctionPredicate",
+          "value": [
+            {
+              "tag": "MessageKeyboardComparisonPredicate",
+              "value": "2"
+            },
+            {
+              "tag": "NegationPredicate",
+              "value": {
+                "tag": "JsonCheckFieldPredicate",
+                "value": {
+                  "path": "$.address"
+                }
+              }
+            }
+          ]
         },
         null
       ]

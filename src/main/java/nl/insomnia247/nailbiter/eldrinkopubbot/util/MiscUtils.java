@@ -58,10 +58,9 @@ public class MiscUtils {
         _Log.info(SecureString.format("res: %s",template));
         return template;
     }
-    public static String ProcessTemplate(String templateName, Map<String, Object> additionalContext) {
+    public static String ProcessTemplate(String templateName, Map<String, Object> additionalContext, Tsv tsv) {
         TemplateEngine _jinjava = new TemplateEngine();
         Map<String,Object> context = new HashMap<>();
-        Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
         List<List<String>> products = tsv.getRecords();
         context.put("products",products);
         if(additionalContext!=null) {

@@ -14,6 +14,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.util.PersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
 import nl.insomnia247.nailbiter.eldrinkopubbot.test_util.MockConsumer;
 import nl.insomnia247.nailbiter.eldrinkopubbot.test_util.MockUserData;
+import nl.insomnia247.nailbiter.eldrinkopubbot.test_util.MockBeerlist;
 import nl.insomnia247.nailbiter.eldrinkopubbot.test_util.MockPersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.model.OutputMessage;
 import org.json.JSONObject;
@@ -68,6 +69,7 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
         return new ElDrinkoInputMessage(_ParseTelegramInputMessage(o.getJSONObject("left")),
                 o.getJSONObject("right"),
                 new MockUserData(o.getJSONObject("userData"))
+                ,new MockBeerlist(new JSONObject(MiscUtils.GetResource("beerlist",".json")))
                 );
     }
     public void testElDrinkoStateMachineTransitions() {
@@ -83,8 +85,8 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
                 System.exit(1);
             }
             ImmutablePair<OutputMessage,JSONObject> om = _edsm.apply(im);
-//            System.out.println(new JSONObject().put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString());
-//            System.out.println(String.format("es: %s",_edsm.getState()));
+            System.out.println(new JSONObject().put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString());
+            System.out.println(String.format("es: %s",_edsm.getState()));
             assertEquals(_edsm.getState(),transition.getString("es"));
             assertEquals(new JSONObject().put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString(), transition.getJSONObject("om").toString());
         }

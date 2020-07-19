@@ -38,7 +38,6 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
  * @author Alex Leontiev
  */
 public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinkoInputMessage,ImmutablePair<OutputMessage,JSONObject>>> {
-    private static final String _BEERLIST = MiscUtils.GetResource("beerlist",".txt");
     private static Logger _Log = LogManager.getLogger(ElDrinkoActionInflator.class);
     private static final JSONObject _TRANSITIONS 
         = new JSONObject(MiscUtils.GetResource("transitions",".json"));
@@ -61,7 +60,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                 if( (((JSONObject)o).getString("correspondence")).equals("f02480c016715289") ) {
                     TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                     int i = Integer.parseInt(tka.getMsg());
-                    Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
+                    Tsv tsv = im.beerlist;
                     JSONObject order = im.right.optJSONObject("order");
                     if(order==null) {
                         order = new JSONObject();
@@ -103,7 +102,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                         int i = Integer.parseInt(tka.getMsg());
                         String paymentMethods 
-                            = MiscUtils.ProcessTemplate("4ea9a63509e8ed5826a37f8a",null);
+                            = MiscUtils.ProcessTemplate("4ea9a63509e8ed5826a37f8a",null,im.beerlist);
                         im.right.put("payment", paymentMethods.split("\n")[i]);
                     }
                 } else if( ((JSONObject)o).getString("correspondence").equals("48c6907046b03db8") ) {
@@ -112,7 +111,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                     order.put("count",_IncrementOrderCount(_masterPersistentStorage));
                     order.put("timestamp", _ORDER_REPORT_FORMATTER.format(new Date()));
                     _sendOrderCallback.accept(new ImmutablePair<String,String>(
-                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",_OrderObjectToJinjaContext(order))
+                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",_OrderObjectToJinjaContext(order,im.beerlist),im.beerlist)
                                 ,"salesmanChatIds"));
                     im.right.put("order","");
                 } else if( ((JSONObject)o).getString("correspondence").equals("75f676187e00dd85") && ((JSONObject)o).optString("src_state").equals("null") ) {
@@ -121,14 +120,14 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
 
                 _Log.info(SecureString.format("before _GetOrder(%s)",im.right));
                 JSONObject ppo = _GetOrder(im.right);
-                _Log.info(SecureString.format("_OrderObjectToJinjaContext(%s)",ppo));
-                Map<String,Object> map = _OrderObjectToJinjaContext(ppo);
+                _Log.info(SecureString.format("_OrderObjectToJinjaContext(%s,%s)",ppo,im.beerlist.toJsonString()));
+                Map<String,Object> map = _OrderObjectToJinjaContext(ppo,im.beerlist);
                 Object oo = null;
                 _Log.info(SecureString.format("after _GetOrder(%s)",im.right));
 
                 if( (((JSONObject)o).getString("correspondence")).equals("72aa7197071b6503") ) {
                     TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
-                    Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
+                    Tsv tsv = im.beerlist;
                     String imgUrl 
                         = tsv.getColumn("image link").get(Integer.parseInt(tka.getMsg()));
                     map.put("i",Integer.parseInt(tka.getMsg()));
@@ -137,16 +136,16 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
 
                 im.right.put("username",im.userData.getUserName());
                 _Log.info(SecureString.format("before _InflateOutputMessage(%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.right));
-                return new ImmutablePair<OutputMessage,JSONObject>(_InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo),im.right);
+                return new ImmutablePair<OutputMessage,JSONObject>(_InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo,im.beerlist),im.right);
             }
         };
     }
     private static OutputMessage _InflateOutputMessage(String code,
-            Map<String,Object> env, Object obj) {
+            Map<String,Object> env, Object obj, Tsv tsv) {
         return _InflateOutputMessageFromJson(
-                _TRANSITIONS.getJSONObject("transitions").get(code),env,obj);
+                _TRANSITIONS.getJSONObject("transitions").get(code),env,obj,tsv);
     }
-    private static OutputMessage _InflateOutputMessageFromJson(Object m, Map<String,Object> env, Object obj) {
+    private static OutputMessage _InflateOutputMessageFromJson(Object m, Map<String,Object> env, Object obj,Tsv tsv) {
         assert m instanceof JSONObject || m instanceof JSONArray;
         _Log.info(m);
         if(m instanceof JSONArray) {
@@ -154,33 +153,32 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
 
             _Log.info(SecureString.format(" %s ",m));
             for(int i = 0; i < ((JSONArray)m).length();i++) {
-                msgs.add(_InflateOutputMessageFromJson(((JSONArray)m).get(i),env,obj));
+                msgs.add(_InflateOutputMessageFromJson(((JSONArray)m).get(i),env,obj,tsv));
             }
             return new OutputArrayMessage(msgs.toArray(OutputMessage[]::new));
         } else {
             JSONObject msg = (JSONObject)m;
             String tag = msg.getString("tag");
             if(tag.equals("TelegramTextOutputMessage")) {
-                return new TelegramTextOutputMessage(MiscUtils.ProcessTemplate(msg.getString("message"), env));
+                return new TelegramTextOutputMessage(MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv));
             } else if(tag.equals("TelegramKeyboard")) {
                 return _InflateTelegramKeyboard(
-                        env, msg.getString("message"), msg.getString("keyboard"));
+                        env, msg.getString("message"), msg.getString("keyboard"),tsv);
             } else if(tag.equals("TelegramImageOutputMessage")) {
                 return new TelegramImageOutputMessage(
-                        MiscUtils.ProcessTemplate(msg.getString("message"), env)
+                        MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv)
                         , (URL)obj);
             } else {
                 return null;
             }
         }
     }
-    private static Map<String,Object> _OrderObjectToJinjaContext(JSONObject order) {
+    private static Map<String,Object> _OrderObjectToJinjaContext(JSONObject order, Tsv tsv) {
         Map<String, Object> context = new HashMap<String,Object>();
         _Log.info(order);
         if(order==null) {
             return context;
         }
-        Tsv tsv = new Tsv(MiscUtils.SafeUrl(_BEERLIST));
         List<List<String>> products = tsv.getRecords();
         Map<String,Object> orderMap = JSONTools.JSONObjectToMap(order);
         //FIXME: try to compute `sum` in templates
@@ -205,9 +203,9 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
         _Log.info(SecureString.format("context: %s",context));
         return context;
     }
-    private static TelegramKeyboard _InflateTelegramKeyboard(Map<String,Object> env,String msgTemplateResName, String keysTemplateResName) {
-        String keyboardKeys = MiscUtils.ProcessTemplate(keysTemplateResName,env);
-        String keyboardMsg = MiscUtils.ProcessTemplate(msgTemplateResName,env);
+    private static TelegramKeyboard _InflateTelegramKeyboard(Map<String,Object> env,String msgTemplateResName, String keysTemplateResName,Tsv tsv) {
+        String keyboardKeys = MiscUtils.ProcessTemplate(keysTemplateResName,env,tsv);
+        String keyboardMsg = MiscUtils.ProcessTemplate(msgTemplateResName,env,tsv);
         _Log.info(SecureString.format("keyboardMsg: %s",keyboardMsg));
         _Log.info(SecureString.format("keyboardKeys: %s",keyboardKeys));
         return new TelegramKeyboard(keyboardMsg,keyboardKeys.split("\n"));
