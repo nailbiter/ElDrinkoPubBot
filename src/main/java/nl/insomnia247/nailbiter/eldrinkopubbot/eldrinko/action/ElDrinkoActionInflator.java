@@ -113,6 +113,10 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                     _sendOrderCallback.accept(new ImmutablePair<String,String>(
                             MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",_OrderObjectToJinjaContext(order,im.beerlist),im.beerlist)
                                 ,"salesmanChatIds"));
+                    _sendOrderCallback.accept(new ImmutablePair<String,String>(
+                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",_OrderObjectToJinjaContext(order,im.beerlist),im.beerlist)
+                            , im.userData.getChatId().toString()
+                                ));
                     im.right.put("order","");
                 } else if( ((JSONObject)o).getString("correspondence").equals("75f676187e00dd85") && ((JSONObject)o).optString("src_state").equals("null") ) {
                     im.right.put("order","");
