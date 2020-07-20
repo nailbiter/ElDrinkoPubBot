@@ -216,6 +216,15 @@
         null
       ]
     ],
+    "[\"choose_amount\",\"choose_amount\"]": [
+      [
+        {
+          "tag": "TrivialPredicate",
+          "value": null
+        },
+        null
+      ]
+    ],
     "[\"confirm\",\"start\"]": [
       [
         {

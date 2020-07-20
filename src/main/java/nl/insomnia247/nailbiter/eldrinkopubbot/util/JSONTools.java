@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
  * @author Alex Leontiev
  */
 public class JSONTools {
-    static final Logger _Log = LogManager.getLogger(JSONTools.class);
+    static final Logger _Log = LogManager.getLogger();
     public static Map<String,Object> JSONObjectToMap(JSONObject o) {
         Map<String,Object> res = new HashMap<>();
         for(String key:o.keySet()) {

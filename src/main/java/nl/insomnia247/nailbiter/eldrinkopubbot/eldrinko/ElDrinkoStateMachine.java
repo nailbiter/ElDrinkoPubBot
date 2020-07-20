@@ -76,7 +76,7 @@ public class ElDrinkoStateMachine extends ExposedStateMachine<ElDrinkoInputMessa
         super._didNotFoundSuitableTransition(im);
 
         Map<String,Object> map = new HashMap<>();
-        map.put("error_code",new Random().nextInt());
+        map.put("error_code",Math.abs(new Random().nextInt()));
         String userMessage = MiscUtils.ProcessTemplate("421a419b2a7139c88298f2ce",map,im.beerlist);
         _Log.info(userMessage);
         _sendOrderCallback.accept(new ImmutablePair<String,String>(

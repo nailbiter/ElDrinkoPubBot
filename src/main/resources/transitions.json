@@ -1,5 +1,9 @@
 {
   "transitions": {
+    "d72f0c922c788133":{
+        "tag": "TelegramTextOutputMessage",
+        "message": "a0c5183bf9b79e8cb17bd7e8"
+    },
     "dd7404e376113591": {
       "tag": "TelegramTextOutputMessage",
       "message": "1475a24ceb48b40d809f9082"
@@ -331,6 +335,16 @@
       {
         "correspondence": "75f676187e00dd85",
         "src_state": "null"
+      }
+    ],
+    [
+      "choose_amount",
+      "choose_amount",
+      {
+        "tag": "TrivialPredicate"
+      },
+      {
+        "correspondence": "d72f0c922c788133"
       }
     ]
   ]

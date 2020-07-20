@@ -135,15 +135,17 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                 }
 
                 im.right.put("username",im.userData.getUserName());
-                _Log.info(SecureString.format("before _InflateOutputMessage(%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.right));
-                return new ImmutablePair<OutputMessage,JSONObject>(_InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo,im.beerlist),im.right);
+                _Log.info(SecureString.format("before _InflateOutputMessage(%s,%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.beerlist.toJsonString(),im.right));
+                OutputMessage om = _InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo,im.beerlist);
+                _Log.info(SecureString.format("om: %s",om));
+                return new ImmutablePair<OutputMessage,JSONObject>(om,im.right);
             }
         };
     }
-    private static OutputMessage _InflateOutputMessage(String code,
-            Map<String,Object> env, Object obj, Tsv tsv) {
-        return _InflateOutputMessageFromJson(
-                _TRANSITIONS.getJSONObject("transitions").get(code),env,obj,tsv);
+    private static OutputMessage _InflateOutputMessage(String code, Map<String,Object> env, Object obj, Tsv tsv) {
+        Object m = _TRANSITIONS.getJSONObject("transitions").get(code);
+        _Log.info(SecureString.format("m: %s",m));
+        return _InflateOutputMessageFromJson(m,env,obj,tsv);
     }
     private static OutputMessage _InflateOutputMessageFromJson(Object m, Map<String,Object> env, Object obj,Tsv tsv) {
         assert m instanceof JSONObject || m instanceof JSONArray;
