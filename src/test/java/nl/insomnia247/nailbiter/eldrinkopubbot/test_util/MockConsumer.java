@@ -7,7 +7,7 @@ import org.json.JSONArray;
  * @author Alex Leontiev
  */
 public class MockConsumer implements Consumer<ImmutablePair<String,String>> {
-    JSONArray _content;
+    JSONArray _content = new JSONArray();
     @Override
     public void accept(ImmutablePair<String,String> pair) {
         JSONArray item = new JSONArray();

@@ -6,7 +6,7 @@ import org.json.JSONObject;
  * @author Alex Leontiev
  */
 public class MockPersistentStorage implements PersistentStorage {
-    JSONObject _content;
+    JSONObject _content = new JSONObject();
     public boolean contains(String key) {
         return _content.has(key);
     }

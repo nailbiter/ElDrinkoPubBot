@@ -75,6 +75,7 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
     public void testElDrinkoStateMachineTransitions() {
         JSONArray transition_tests = new JSONArray(MiscUtils.GetResource("transition_tests",".json"));
         for(int i = 0; i < transition_tests.length(); i++) {
+            _Log.info(String.format("test #%d",i));
             JSONObject transition = transition_tests.getJSONObject(i);
             ElDrinkoInputMessage im = null;
             try {
@@ -85,10 +86,11 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
                 System.exit(1);
             }
             ImmutablePair<OutputMessage,JSONObject> om = _edsm.apply(im);
-            System.out.println(new JSONObject().put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString());
-            System.out.println(String.format("es: %s",_edsm.getState()));
+            String om_actual = new JSONObject().put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString();
+            _Log.info(String.format("om: %s",om_actual));
+            _Log.info(String.format("es: %s",_edsm.getState()));
             assertEquals(_edsm.getState(),transition.getString("es"));
-            assertEquals(new JSONObject().put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString(), transition.getJSONObject("om").toString());
+            assertEquals(transition.getJSONObject("om").toString(), om_actual);
         }
     }
 }
