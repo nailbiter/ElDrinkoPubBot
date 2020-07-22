@@ -530,7 +530,7 @@
       "left": {
         "tag": "TelegramKeyboard",
         "value": {
-          "msg": "Що будемо вилучати?\n",
+          "msg": "Що будемо видаляти?\n",
           "categories": [
             [
               "1.5 литров пива \"Milk Stout\"",
@@ -1443,7 +1443,7 @@
       "left": {
         "tag": "TelegramKeyboard",
         "value": {
-          "msg": "Що будемо вилучати?\n",
+          "msg": "Що будемо видаляти?\n",
           "categories": [
             [
               "1.5 литров пива \"Pilsner\""
