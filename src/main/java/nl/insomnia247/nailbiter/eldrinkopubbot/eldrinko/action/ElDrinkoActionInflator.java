@@ -122,6 +122,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                     order.put("uid",im.userData.getUserName());
                     order.put("count",_IncrementOrderCount(_masterPersistentStorage));
                     order.put("timestamp", _ORDER_REPORT_FORMATTER.format(new Date()));
+                    order.put("_timestamp", new Date());
                     Map<String,Object> map = _OrderObjectToJinjaContext(order,im.beerlist);
                     _orderInserter.accept(new Document(map));
                     _sendOrderCallback.accept(new ImmutablePair<String,String>(
