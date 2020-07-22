@@ -11,6 +11,7 @@
   "mongodb": {
     "order_history":"dev_order_history",
     "data": "dev_data",
-    "logs": "dev_logs"
+    "logs": "dev_logs",
+    "state_machine_states": "dev_state_machine_states"
   }
 }

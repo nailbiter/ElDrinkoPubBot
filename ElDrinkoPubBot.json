@@ -12,6 +12,7 @@
   "mongodb": {
     "order_history":"order_history",
     "data": "data",
-    "logs": "logs"
+    "logs": "logs",
+    "state_machine_states": "state_machine_states"
   }
 }

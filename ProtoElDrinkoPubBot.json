@@ -3,16 +3,19 @@
   "telegram": {
     "salesmanChatIds": [
       "145766172",
-      "340880765"
+      "340880765",
+      "430533784"
     ],
     "developerChatIds": [
       "145766172",
-      "340880765"
+      "340880765",
+      "430533784"
     ]
   },
   "mongodb": {
     "order_history":"proto_order_history",
     "data": "proto_data",
-    "logs": "proto_logs"
+    "logs": "proto_logs",
+    "state_machine_states": "proto_state_machine_states"
   }
 }
