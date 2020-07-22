@@ -9,6 +9,7 @@
     ]
   },
   "mongodb": {
+    "order_history":"dev_order_history",
     "data": "dev_data",
     "logs": "dev_logs"
   }

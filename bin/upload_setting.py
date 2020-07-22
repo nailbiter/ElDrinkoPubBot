@@ -31,3 +31,6 @@ if args.id is None:
     coll.insert_one(doc)
 else:
     coll.replace_one({args.id:doc[args.id]},doc,upsert=True)
+
+for v in doc["mongodb"].values():
+    client.beerbot[v]

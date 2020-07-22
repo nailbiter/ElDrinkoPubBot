@@ -10,6 +10,7 @@
     ]
   },
   "mongodb": {
+    "order_history":"order_history",
     "data": "data",
     "logs": "logs"
   }

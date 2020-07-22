@@ -11,6 +11,7 @@
     ]
   },
   "mongodb": {
+    "order_history":"proto_order_history",
     "data": "proto_data",
     "logs": "proto_logs"
   }
