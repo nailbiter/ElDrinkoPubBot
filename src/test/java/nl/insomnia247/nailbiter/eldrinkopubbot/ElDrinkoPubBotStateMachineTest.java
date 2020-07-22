@@ -38,7 +38,7 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
         _consumer = new MockConsumer();
         _edsm = new ElDrinkoStateMachine(_consumer);
         _persistentStorage = new MockPersistentStorage();
-        _actionInflator = new ElDrinkoActionInflator(_consumer, _persistentStorage);
+        _actionInflator = new ElDrinkoActionInflator(_consumer, _persistentStorage, null);
         _conditionInflator = new ElDrinkoConditionInflator();
         try {
             _edsm.inflateTransitionsFromJSON(_conditionInflator,_actionInflator, 

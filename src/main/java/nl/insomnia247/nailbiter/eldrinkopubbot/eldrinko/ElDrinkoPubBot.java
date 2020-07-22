@@ -155,6 +155,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             MongoCollection<Document> statesColl = _mongoClient
                 .getDatabase("beerbot")
                 .getCollection(_config.getJSONObject("mongodb").getString("state_machine_states"));
+            _Log.info("here");
             Document doc = statesColl.find(Filters.eq("id",ud.toString())).first();
             _Log.info(SecureString.format("doc: %s",doc));
             String state = null;
@@ -236,6 +237,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 .first()
                 .toJson())
         });
+        SecureString.setHiddenInfo(_config.getJSONObject("telegram").getString("token"));
         _Log.info(SecureString.format("_config: %s\n",_config.toString()));
         _botname = botname;
 
@@ -250,7 +252,15 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
         _persistentStorage = new MongoPersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
         ElDrinkoStateMachine.PreloadImages();
         _edsm = new ElDrinkoStateMachine(this);
-        _actionInflator = new ElDrinkoActionInflator(this,_persistentStorage);
+        _actionInflator = new ElDrinkoActionInflator(this, _persistentStorage, new Consumer<Document>() {
+            @Override
+            public void accept(Document doc) {
+                MongoCollection<Document> statesColl = _mongoClient
+                    .getDatabase("beerbot")
+                    .getCollection(_config.getJSONObject("mongodb").getString("order_history"));
+                statesColl.insertOne(doc);
+            }
+        });
         _conditionInflator = new ElDrinkoConditionInflator();
         _edsm.inflateTransitionsFromJSON(_conditionInflator,_actionInflator, 
                 new JSONObject(MiscUtils.GetResource("transitions",".json")).getJSONArray("correspondence").toString());

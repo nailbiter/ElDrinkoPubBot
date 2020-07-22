@@ -1,5 +1,7 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action;
 import java.util.function.Function;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
 import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.ElDrinkoInputMessage;
 import java.util.Date;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
@@ -39,17 +41,27 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
  */
 public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinkoInputMessage,ImmutablePair<OutputMessage,JSONObject>>> {
     private static Logger _Log = LogManager.getLogger(ElDrinkoActionInflator.class);
+    private Consumer<Document> _orderInserter;
     private static final JSONObject _TRANSITIONS 
         = new JSONObject(MiscUtils.GetResource("transitions",".json"));
     private final PersistentStorage _masterPersistentStorage;
+    private JSONObject _config;
     private static final DateFormat _ORDER_REPORT_FORMATTER = new SimpleDateFormat("dd.mm.yy HH:MM");
     static {
         _ORDER_REPORT_FORMATTER.setTimeZone(TimeZone.getTimeZone("Ukraine/Kiev"));
     }
     private final Consumer<ImmutablePair<String,String>>  _sendOrderCallback;
-    public ElDrinkoActionInflator(Consumer<ImmutablePair<String,String>> sendOrderCallback, PersistentStorage masterPersistentStorage) {
+    public ElDrinkoActionInflator(Consumer<ImmutablePair<String,String>> sendOrderCallback, PersistentStorage masterPersistentStorage
+            , Consumer<Document> orderInserter) {
         _masterPersistentStorage = masterPersistentStorage;
         _sendOrderCallback = sendOrderCallback;
+        _orderInserter = orderInserter;
+        if(_orderInserter == null) {
+            _orderInserter = new Consumer<Document> () {
+                @Override
+                public void accept(Document d) {}
+            };
+        }
     }
     @Override
     public Function<ElDrinkoInputMessage,ImmutablePair<OutputMessage,JSONObject>> apply(Object o) {
@@ -110,11 +122,13 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                     order.put("uid",im.userData.getUserName());
                     order.put("count",_IncrementOrderCount(_masterPersistentStorage));
                     order.put("timestamp", _ORDER_REPORT_FORMATTER.format(new Date()));
+                    Map<String,Object> map = _OrderObjectToJinjaContext(order,im.beerlist);
+                    _orderInserter.accept(new Document(map));
                     _sendOrderCallback.accept(new ImmutablePair<String,String>(
-                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",_OrderObjectToJinjaContext(order,im.beerlist),im.beerlist)
+                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",map,im.beerlist)
                                 ,"salesmanChatIds"));
                     _sendOrderCallback.accept(new ImmutablePair<String,String>(
-                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",_OrderObjectToJinjaContext(order,im.beerlist),im.beerlist)
+                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",map,im.beerlist)
                             , im.userData.getChatId().toString()
                                 ));
                     im.right.put("order","");
