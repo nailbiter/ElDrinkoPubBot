@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
  * @author Alex Leontiev
  */
 public class JSONTools {
-    static final Logger _Log = LogManager.getLogger(JSONTools.class);
+    static final Logger _Log = LogManager.getLogger();
     public static Map<String,Object> JSONObjectToMap(JSONObject o) {
         Map<String,Object> res = new HashMap<>();
         for(String key:o.keySet()) {
@@ -27,7 +27,7 @@ public class JSONTools {
             }
         }
 
-//        _Log.info(String.format("JSONObjectToMap: %s -> %s",o,res));
+//        _Log.info(SecureString.format("JSONObjectToMap: %s -> %s",o,res));
         return res;
     }
     public static List<Object> JSONArrayToList(JSONArray a) {
@@ -43,7 +43,7 @@ public class JSONTools {
             }
         }
 
-//        _Log.info(String.format("JSONArrayToList: %s -> %s",a,res));
+//        _Log.info(SecureString.format("JSONArrayToList: %s -> %s",a,res));
         return res;
     }
 }

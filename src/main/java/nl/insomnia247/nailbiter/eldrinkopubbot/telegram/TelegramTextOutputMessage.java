@@ -1,6 +1,8 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.telegram;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramOutputMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 
 /**
@@ -16,5 +18,12 @@ public class TelegramTextOutputMessage extends TelegramOutputMessage {
     @Override
     public String toString() {
         return String.format("TelegramOutputMessage(%s)",_msg);
+    }
+    @Override
+    public String toJsonString() {
+        return new JSONObject()
+            .put("tag",getClass().getSimpleName())
+            .put("value", new JSONObject().put("msg",_msg))
+            .toString();
     }
 }

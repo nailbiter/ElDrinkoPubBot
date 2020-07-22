@@ -4,8 +4,8 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %l - %msg%n" />
         </Console>
-        <File name="MyCsvFile" fileName=".log/${sys:filename}.csv" immediateFlush="true" append="false">
-            <CsvLogEventLayout delimiter=","/>
+        <File name="MyJsonFile" fileName=".log/${sys:filename}_${date:yyyy-MM-dd_HH:mm:ss}.json" immediateFlush="true" append="false">
+            <JsonLayout compact="true" eventEol="true" locationInfo="true"/>
         </File>
         <File name="MyFile" fileName=".log/${sys:filename}.txt" immediateFlush="true" append="false">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} %-5level %l - %msg%n"/>
@@ -15,7 +15,7 @@
         <Root level="debug">
             <AppenderRef ref="Console" />
             <AppenderRef ref="MyFile"/>
-            <AppenderRef ref="MyCsvFile"/>
+            <AppenderRef ref="MyJsonFile"/>
         </Root>
     </Loggers>
 </Configuration>

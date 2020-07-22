@@ -1,5 +1,9 @@
 {
   "transitions": {
+    "d72f0c922c788133":{
+        "tag": "TelegramTextOutputMessage",
+        "message": "a0c5183bf9b79e8cb17bd7e8"
+    },
     "dd7404e376113591": {
       "tag": "TelegramTextOutputMessage",
       "message": "1475a24ceb48b40d809f9082"
@@ -87,7 +91,9 @@
     [
       "_",
       "start",
-      null,
+      {
+        "tag": "TrivialPredicate"
+      },
       {
         "correspondence": "75f676187e00dd85"
       }
@@ -179,10 +185,46 @@
     ],
     [
       "confirm",
+      "choose_phone_number",
+      {
+        "tag": "ConjunctionPredicate",
+        "value": [
+          {
+            "tag": "MessageKeyboardComparisonPredicate",
+            "value": "2"
+          },
+          {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.address"
+            }
+          }
+        ]
+      },
+      {
+        "correspondence": "72e97b89bcab08c4"
+      }
+    ],
+    [
+      "confirm",
       "choose_address",
       {
-        "tag": "MessageKeyboardComparisonPredicate",
-        "value": "2"
+        "tag": "ConjunctionPredicate",
+        "value": [
+          {
+            "tag": "MessageKeyboardComparisonPredicate",
+            "value": "2"
+          },
+          {
+            "tag": "NegationPredicate",
+            "value": {
+              "tag": "JsonCheckFieldPredicate",
+              "value": {
+                "path": "$.address"
+              }
+            }
+          }
+        ]
       },
       {
         "correspondence": "0f13e63d9cd69630"
@@ -201,7 +243,9 @@
     [
       "choose_phone_number",
       "choose_phone_number",
-      null,
+      {
+        "tag": "TrivialPredicate"
+      },
       {
         "correspondence": "dd7404e376113591"
       }
@@ -290,7 +334,17 @@
       },
       {
         "correspondence": "75f676187e00dd85",
-        "src_state":"null"
+        "src_state": "null"
+      }
+    ],
+    [
+      "choose_amount",
+      "choose_amount",
+      {
+        "tag": "TrivialPredicate"
+      },
+      {
+        "correspondence": "d72f0c922c788133"
       }
     ]
   ]

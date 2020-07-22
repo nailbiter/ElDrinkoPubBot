@@ -30,7 +30,7 @@ public class TemplateEngine {
                 } else {
                     d = (double)var;
                 }
-                return String.format("%.2f",d).replace(".",",");
+                return SecureString.format("%.2f",d).replace(".",",");
             }
             public String getName() {
                 return "myprintf";
@@ -55,7 +55,7 @@ public class TemplateEngine {
                 } else {
                     d = (int)var;
                 }
-                return String.format("%02d",d);
+                return SecureString.format("%02d",d);
             }
             public String getName() {
                 return "myprintf_int";

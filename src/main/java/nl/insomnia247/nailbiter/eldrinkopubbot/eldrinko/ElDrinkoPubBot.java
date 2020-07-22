@@ -1,12 +1,15 @@
-package nl.insomnia247.nailbiter.eldrinkopubbot;
+package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.json.JSONArray;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramKeyboard;
 import nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.StateMachineException;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
-import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.PersistentStorage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.PersistentStorage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.MongoPersistentStorage;
 import org.bson.Document;
 import java.util.stream.Collectors;
 import com.mongodb.MongoClient;
@@ -42,6 +45,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.ElDrinkoActionInflator;
+import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition.ElDrinkoConditionInflator;
 
 
 public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<ImmutablePair<String,String>> {
@@ -61,7 +66,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     }
     private void _sendMessageToMasters(String msg, boolean isMarkdown, String key) {
         if(key.equals("developerChatIds")) {
-            msg = String.format("`(> %s <)`",msg);
+            msg = SecureString.format("`(> %s <)`",msg);
             isMarkdown = true;
         }
 
@@ -82,10 +87,10 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 sendMessage.enableMarkdown(true);
             }
             try {
-                _Log.info(String.format("sending %s to %s\n",msg,chatId));
+                _Log.info(SecureString.format("sending %s to %s\n",msg,chatId));
                 execute(sendMessage);
             } catch(Exception e) {
-                _Log.error(String.format("f531ae90faad7adb: \"%s\" \"%s\" \"%s\" \"%s\"\n",
+                _Log.error(SecureString.format("f531ae90faad7adb: \"%s\" \"%s\" \"%s\" \"%s\"\n",
                             e.getMessage(),
                             e.getClass().getName(),
                             "no",
@@ -103,7 +108,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             Integer replyMessageId = null;
 		    String call_data = u.getCallbackQuery().getData();
             if(u.getCallbackQuery().getMessage().getReplyMarkup()!=null && u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard()!=null) {
-                _Log.info(String.format("inline markup: %s\n",u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard()));
+                _Log.info(SecureString.format("inline markup: %s\n",u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard()));
                 List<List<InlineKeyboardButton>> buttons = u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard();
                 for(int i = 0, idx = 0;i<buttons.size();i++) {
                     List<InlineKeyboardButton> row = buttons.get(i);
@@ -134,8 +139,8 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 }
             }
 
-            _Log.info(String.format("call_data: %s",call_data));
-            _Log.info(String.format("TelegramKeyboardAnswer(%s) to %s",call_data,replyMessageId));
+            _Log.info(SecureString.format("call_data: %s",call_data));
+            _Log.info(SecureString.format("TelegramKeyboardAnswer(%s) to %s",call_data,replyMessageId));
             return new TelegramKeyboardAnswer(call_data);
         } else {
             return null;
@@ -146,19 +151,20 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
         TelegramInputMessage tim = _createInputMessage(update);
         if(tim != null) {
             UserData ud = new UserData(update);
-            _Log.info(String.format("config: %s",_config));
+            _Log.info(SecureString.format("config: %s",_config));
             MongoCollection<Document> statesColl = _mongoClient
                 .getDatabase("beerbot")
                 .getCollection(_config.getJSONObject("mongodb").getString("state_machine_states"));
+            _Log.info("here");
             Document doc = statesColl.find(Filters.eq("id",ud.toString())).first();
-            _Log.info(String.format("doc: %s",doc));
+            _Log.info(SecureString.format("doc: %s",doc));
             String state = null;
             if( doc == null ) {
                 state = "_";
             } else {
                 state = new JSONObject(doc.toJson()).getString("state");
             }
-            _Log.info(String.format("state: %s",state));
+            _Log.info(SecureString.format("state: %s",state));
             try {
                 _edsm.setState(state);
             } catch (Exception e) {
@@ -172,11 +178,12 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 .find(Filters.eq("id",ud.toString())).first();
             ElDrinkoInputMessage im = new ElDrinkoInputMessage(tim, data==null ? new JSONObject() : new JSONObject(data.toJson()).getJSONObject("data"), ud);
 
-            _Log.info(String.format("ss(%s): %s",im.userData,_edsm.getState()));
-            _Log.info(String.format("im(%s): %s",im.userData,im));
+            _Log.info(SecureString.format("ss(%s): %s",im.userData,_edsm.getState()));
+            _Log.info(SecureString.format("im(%s): %s",im.userData,im.toJsonString()));
             ImmutablePair<OutputMessage,JSONObject> om = _edsm.apply(im);
-            _Log.info(String.format("es(%s): %s",im.userData,_edsm.getState()));
-            _Log.info(String.format("om(%s): %s",im.userData,om));
+            _Log.info(SecureString.format("es(%s): %s",im.userData,_edsm.getState()));
+            _Log.info(SecureString.format("om(%s): %s"
+                        ,im.userData,new JSONArray().put(new JSONObject(om.left.toJsonString())).put(om.right).toString()));
 
             _mongoClient.getDatabase("beerbot").getCollection(_config.getJSONObject("mongodb").getString("data"))
                 .updateOne(Filters.eq("id",ud.toString()),Updates.set("data",Document.parse(om.right.toString())),new UpdateOptions().upsert(true));
@@ -196,7 +203,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 sendMessage.enableMarkdown(true);
                 sendMessage.setChatId(ud.getChatId().toString());
                 Message resMessage = execute(sendMessage);
-                _Log.info(String.format("after execute(%s) as %s",sendMessage,resMessage.getMessageId()));
+                _Log.info(SecureString.format("after execute(%s) as %s",sendMessage,resMessage.getMessageId()));
                 if( om instanceof TelegramKeyboard ) {
                     _lastSentKeyboardHash.put(ud.toString(),resMessage.getMessageId());
                 }
@@ -205,15 +212,15 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 sendPhoto.setChatId(ud.getChatId().toString());
                 execute(sendPhoto);
             } else {
-                throw new ElDrinkoStateMachine.ElDrinkoStateMachineException(String.format("cannot _execute(%s,%s)",om,ud));
+                throw new ElDrinkoStateMachine.ElDrinkoStateMachineException(SecureString.format("cannot _execute(%s,%s)",om,ud));
             }
         } catch(Exception e) {
             _Log.error(e);
         }
     }
-    ElDrinkoPubBot(String dbpass,String commit_hash, String botname) throws ElDrinkoStateMachine.ElDrinkoStateMachineException, StateMachineException {
+    public ElDrinkoPubBot(String dbpass,String commit_hash, String botname) throws ElDrinkoStateMachine.ElDrinkoStateMachineException, StateMachineException {
         _mongoClient = _GetMongoClient(dbpass);
-        _Log.info(String.format("botname: %s",botname));
+        _Log.info(SecureString.format("botname: %s",botname));
         _config = _MergeJsonObjects(new JSONObject[] {
             new JSONObject(
                 _mongoClient
@@ -230,7 +237,8 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 .first()
                 .toJson())
         });
-        _Log.info(String.format("_config: %s\n",_config.toString()));
+        SecureString.setHiddenInfo(_config.getJSONObject("telegram").getString("token"));
+        _Log.info(SecureString.format("_config: %s\n",_config.toString()));
         _botname = botname;
 
         String[] MASTER_CHAT_IDS = new String[] {"salesmanChatIds","developerChatIds"};
@@ -241,15 +249,23 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 l.add( (long)_config.getJSONObject("telegram").getJSONArray(s).getInt(i) );
             }
         }
-        _persistentStorage = new PersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
+        _persistentStorage = new MongoPersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
         ElDrinkoStateMachine.PreloadImages();
         _edsm = new ElDrinkoStateMachine(this);
-        _actionInflator = new ElDrinkoActionInflator(this,_persistentStorage);
+        _actionInflator = new ElDrinkoActionInflator(this, _persistentStorage, new Consumer<Document>() {
+            @Override
+            public void accept(Document doc) {
+                MongoCollection<Document> statesColl = _mongoClient
+                    .getDatabase("beerbot")
+                    .getCollection(_config.getJSONObject("mongodb").getString("order_history"));
+                statesColl.insertOne(doc);
+            }
+        });
         _conditionInflator = new ElDrinkoConditionInflator();
         _edsm.inflateTransitionsFromJSON(_conditionInflator,_actionInflator, 
-                new JSONObject(MiscUtils.GetResource("transitions",".json")).getJSONArray("correspondence"));
-        _Log.info(String.format("edsm: %s\n",_edsm));
-        this._sendMessageToMasters(String.format("updated! now at %s",commit_hash),true,"developerChatIds");
+                new JSONObject(MiscUtils.GetResource("transitions",".json")).getJSONArray("correspondence").toString());
+        _Log.info(SecureString.format("edsm: %s\n",_edsm));
+        this._sendMessageToMasters(SecureString.format("updated! now at %s",commit_hash),true,"developerChatIds");
     }
 
     private static JSONObject _MergeJsonObjects(JSONObject[] objs) {
@@ -282,13 +298,13 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     }
 	private static MongoClient _GetMongoClient(String password) {
         String mongo = "mongodb+srv://nailbiter:%s@cluster0-ta3pc.gcp.mongodb.net/test?retryWrites=true&w=majority";
-		String url = String.format(mongo,password);
+		String url = SecureString.format(mongo,password);
 		MongoClientURI uri = null;
 		try {
 			uri = new MongoClientURI(url);
 		}
 		catch(Exception e) {
-			_Log.info(String.format("EXCEPTION!\n"));
+			_Log.info(SecureString.format("EXCEPTION!\n"));
 		}
 		return new MongoClient(uri);
 	}

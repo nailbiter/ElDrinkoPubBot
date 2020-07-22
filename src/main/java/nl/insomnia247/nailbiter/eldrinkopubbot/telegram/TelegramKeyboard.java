@@ -4,6 +4,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 /**
  * @author Alex Leontiev
@@ -35,5 +37,12 @@ public class TelegramKeyboard extends TelegramOutputMessage {
     public String toString() {
         String res = super.toString();
         return String.format("%s(%s,%s)",this.getClass().getSimpleName(),_msg,_categories);
+    }
+    @Override
+    public String toJsonString() {
+        return new JSONObject()
+            .put("tag",getClass().getSimpleName())
+            .put("value", new JSONObject().put("msg",_msg).put("categories",new JSONArray(Arrays.asList(_categories))))
+            .toString();
     }
 }

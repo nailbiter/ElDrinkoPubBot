@@ -29,11 +29,11 @@ public class DownloadCache {
 
         if(_DATA.containsKey(url)) {
             String res = _DATA.get(url);
-            _Log.info(String.format("cache hit for \"%s\" -> \"%s\"",url,res));
+            _Log.info(SecureString.format("cache hit for \"%s\" -> \"%s\"",url,res));
             return res;
         } else {
-            _Log.info(String.format("cache miss for \"%s\"",u));
-            String fileName = String.format("/tmp/%s_%d%s"
+            _Log.info(SecureString.format("cache miss for \"%s\"",u));
+            String fileName = SecureString.format("/tmp/%s_%d%s"
                     ,_PREFIX
                     ,url.hashCode()
                     ,_ext
@@ -48,7 +48,7 @@ public class DownloadCache {
               _Log.info(" 270b0820b521ef23 \n");
               return null;
             }
-            _Log.info(String.format("saved to %s",fileName));
+            _Log.info(SecureString.format("saved to %s",fileName));
             _DATA.put(url,fileName);
             return fileName;
         }

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if ack "_Log\.(warn|info|debug|error)\(String\.format" src/main/java/nl/insomnia247/nailbiter/eldrinkopubbot/ 
+then
+    exit 1
+fi
