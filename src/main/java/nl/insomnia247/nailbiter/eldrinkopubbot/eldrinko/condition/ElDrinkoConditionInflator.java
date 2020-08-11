@@ -21,6 +21,7 @@ public class ElDrinkoConditionInflator implements Function<Object,Predicate<ElDr
     private static Logger _Log = LogManager.getLogger();
     public static  ElDrinkoCondition ParseElDrinkoCondition(Object oo) {
         JSONObject o = (JSONObject)oo;
+        //FIXME: automatize (change to loop)
         if(o.getString("tag").equals("TrivialPredicate")) {
             return new TrivialPredicate(o.opt("value"));
         } else if(o.getString("tag").equals("IsPhoneNumberPredicate")) {
@@ -39,6 +40,8 @@ public class ElDrinkoConditionInflator implements Function<Object,Predicate<ElDr
             return new JsonCheckFieldPredicate(o.opt("value"));
         } else if(o.optString("tag").equals("IsHalfIntegerFloatPredicate")) {
             return new IsHalfIntegerFloatPredicate(o.opt("value"));
+        } else if(o.optString("tag").equals("WidgetPredicate")) {
+            return new WidgetPredicate(o.opt("value"));
         } else {
             _Log.error("8c817a6ca72e77d2c42e58aa");
             return null;

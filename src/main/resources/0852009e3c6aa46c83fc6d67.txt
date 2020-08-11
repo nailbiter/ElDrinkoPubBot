@@ -1,0 +1,7 @@
+{%for p in products-%}
+{{p[1]}}
++0.5
+-0.5
+{{beerVolumes[p[1]].amount|myprintf}}л. {{beerVolumes[p[1]].price|myprintf}}грн.
+{%endfor-%}
+Заказать {{totalVolume|myprintf}}л. {{totalPrice|myprintf}}грн.

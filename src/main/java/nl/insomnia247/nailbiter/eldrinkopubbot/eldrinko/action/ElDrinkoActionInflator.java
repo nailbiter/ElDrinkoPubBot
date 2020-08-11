@@ -117,6 +117,57 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                             = MiscUtils.ProcessTemplate("4ea9a63509e8ed5826a37f8a",null,im.beerlist);
                         im.right.put("payment", paymentMethods.split("\n")[i]);
                     }
+                } else if( ((JSONObject)o).getString("correspondence").equals("e22069e5c338fa6c") ) {
+                    _Log.info(SecureString.format("7ba3f409e638d9313fbb0e9a o: %s",o));
+                    if(((JSONObject)o).optString("src_state").equals("widget")) {
+                        String type = ((JSONObject)o).optString("type");
+                        _Log.info(SecureString.format("type: %s",type));
+                        if( type.equals("validButton") ) {
+                            int _i = Integer.parseInt(im.left.getMsg());
+                            _Log.info(SecureString.format("_i: %d",_i));
+                            int idx = _i/4;
+                            _Log.info(SecureString.format("idx: %d",idx));
+                            boolean shouldAdd = _i%4==1;
+                            _Log.info(SecureString.format("shouldAdd: %s",shouldAdd));
+                            List<String> r = im.beerlist.getRecords().get(idx);
+                            _Log.info(SecureString.format("r: %s",r));
+                            String name = r.get(1);
+                            _Log.info(SecureString.format("name: %s",name));
+
+                            JSONObject order = im.right.optJSONObject("order");
+                            _Log.info(SecureString.format("order: %s",order));
+                            if(order==null) {
+                                order = new JSONObject();
+                                order.put("cart",new JSONArray());
+                            }
+                            _Log.info(SecureString.format("order: %s",order));
+
+                            JSONArray cart = order.getJSONArray("cart");
+                            boolean didFind = false;
+                            for(int i = 0; i < cart.length(); i++) {
+                                JSONObject obj = cart.getJSONObject(i);
+                                if(obj.getString("name").equals(name)) {
+                                    obj.put("amount",(float)(obj.getDouble("amount") + (shouldAdd ? 0.5 : -0.5)));
+                                    didFind = true;
+                                    break;
+                                }
+                            }
+                            if( !didFind && shouldAdd ) {
+                                JSONObject obj = new JSONObject();
+                                obj.put("name",name).put("amount",0.5f);
+                                cart.put(obj);
+                            }
+                            for(int i = 0; i < cart.length(); i++) {
+                                JSONObject obj = cart.getJSONObject(i);
+                                if(obj.getDouble("amount")==0.0) {
+                                    cart.remove(i);
+                                    i--;
+                                }
+                            }
+
+                            im.right.put("order",order);
+                        }
+                    }
                 } else if( ((JSONObject)o).getString("correspondence").equals("48c6907046b03db8") ) {
                     JSONObject order = _GetOrder(im.right);
                     order.put("uid",im.userData.getUserName());
@@ -152,6 +203,47 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         = tsv.getColumn("image link").get(Integer.parseInt(tka.getMsg()));
                     map.put("i",Integer.parseInt(tka.getMsg()));
                     oo = MiscUtils.SafeUrl(imgUrl);
+                } else if( ((JSONObject)o).getString("correspondence").equals("e22069e5c338fa6c") ) {
+                    try {
+                        Map<String,Object> beerVolumes = new HashMap<>();
+                        Tsv tsv = im.beerlist;
+
+                        float totalVolume = 0.0f, totalPrice = 0.0f;
+                        _Log.info("a28b2cf6997f67b9d64e3773");
+
+                        for(int i = 0; i < tsv.getColumn("name").size(); i++) {
+                            String cn = tsv.getColumn("name").get(i);
+                            Map<String,Object> r = new HashMap<>();
+                            r.put("price",0.0f);
+                            r.put("amount",0.0f);
+                            r.put("_price",Float.parseFloat(tsv.getColumn("price (UAH/L)").get(i)));
+                            beerVolumes.put(cn,r);
+                        }
+                        _Log.info(SecureString.format("beerVolumes: %s",beerVolumes));
+                        JSONObject order = im.right.optJSONObject("order");
+                        if(order==null) {
+                            order = new JSONObject();
+                            order.put("cart",new JSONArray());
+                        }
+                        for(int i = 0; i < order.getJSONArray("cart").length(); i++) {
+                            JSONObject o = order.getJSONArray("cart").getJSONObject(i);
+                            Map<String,Object> r = (Map<String,Object>)beerVolumes.get(o.getString("name"));
+                            r.put("amount",(float)(o.getDouble("amount")));
+                            r.put("price",(float)(o.getDouble("amount")*(float)r.get("_price")));
+                        }
+                        for(String cn : beerVolumes.keySet()) {
+                            Map<String,Object> r = (Map<String,Object>) beerVolumes.get(cn);
+                            totalPrice += (float)r.get("price");
+                            totalVolume += (float)r.get("amount");
+                        }
+
+                        map.put("beerVolumes",beerVolumes);
+                        map.put("totalVolume",totalVolume);
+                        map.put("totalPrice",totalPrice);
+                        _Log.info(SecureString.format("map: %s",map));
+                    } catch(Exception e) {
+                        _Log.error(e.getMessage(), e);
+                    }
                 }
 
                 im.right.put("username",im.userData.getUserName());
@@ -185,7 +277,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                 return new TelegramTextOutputMessage(MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv));
             } else if(tag.equals("TelegramKeyboard")) {
                 return _InflateTelegramKeyboard(
-                        env, msg.getString("message"), msg.getString("keyboard"),tsv);
+                        env, msg.getString("message"), msg.getString("keyboard"),tsv,msg.optInt("columns",2));
             } else if(tag.equals("TelegramImageOutputMessage")) {
                 return new TelegramImageOutputMessage(
                         MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv)
@@ -225,12 +317,12 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
         _Log.info(SecureString.format("context: %s",context));
         return context;
     }
-    private static TelegramKeyboard _InflateTelegramKeyboard(Map<String,Object> env,String msgTemplateResName, String keysTemplateResName,Tsv tsv) {
+    private static TelegramKeyboard _InflateTelegramKeyboard(Map<String,Object> env,String msgTemplateResName, String keysTemplateResName,Tsv tsv,int columns) {
         String keyboardKeys = MiscUtils.ProcessTemplate(keysTemplateResName,env,tsv);
         String keyboardMsg = MiscUtils.ProcessTemplate(msgTemplateResName,env,tsv);
         _Log.info(SecureString.format("keyboardMsg: %s",keyboardMsg));
         _Log.info(SecureString.format("keyboardKeys: %s",keyboardKeys));
-        return new TelegramKeyboard(keyboardMsg,keyboardKeys.split("\n"));
+        return new TelegramKeyboard(keyboardMsg,keyboardKeys.split("\n"),columns);
     }
     private static int _IncrementOrderCount(PersistentStorage masterPersistentStorage) {
         final String FN = "order_count";
