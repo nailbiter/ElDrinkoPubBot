@@ -19,17 +19,6 @@ public class WidgetPredicate extends MessageKeyboardComparisonPredicate {
         super(null);
         _type = (String)o;
     }
-    private static boolean _CartIsEmpty(ElDrinkoInputMessage tim) {
-        JSONObject order = tim.right.optJSONObject("order");
-        if(order==null) {
-            return true;
-        }
-        JSONArray cart = order.optJSONArray("cart");
-        if(cart==null) {
-            return true;
-        }
-        return cart.length()==0;
-    }
     @Override
     public boolean test(ElDrinkoInputMessage tim) {
         if( !super.test(tim) ) {
@@ -37,16 +26,16 @@ public class WidgetPredicate extends MessageKeyboardComparisonPredicate {
         }
         int i = Integer.parseInt(tim.left.getMsg());
         _Log.info(SecureString.format("i: %d",i));
-        int numProducts = tim.beerlist.getRecords().size();
+        int numProducts = 4;
         _Log.info(SecureString.format("numProducts: %d",numProducts));
         _Log.info(SecureString.format("type: %s",_type));
 
         if (_type.equals("finishButton")) {
-            return !_CartIsEmpty(tim) && i==4*numProducts;
+            return i==4*numProducts;
         } else if (_type.equals("validButton")) {
             return i<4*numProducts && ((i%4==1) || (i%4==2));
         } else if (_type.equals("invalidButton")) {
-            return _CartIsEmpty(tim) ?  ( (i==4*numProducts) || ((i%4!=1) && (i%4!=2)) ) : (i<4*numProducts && (i%4!=1) && (i%4!=2));
+            return (i==4*numProducts) || ((i%4!=1) && (i%4!=2));
         }
 
         _Log.error(SecureString.format("_type: %s",_type));

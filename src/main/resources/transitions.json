@@ -43,128 +43,48 @@
       }
     ],
     [
-      "start",
-      "widget",
-      {
-        "tag": "MessageKeyboardComparisonPredicate",
-        "value": "2"
-      },
-      {
-        "correspondence": "e22069e5c338fa6c",
-        "src_state": "start"
-      }
-    ],
-    [
-      "widget",
-      "widget",
-      {
-        "tag": "WidgetPredicate",
-        "value": "validButton"
-      },
-      {
-        "correspondence": "e22069e5c338fa6c",
-        "type": "validButton",
-        "src_state": "widget"
-      }
-    ],
-    [
-      "widget",
-      "widget",
-      {
-        "tag": "WidgetPredicate",
-        "value": "invalidButton"
-      },
-      {
-        "correspondence": "e22069e5c338fa6c",
-        "type": "invalidButton",
-        "src_state": "widget"
-      }
-    ],
-    [
-      "widget",
-      "widget_confirm",
-      {
-        "tag": "WidgetPredicate",
-        "value": "finishButton"
-      },
-      {
-        "correspondence": "188dcd3edbb12949"
-      }
-    ],
-    [
-      "widget_confirm",
-      "widget",
-      {
-        "tag": "MessageKeyboardComparisonPredicate",
-        "value": "0"
-      },
-      {
-        "correspondence": "e22069e5c338fa6c",
-        "src_state": "widget_confirm"
-      }
-    ],
-    [
-      "widget_confirm",
-      "choose_phone_number",
-      {
-        "tag": "ConjunctionPredicate",
-        "value": [
-          {
-            "tag": "MessageKeyboardComparisonPredicate",
-            "value": "1"
-          },
-          {
-            "tag": "JsonCheckFieldPredicate",
-            "value": {
-              "path": "$.address"
-            }
-          }
-        ]
-      },
-      {
-        "correspondence": "72e97b89bcab08c4"
-      }
-    ],
-    [
-      "widget_confirm",
-      "choose_address",
-      {
-        "tag": "ConjunctionPredicate",
-        "value": [
-          {
-            "tag": "MessageKeyboardComparisonPredicate",
-            "value": "1"
-          },
-          {
-            "tag": "NegationPredicate",
-            "value": {
-              "tag": "JsonCheckFieldPredicate",
-              "value": {
-                "path": "$.address"
-              }
-            }
-          }
-        ]
-      },
-      {
-        "correspondence": "0f13e63d9cd69630"
-      }
-    ],
-    [
       "choose_product_to_make_order",
       "choose_amount",
       {
         "tag": "MessageKeyboardComparisonPredicate"
       },
       {
-        "correspondence": "f02480c016715289"
+        "src_state": "choose_product_to_make_order",
+        "correspondence": "9c851972cb7438c5"
+      }
+    ],
+    [
+      "choose_amount",
+      "choose_amount",
+      {
+        "tag": "WidgetPredicate",
+        "value": "validButton"
+      },
+      {
+        "correspondence": "9c851972cb7438c5",
+        "src_state": "choose_amount",
+        "type": "validButton"
+      }
+    ],
+    [
+      "choose_amount",
+      "choose_amount",
+      {
+        "tag": "WidgetPredicate",
+        "value": "invalidButton"
+      },
+      {
+        "correspondence": "9c851972cb7438c5",
+        "src_state": "choose_amount",
+        "type": "invalidButton"
       }
     ],
     [
       "choose_amount",
       "confirm",
       {
-        "tag": "IsHalfIntegerFloatPredicate"
+        "tag": "WidgetPredicate",
+        "value": "finishButton"
       },
       {
         "correspondence": "5e11c9696e9b38f0"
@@ -369,11 +289,6 @@
     ]
   ],
   "transitions": {
-    "188dcd3edbb12949": {
-      "keyboard": "ad49223283d70b877cd43f69",
-      "message": "7a70873a5685da4f9cb2c609",
-      "tag": "TelegramKeyboard"
-    },
     "04dc388df66f8e8c": {
       "keyboard": "ac9a00c3bc0e96735b047a7e",
       "message": "2ae6c7859b755abf51a3289b",
@@ -446,19 +361,15 @@
       "message": "1475a24ceb48b40d809f9082",
       "tag": "TelegramTextOutputMessage"
     },
-    "e22069e5c338fa6c": {
-      "columns": 4,
-      "keyboard": "0852009e3c6aa46c83fc6d67",
-      "message": "e39bbb8c47ad2923a4041700",
-      "tag": "TelegramKeyboard"
-    },
-    "f02480c016715289": {
-      "message": "ec779e4315ccf36a38c2d470",
-      "tag": "TelegramTextOutputMessage"
-    },
     "f4a78dc2c6339be1": {
       "keyboard": "76a5127e87e48a4e6759d248",
       "message": "67c31fcc0fa6566a955c1792",
+      "tag": "TelegramKeyboard"
+    },
+    "9c851972cb7438c5":{
+      "keyboard":"2c3381744a60241c14250678",
+      "message":"77fd93507a4b86849d171396",
+      "columns": 4,
       "tag": "TelegramKeyboard"
     },
     "fa702a44b70ddcae": {

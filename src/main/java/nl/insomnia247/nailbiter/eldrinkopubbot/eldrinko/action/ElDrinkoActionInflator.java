@@ -1,5 +1,8 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Predicate;
 import java.util.function.Function;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.ElDrinkoInputMessage;
@@ -40,6 +43,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
  * @author Alex Leontiev
  */
 public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinkoInputMessage,ImmutablePair<OutputMessage,JSONObject>>> {
+    String[] _BOTTLE_TYPES = new String[] {"0,5","1,0","1,5","2,0"};
     private static Logger _Log = LogManager.getLogger(ElDrinkoActionInflator.class);
     private Consumer<Document> _orderInserter;
     private static final JSONObject _TRANSITIONS 
@@ -69,20 +73,52 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
             @Override
             public ImmutablePair<OutputMessage,JSONObject> apply(ElDrinkoInputMessage im) {
                 _Log.info(SecureString.format("here with %s,%s",o,im));
-                if( (((JSONObject)o).getString("correspondence")).equals("f02480c016715289") ) {
-                    TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
-                    int i = Integer.parseInt(tka.getMsg());
-                    Tsv tsv = im.beerlist;
-                    JSONObject order = im.right.optJSONObject("order");
-                    if(order==null) {
-                        order = new JSONObject();
-                        order.put("cart",new JSONArray());
+                if( (((JSONObject)o).getString("correspondence")).equals("9c851972cb7438c5") ) {
+                    _Log.info(SecureString.format("%s",o));
+                    if ((((JSONObject)o).optString("src_state")).equals("choose_product_to_make_order")) {
+                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
+                        int i = Integer.parseInt(tka.getMsg());
+                        Tsv tsv = im.beerlist;
+                        JSONObject order = im.right.optJSONObject("order");
+                        if(order==null) {
+                            order = new JSONObject();
+                            order.put("cart",new JSONArray());
+                        }
+                        JSONObject obj = new JSONObject();
+                        String name = tsv.getColumn("name").get(i);
+                        //FIXME: remove `amount` from here
+                        obj.put("name",name).put("bottles",new JSONObject()).put("amount",0.0f);
+                        order.getJSONArray("cart").put(obj);
+                        im.right.put("order",order);
+                    } else if( ((JSONObject)o).optString("type").equals("validButton") ) {
+                        _Log.info(SecureString.format("%s",im.left.getMsg()));
+                        _Log.info(SecureString.format("%s",im.right));
+                        JSONArray cart = im.right.getJSONObject("order").getJSONArray("cart");
+                        JSONObject lastItem = cart.getJSONObject(cart.length()-1);
+                        JSONObject bottles = lastItem.getJSONObject("bottles");
+                        int _i = Integer.parseInt(im.left.getMsg());
+                        _Log.info(SecureString.format("_i: %d",_i));
+                        int idx = _i/4;
+                        _Log.info(SecureString.format("idx: %d",idx));
+                        boolean shouldAdd = _i%4==1;
+                        _Log.info(SecureString.format("shouldAdd: %s",shouldAdd));
+                        String bottleType = _BOTTLE_TYPES[idx];
+
+                        if( !bottles.has(bottleType) ) {
+                            bottles.put(bottleType,0);
+                        }
+                        bottles.put(bottleType,bottles.getInt(bottleType) + (shouldAdd?1:-1));
+                        bottles.put(bottleType,Math.max(bottles.getInt(bottleType),0));
+                        float amount = 0.0f;
+                        for(String s: _BOTTLE_TYPES) {
+                            try {
+                                amount += MiscUtils.ParseFloat(s) * bottles.optInt(s,0);
+                            } catch (MiscUtils.ParseFloatException e) {
+                                _Log.error(e);
+                            }
+                        }
+                        lastItem.put("amount",amount);
                     }
-                    JSONObject obj = new JSONObject();
-                    String name = tsv.getColumn("name").get(i);
-                    obj.put("name",name);
-                    order.getJSONArray("cart").put(obj);
-                    im.right.put("order",order);
                 } else if( ((JSONObject)o).getString("correspondence").equals("5e11c9696e9b38f0") ) {
                     if(((JSONObject)o).optString("src_state").equals("delete")) {
                         TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
@@ -91,17 +127,20 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         JSONArray cart = order.getJSONArray("cart");
                         JSONObject removed = cart.getJSONObject(i);
                         cart.remove(i);
-                    } else {
-                        TelegramTextInputMessage ttim = (TelegramTextInputMessage) im.left;
-                        float amount = 0;
-                        try {
-                            amount = MiscUtils.ParseFloat(ttim.getMsg());
-                        } catch(Exception e) {}
-                        JSONObject order = im.right.optJSONObject("order");
-                        JSONArray cart = order.getJSONArray("cart");
-                        JSONObject obj = cart.getJSONObject(cart.length()-1);
-                        obj.put("amount",amount);
-                        im.right.put("order",order);
+//                    } else {
+//                        TelegramTextInputMessage ttim = (TelegramTextInputMessage) im.left;
+//                        float amount = 0;
+//                        try {
+//                            amount = MiscUtils.ParseFloat(ttim.getMsg());
+//                        } catch(Exception e) {
+//                            _Log.error(e.getMessage());
+//                            _Log.error(e);
+//                        }
+//                        JSONObject order = im.right.optJSONObject("order");
+//                        JSONArray cart = order.getJSONArray("cart");
+//                        JSONObject obj = cart.getJSONObject(cart.length()-1);
+//                        obj.put("amount",amount);
+//                        im.right.put("order",order);
                     }
                 } else if( ((JSONObject)o).getString("correspondence").equals("72e97b89bcab08c4") ) {
                     im.right.put("address",im.left.getMsg());
@@ -116,57 +155,6 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         String paymentMethods 
                             = MiscUtils.ProcessTemplate("4ea9a63509e8ed5826a37f8a",null,im.beerlist);
                         im.right.put("payment", paymentMethods.split("\n")[i]);
-                    }
-                } else if( ((JSONObject)o).getString("correspondence").equals("e22069e5c338fa6c") ) {
-                    _Log.info(SecureString.format("7ba3f409e638d9313fbb0e9a o: %s",o));
-                    if(((JSONObject)o).optString("src_state").equals("widget")) {
-                        String type = ((JSONObject)o).optString("type");
-                        _Log.info(SecureString.format("type: %s",type));
-                        if( type.equals("validButton") ) {
-                            int _i = Integer.parseInt(im.left.getMsg());
-                            _Log.info(SecureString.format("_i: %d",_i));
-                            int idx = _i/4;
-                            _Log.info(SecureString.format("idx: %d",idx));
-                            boolean shouldAdd = _i%4==1;
-                            _Log.info(SecureString.format("shouldAdd: %s",shouldAdd));
-                            List<String> r = im.beerlist.getRecords().get(idx);
-                            _Log.info(SecureString.format("r: %s",r));
-                            String name = r.get(1);
-                            _Log.info(SecureString.format("name: %s",name));
-
-                            JSONObject order = im.right.optJSONObject("order");
-                            _Log.info(SecureString.format("order: %s",order));
-                            if(order==null) {
-                                order = new JSONObject();
-                                order.put("cart",new JSONArray());
-                            }
-                            _Log.info(SecureString.format("order: %s",order));
-
-                            JSONArray cart = order.getJSONArray("cart");
-                            boolean didFind = false;
-                            for(int i = 0; i < cart.length(); i++) {
-                                JSONObject obj = cart.getJSONObject(i);
-                                if(obj.getString("name").equals(name)) {
-                                    obj.put("amount",(float)(obj.getDouble("amount") + (shouldAdd ? 0.5 : -0.5)));
-                                    didFind = true;
-                                    break;
-                                }
-                            }
-                            if( !didFind && shouldAdd ) {
-                                JSONObject obj = new JSONObject();
-                                obj.put("name",name).put("amount",0.5f);
-                                cart.put(obj);
-                            }
-                            for(int i = 0; i < cart.length(); i++) {
-                                JSONObject obj = cart.getJSONObject(i);
-                                if(obj.getDouble("amount")==0.0) {
-                                    cart.remove(i);
-                                    i--;
-                                }
-                            }
-
-                            im.right.put("order",order);
-                        }
                     }
                 } else if( ((JSONObject)o).getString("correspondence").equals("48c6907046b03db8") ) {
                     JSONObject order = _GetOrder(im.right);
@@ -203,47 +191,39 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         = tsv.getColumn("image link").get(Integer.parseInt(tka.getMsg()));
                     map.put("i",Integer.parseInt(tka.getMsg()));
                     oo = MiscUtils.SafeUrl(imgUrl);
-                } else if( ((JSONObject)o).getString("correspondence").equals("e22069e5c338fa6c") ) {
-                    try {
-                        Map<String,Object> beerVolumes = new HashMap<>();
-                        Tsv tsv = im.beerlist;
+                } else if( ((JSONObject)o).getString("correspondence").equals("9c851972cb7438c5") ) {
+                    Map<String,Object> beerVolumes = new HashMap<>();
+                    Tsv tsv = im.beerlist;
 
-                        float totalVolume = 0.0f, totalPrice = 0.0f;
-                        _Log.info("a28b2cf6997f67b9d64e3773");
+                    float totalVolume = 0.0f;
 
-                        for(int i = 0; i < tsv.getColumn("name").size(); i++) {
-                            String cn = tsv.getColumn("name").get(i);
-                            Map<String,Object> r = new HashMap<>();
-                            r.put("price",0.0f);
-                            r.put("amount",0.0f);
-                            r.put("_price",Float.parseFloat(tsv.getColumn("price (UAH/L)").get(i)));
-                            beerVolumes.put(cn,r);
+                    JSONArray cart = im.right.getJSONObject("order").getJSONArray("cart");
+                    JSONObject bottles = cart.getJSONObject(cart.length()-1).getJSONObject("bottles");
+                    String beerName = cart.getJSONObject(cart.length()-1).getString("name");
+                    for(String s:_BOTTLE_TYPES) {
+                        float volume = 0.0f;
+                        try {
+                            volume = MiscUtils.ParseFloat(s);
+                        } catch (MiscUtils.ParseFloatException e) {
+                            _Log.error(e);
                         }
-                        _Log.info(SecureString.format("beerVolumes: %s",beerVolumes));
-                        JSONObject order = im.right.optJSONObject("order");
-                        if(order==null) {
-                            order = new JSONObject();
-                            order.put("cart",new JSONArray());
-                        }
-                        for(int i = 0; i < order.getJSONArray("cart").length(); i++) {
-                            JSONObject o = order.getJSONArray("cart").getJSONObject(i);
-                            Map<String,Object> r = (Map<String,Object>)beerVolumes.get(o.getString("name"));
-                            r.put("amount",(float)(o.getDouble("amount")));
-                            r.put("price",(float)(o.getDouble("amount")*(float)r.get("_price")));
-                        }
-                        for(String cn : beerVolumes.keySet()) {
-                            Map<String,Object> r = (Map<String,Object>) beerVolumes.get(cn);
-                            totalPrice += (float)r.get("price");
-                            totalVolume += (float)r.get("amount");
-                        }
-
-                        map.put("beerVolumes",beerVolumes);
-                        map.put("totalVolume",totalVolume);
-                        map.put("totalPrice",totalPrice);
-                        _Log.info(SecureString.format("map: %s",map));
-                    } catch(Exception e) {
-                        _Log.error(e.getMessage(), e);
+                        totalVolume += volume*bottles.optInt(s);
                     }
+                    int i = IterableUtils.indexOf(tsv.getColumn("name"),new Predicate<String>(){
+                        @Override
+                        public boolean evaluate(String n) {
+                            return n.equals(beerName);
+                        }
+                    });
+                    float totalPrice = 0.0f;
+                    try {
+                        totalPrice = totalVolume*MiscUtils.ParseFloat(tsv.getColumn("price (UAH/L)").get(i));
+                    } catch (MiscUtils.ParseFloatException e) {
+                        _Log.error(e);
+                    }
+                    map.put("totalVolume",totalVolume);
+                    map.put("totalPrice",totalPrice);
+                    _Log.info(SecureString.format("map: %s",map));
                 }
 
                 im.right.put("username",im.userData.getUserName());
