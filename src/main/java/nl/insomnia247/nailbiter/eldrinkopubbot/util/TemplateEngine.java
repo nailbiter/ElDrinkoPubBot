@@ -31,7 +31,11 @@ public class TemplateEngine {
                     d = (double)vvar;
                 }
                 _Log.info(d);
-                return SecureString.format("%.2f",d.floatValue()).replace(".",",");
+                String pre = SecureString.format("%.2f",d.floatValue());
+                _Log.info(pre);
+                String res = pre.replace(".",",");
+                _Log.info(res);
+                return res;
             }
             public String getName() {
                 return "myprintf";
@@ -64,6 +68,16 @@ public class TemplateEngine {
         });
     }
     public String render(String template, Map<String,Object> context) {
-        return _jinjava.render(template,context);
+        _Log.info(template);
+        _Log.info(context);
+        String res = "";
+        try {
+            res = _jinjava.render(template,context);
+        } catch(Exception e) {
+            _Log.error(e);
+            _Log.error(e.getMessage());
+        }
+        _Log.info(res);
+        return res;
     }
 }
