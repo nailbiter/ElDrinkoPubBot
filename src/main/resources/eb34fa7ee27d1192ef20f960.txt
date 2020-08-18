@@ -1,4 +1,4 @@
-Ви замовили: {%for r in order.cart%}{{r.name}}-{{r.amount}} л{%if not loop.last%}; {%endif%}{%endfor%}
+Ви замовили: {%for r in order.cart%}{{r.name}}-{{r.amount}}(={%for k,v in (r.bottles|dictsort)%}{{k}}`*`{{v}}{%if not loop.last%}+{%endif%}{%endfor%})л{%if not loop.last%}; {%endif%}{%endfor%}
 Адреса замовлення: {{order.address}}
 Форма сплати: {{order.payment}}
 Сума до сплати {{(order.sum + order.delivery_fee)|myprintf}} грн.
