@@ -31,7 +31,7 @@ public class TemplateEngine {
                     d = (double)vvar;
                 }
                 _Log.info(d);
-                return SecureString.format("%.2f",d).replace(".",",");
+                return SecureString.format("%.2f",(float)d).replace(".",",");
             }
             public String getName() {
                 return "myprintf";
