@@ -1,5 +1,5 @@
-{%for t in ["0,5","1,0","1,5","2,0"]-%}
-Пляшка {{t}}л
+{%for t in BOTTLES-%}
+{{t}}л пляшка 
 +1
 -1
 {{(order.cart|last)["bottles"][t]|default(0)}}шт

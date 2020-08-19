@@ -1,5 +1,6 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition;
 import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.ElDrinkoInputMessage;
+import nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.ElDrinkoActionInflator;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.TelegramTextInputMessage;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +27,7 @@ public class WidgetPredicate extends MessageKeyboardComparisonPredicate {
         }
         int i = Integer.parseInt(tim.left.getMsg());
         _Log.info(SecureString.format("i: %d",i));
-        int numProducts = 4;
+        int numProducts = ElDrinkoActionInflator.BOTTLE_TYPES.length;
         _Log.info(SecureString.format("numProducts: %d",numProducts));
         _Log.info(SecureString.format("type: %s",_type));
 

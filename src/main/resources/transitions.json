@@ -49,8 +49,8 @@
         "tag": "MessageKeyboardComparisonPredicate"
       },
       {
-        "src_state": "choose_product_to_make_order",
-        "correspondence": "9c851972cb7438c5"
+        "correspondence": "9c851972cb7438c5",
+        "src_state": "choose_product_to_make_order"
       }
     ],
     [
@@ -142,7 +142,7 @@
         ]
       },
       {
-        "correspondence": "72e97b89bcab08c4"
+        "correspondence": "02b6ac70d65c067e"
       }
     ],
     [
@@ -289,6 +289,16 @@
     ]
   ],
   "transitions": {
+    "02b6ac70d65c067e": [
+      {
+        "message": "526b3b48fb69070e6953eba3",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "message": "fcff2695d806371dab5d7e05",
+        "tag": "TelegramTextOutputMessage"
+      }
+    ],
     "04dc388df66f8e8c": {
       "keyboard": "ac9a00c3bc0e96735b047a7e",
       "message": "2ae6c7859b755abf51a3289b",
@@ -353,6 +363,12 @@
       "message": "a96f38cbc06abbd47de38fe3",
       "tag": "TelegramKeyboard"
     },
+    "9c851972cb7438c5": {
+      "columns": 4,
+      "keyboard": "2c3381744a60241c14250678",
+      "message": "77fd93507a4b86849d171396",
+      "tag": "TelegramKeyboard"
+    },
     "d72f0c922c788133": {
       "message": "a0c5183bf9b79e8cb17bd7e8",
       "tag": "TelegramTextOutputMessage"
@@ -364,12 +380,6 @@
     "f4a78dc2c6339be1": {
       "keyboard": "76a5127e87e48a4e6759d248",
       "message": "67c31fcc0fa6566a955c1792",
-      "tag": "TelegramKeyboard"
-    },
-    "9c851972cb7438c5":{
-      "keyboard":"2c3381744a60241c14250678",
-      "message":"77fd93507a4b86849d171396",
-      "columns": 4,
       "tag": "TelegramKeyboard"
     },
     "fa702a44b70ddcae": {

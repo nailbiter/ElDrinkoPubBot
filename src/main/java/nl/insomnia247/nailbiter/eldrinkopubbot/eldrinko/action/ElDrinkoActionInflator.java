@@ -1,6 +1,7 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
+import java.util.Arrays;
 import java.util.function.Function;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
 import org.bson.Document;
@@ -43,7 +44,7 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.util.SecureString;
  * @author Alex Leontiev
  */
 public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinkoInputMessage,ImmutablePair<OutputMessage,JSONObject>>> {
-    String[] _BOTTLE_TYPES = new String[] {"0,5","1,0","1,5","2,0"};
+    public static String[] BOTTLE_TYPES = new String[] {"0,5","1,0","1,5","2,0","3,0"};
     private static Logger _Log = LogManager.getLogger(ElDrinkoActionInflator.class);
     private Consumer<Document> _orderInserter;
     private static final JSONObject _TRANSITIONS 
@@ -102,7 +103,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         _Log.info(SecureString.format("idx: %d",idx));
                         boolean shouldAdd = _i%4==1;
                         _Log.info(SecureString.format("shouldAdd: %s",shouldAdd));
-                        String bottleType = _BOTTLE_TYPES[idx];
+                        String bottleType = BOTTLE_TYPES[idx];
 
                         if( !bottles.has(bottleType) ) {
                             bottles.put(bottleType,0);
@@ -110,7 +111,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         bottles.put(bottleType,bottles.getInt(bottleType) + (shouldAdd?1:-1));
                         bottles.put(bottleType,Math.max(bottles.getInt(bottleType),0));
                         float amount = 0.0f;
-                        for(String s: _BOTTLE_TYPES) {
+                        for(String s: BOTTLE_TYPES) {
                             try {
                                 amount += MiscUtils.ParseFloat(s) * bottles.optInt(s,0);
                             } catch (MiscUtils.ParseFloatException e) {
@@ -200,7 +201,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                     JSONArray cart = im.right.getJSONObject("order").getJSONArray("cart");
                     JSONObject bottles = cart.getJSONObject(cart.length()-1).getJSONObject("bottles");
                     String beerName = cart.getJSONObject(cart.length()-1).getString("name");
-                    for(String s:_BOTTLE_TYPES) {
+                    for(String s:BOTTLE_TYPES) {
                         float volume = 0.0f;
                         try {
                             volume = MiscUtils.ParseFloat(s);
@@ -269,6 +270,8 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
     }
     private static Map<String,Object> _OrderObjectToJinjaContext(JSONObject order, Tsv tsv) {
         Map<String, Object> context = new HashMap<String,Object>();
+        context.put("BOTTLES",Arrays.asList(BOTTLE_TYPES));
+
         _Log.info(order);
         if(order==null) {
             return context;
