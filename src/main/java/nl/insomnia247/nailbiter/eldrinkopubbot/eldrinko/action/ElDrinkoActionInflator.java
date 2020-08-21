@@ -51,7 +51,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
         = new JSONObject(MiscUtils.GetResource("transitions",".json"));
     private final PersistentStorage _masterPersistentStorage;
     private JSONObject _config;
-    private static final DateFormat _ORDER_REPORT_FORMATTER = new SimpleDateFormat("dd.mm.yy HH:MM");
+    private static final DateFormat _ORDER_REPORT_FORMATTER = new SimpleDateFormat("dd.MM.yy HH:mm");
     static {
         _ORDER_REPORT_FORMATTER.setTimeZone(TimeZone.getTimeZone("Ukraine/Kiev"));
     }
