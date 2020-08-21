@@ -1,7 +1,0 @@
-Замовлення №{{order.count}}; {{order.timestamp}}
-Покупець: {{order.uid}}
-Замовив: {%for r in order.cart%}{{r.name}}-{{r.amount}} л{%if not loop.last%}; {%endif%}{%endfor%}
-Адреса замовлення: {{order.address}}
-Номер телефону: {{order.phone_number}}
-Форма сплати: {{order.payment}}
-Сума до сплати {{(order.sum + order.delivery_fee)|myprintf}} грн.

@@ -1,3 +1,0 @@
-{%for p in products-%}
-{{p[1]}} - {{p[3]|myprintf_int}}грн.
-{%endfor-%}
