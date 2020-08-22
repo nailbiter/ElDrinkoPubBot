@@ -27,9 +27,10 @@ def _get_orders(date):
         search_object = {"order.timestamp":{"$regex":regx}}
     else:
         search_object = {}
-        res = [{**{k:v for k,v in o["order"].items() if k!="_id"}, "_timestamp":o["order"]["_timestamp"].strftime("%d.%m.%y %H:%M")} 
-                for o 
-                in mongo_client.beerbot.order_history.find(filter=search_object,sort=[("order._timestamp",-1)])]
+
+    res = [{**{k:v for k,v in o["order"].items() if k!="_id"}, "_timestamp":o["order"]["_timestamp"].strftime("%d.%m.%y %H:%M")} 
+            for o 
+            in mongo_client.beerbot.order_history.find(filter=search_object,sort=[("order._timestamp",-1)])]
     return res
 
 @app.route('/')
