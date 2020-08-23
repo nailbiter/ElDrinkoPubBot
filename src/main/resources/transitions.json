@@ -125,6 +125,34 @@
     ],
     [
       "confirm",
+      "choose_payment",
+      {
+        "tag": "ConjunctionPredicate",
+        "value": [
+          {
+            "tag": "MessageKeyboardComparisonPredicate",
+            "value": "2"
+          },
+          {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.address"
+            }
+          },
+          {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.phone_number"
+            }
+          }
+        ]
+      },
+      {
+        "correspondence": "d4fc73e4735c9719"
+      }
+    ],
+    [
+      "confirm",
       "choose_phone_number",
       {
         "tag": "ConjunctionPredicate",
@@ -137,6 +165,15 @@
             "tag": "JsonCheckFieldPredicate",
             "value": {
               "path": "$.address"
+            }
+          },
+          {
+            "tag": "NegationPredicate",
+            "value": {
+              "tag": "JsonCheckFieldPredicate",
+              "value": {
+                "path": "$.phone_number"
+              }
             }
           }
         ]
@@ -174,10 +211,45 @@
       "choose_address",
       "choose_phone_number",
       {
-        "tag": "IsTextMessagePredicate"
+        "tag": "ConjunctionPredicate",
+        "value": [
+          {
+            "tag": "IsTextMessagePredicate"
+          },
+          {
+            "tag": "NegationPredicate",
+            "value": {
+              "tag": "JsonCheckFieldPredicate",
+              "value": {
+                "path": "$.phone_number"
+              }
+            }
+          }
+        ]
       },
       {
         "correspondence": "72e97b89bcab08c4"
+      }
+    ],
+    [
+      "choose_address",
+      "choose_payment",
+      {
+        "tag": "ConjunctionPredicate",
+        "value": [
+          {
+            "tag": "IsTextMessagePredicate"
+          },
+          {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.phone_number"
+            }
+          }
+        ]
+      },
+      {
+        "correspondence": "774ed3e0f5ef17cf"
       }
     ],
     [
@@ -317,6 +389,17 @@
       "message": "fdb3ef9a7dcc8e36c4fa489f",
       "tag": "TelegramKeyboard"
     },
+    "2e2aa27f140e603a": [
+      {
+        "message": "f540cf40794c154afbd807a6",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "keyboard": "4ea9a63509e8ed5826a37f8a",
+        "message": "1dc02faec7377fc537510e30",
+        "tag": "TelegramKeyboard"
+      }
+    ],
     "48c6907046b03db8": {
       "keyboard": "04cd61335c0eedfe073de872",
       "message": "6e3ec3f7345ed7115141f355",
@@ -353,6 +436,17 @@
         "tag": "TelegramKeyboard"
       }
     ],
+    "774ed3e0f5ef17cf": [
+      {
+        "message": "f540cf40794c154afbd807a6",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "keyboard": "4ea9a63509e8ed5826a37f8a",
+        "message": "1dc02faec7377fc537510e30",
+        "tag": "TelegramKeyboard"
+      }
+    ],
     "8e0edde4a3199d0c": {
       "keyboard": "4ea9a63509e8ed5826a37f8a",
       "message": "1dc02faec7377fc537510e30",
@@ -369,6 +463,21 @@
       "message": "77fd93507a4b86849d171396",
       "tag": "TelegramKeyboard"
     },
+    "d4fc73e4735c9719": [
+      {
+        "message": "526b3b48fb69070e6953eba3",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "message": "f540cf40794c154afbd807a6",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "keyboard": "4ea9a63509e8ed5826a37f8a",
+        "message": "1dc02faec7377fc537510e30",
+        "tag": "TelegramKeyboard"
+      }
+    ],
     "d72f0c922c788133": {
       "message": "a0c5183bf9b79e8cb17bd7e8",
       "tag": "TelegramTextOutputMessage"

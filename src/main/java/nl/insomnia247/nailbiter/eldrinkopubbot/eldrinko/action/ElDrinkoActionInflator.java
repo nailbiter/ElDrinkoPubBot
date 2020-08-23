@@ -128,22 +128,8 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         JSONArray cart = order.getJSONArray("cart");
                         JSONObject removed = cart.getJSONObject(i);
                         cart.remove(i);
-//                    } else {
-//                        TelegramTextInputMessage ttim = (TelegramTextInputMessage) im.left;
-//                        float amount = 0;
-//                        try {
-//                            amount = MiscUtils.ParseFloat(ttim.getMsg());
-//                        } catch(Exception e) {
-//                            _Log.error(e.getMessage());
-//                            _Log.error(e);
-//                        }
-//                        JSONObject order = im.right.optJSONObject("order");
-//                        JSONArray cart = order.getJSONArray("cart");
-//                        JSONObject obj = cart.getJSONObject(cart.length()-1);
-//                        obj.put("amount",amount);
-//                        im.right.put("order",order);
                     }
-                } else if( ((JSONObject)o).getString("correspondence").equals("72e97b89bcab08c4") ) {
+                } else if( ((JSONObject)o).getString("correspondence").equals("72e97b89bcab08c4") ||  ((JSONObject)o).getString("correspondence").equals("774ed3e0f5ef17cf")) {
                     im.right.put("address",im.left.getMsg());
                 } else if( ((JSONObject)o).getString("correspondence").equals("8e0edde4a3199d0c") ) {
                     im.right.put("phone_number",im.left.getMsg());
