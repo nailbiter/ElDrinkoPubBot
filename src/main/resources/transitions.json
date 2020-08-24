@@ -74,7 +74,7 @@
         "value": "invalidButton"
       },
       {
-        "correspondence": "9c851972cb7438c5",
+        "correspondence": "07defdb4543782cb",
         "src_state": "choose_amount",
         "type": "invalidButton"
       }
@@ -495,6 +495,18 @@
       "keyboard": "a203791aec81dfaf5a187b3d",
       "message": "eb34fa7ee27d1192ef20f960",
       "tag": "TelegramKeyboard"
-    }
+    },
+    "07defdb4543782cb":[
+      {
+        "message": "b0a3c9bdf91ea92bb36a3624",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "columns": 4,
+        "keyboard": "2c3381744a60241c14250678",
+        "message": "77fd93507a4b86849d171396",
+        "tag": "TelegramKeyboard"
+      }
+    ]
   }
 }

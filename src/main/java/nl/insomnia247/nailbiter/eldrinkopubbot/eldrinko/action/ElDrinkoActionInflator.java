@@ -74,7 +74,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
             @Override
             public ImmutablePair<OutputMessage,JSONObject> apply(ElDrinkoInputMessage im) {
                 _Log.info(SecureString.format("here with %s,%s",o,im));
-                if( (((JSONObject)o).getString("correspondence")).equals("9c851972cb7438c5") ) {
+                if( (((JSONObject)o).getString("correspondence")).equals("9c851972cb7438c5") || (((JSONObject)o).getString("correspondence")).equals("07defdb4543782cb")) {
                     _Log.info(SecureString.format("%s",o));
                     if ((((JSONObject)o).optString("src_state")).equals("choose_product_to_make_order")) {
                         TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
@@ -178,7 +178,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         = tsv.getColumn("image link").get(Integer.parseInt(tka.getMsg()));
                     map.put("i",Integer.parseInt(tka.getMsg()));
                     oo = MiscUtils.SafeUrl(imgUrl);
-                } else if( ((JSONObject)o).getString("correspondence").equals("9c851972cb7438c5") ) {
+                } else if((((JSONObject)o).getString("correspondence")).equals("9c851972cb7438c5") || (((JSONObject)o).getString("correspondence")).equals("07defdb4543782cb") ) {
                     Map<String,Object> beerVolumes = new HashMap<>();
                     Tsv tsv = im.beerlist;
 
