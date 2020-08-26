@@ -129,7 +129,7 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                         JSONObject removed = cart.getJSONObject(i);
                         cart.remove(i);
                     }
-                } else if( ((JSONObject)o).getString("correspondence").equals("72e97b89bcab08c4") ||  ((JSONObject)o).getString("correspondence").equals("774ed3e0f5ef17cf")) {
+                } else if( (((JSONObject)o).getString("correspondence").equals("72e97b89bcab08c4") && ((JSONObject)o).getString("src_state").equals("choose_address")) ||  ((JSONObject)o).getString("correspondence").equals("774ed3e0f5ef17cf")) {
                     im.right.put("address",im.left.getMsg());
                 } else if( ((JSONObject)o).getString("correspondence").equals("8e0edde4a3199d0c") ) {
                     im.right.put("phone_number",im.left.getMsg());
