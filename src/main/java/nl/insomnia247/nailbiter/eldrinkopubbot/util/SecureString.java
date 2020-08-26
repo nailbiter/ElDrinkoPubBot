@@ -11,6 +11,9 @@ public class SecureString {
     public static void setHiddenInfo(String what) {
         _SENSITIVE_INFO.add(what);
     }
+    /**
+     * FIXME: remove and move this functionality to constructor
+     */
     public static String format(String format,Object... args) {
         String res = String.format(format,args);
         for(String what: _SENSITIVE_INFO) {

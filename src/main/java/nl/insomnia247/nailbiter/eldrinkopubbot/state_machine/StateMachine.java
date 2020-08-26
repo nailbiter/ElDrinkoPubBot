@@ -81,9 +81,9 @@ public class StateMachine<InputMessage,OutputMessage> implements Function<InputM
         _Log.info(SecureString.format("apply: state: \"%s\"\nim: \"%s\"",_currentState,im));
         for(String to:_states) {
             List<ImmutablePair<Predicate<InputMessage>, Function<InputMessage,OutputMessage>>> pl
-                = null;
-            _Log.info(SecureString.format("checking %s -> %s",_currentState,to));
-            if( (pl=_transitions.get(new ImmutablePair<String,String>(_currentState,to))) != null ) {
+                = _transitions.get(new ImmutablePair<String,String>(_currentState,to));
+            _Log.info(SecureString.format("checking %s -> %s [%s]",_currentState,to,pl));
+            if( pl != null ) {
                 for(ImmutablePair<Predicate<InputMessage>, Function<InputMessage,OutputMessage>> p:pl) {
                     if(p.left.test(im)) {
                         _Log.info(SecureString.format("active transition: %s -> %s",_currentState,to));

@@ -15,22 +15,27 @@ public class TemplateEngine {
     public TemplateEngine() {
         _jinjava.getGlobalContext().registerFilter(new Filter(){
             @Override
-            public Object filter(Object var, JinjavaInterpreter interpreter, String... args) {
-                _Log.info(var.getClass().getName());
-                _Log.info(var);
+            public Object filter(Object vvar, JinjavaInterpreter interpreter, String... args) {
+                _Log.info(vvar.getClass().getName());
+                _Log.info(vvar);
                 Double d = 0.0;
-                if(var instanceof String) {
-                    d = Double.parseDouble((String)var);
-                } else if(var instanceof Integer) {
-                    d = ((Integer)var).doubleValue();
-                } else if(var instanceof Float) {
-                    d = ((Float)var).doubleValue();
-                } else if(var instanceof Long) {
-                    d = ((Long)var).doubleValue();
+                if(vvar instanceof String) {
+                    d = Double.parseDouble((String)vvar);
+                } else if(vvar instanceof Integer) {
+                    d = ((Integer)vvar).doubleValue();
+                } else if(vvar instanceof Float) {
+                    d = ((Float)vvar).doubleValue();
+                } else if(vvar instanceof Long) {
+                    d = ((Long)vvar).doubleValue();
                 } else {
-                    d = (double)var;
+                    d = (double)vvar;
                 }
-                return SecureString.format("%.2f",d).replace(".",",");
+                _Log.info(d);
+                String pre = SecureString.format("%.2f",d.floatValue());
+                _Log.info(pre);
+                String res = pre.replace(".",",");
+                _Log.info(res);
+                return res;
             }
             public String getName() {
                 return "myprintf";
@@ -38,22 +43,22 @@ public class TemplateEngine {
         });
         _jinjava.getGlobalContext().registerFilter(new Filter(){
             @Override
-            public Object filter(Object var, JinjavaInterpreter interpreter, String... args) {
-                _Log.info(var.getClass().getName());
-                _Log.info(var);
+            public Object filter(Object vvar, JinjavaInterpreter interpreter, String... args) {
+                _Log.info(vvar.getClass().getName());
+                _Log.info(vvar);
                 int d = 0;
-                if(var instanceof String) {
-                    d = Integer.parseInt((String)var);
-                } else if(var instanceof Integer) {
-                    d = ((Integer)var).intValue();
-                } else if(var instanceof Float) {
-                    d = ((Float)var).intValue();
-                } else if(var instanceof Double) {
-                    d = ((Double)var).intValue();
-                } else if(var instanceof Long) {
-                    d = ((Long)var).intValue();
+                if(vvar instanceof String) {
+                    d = Integer.parseInt((String)vvar);
+                } else if(vvar instanceof Integer) {
+                    d = ((Integer)vvar).intValue();
+                } else if(vvar instanceof Float) {
+                    d = ((Float)vvar).intValue();
+                } else if(vvar instanceof Double) {
+                    d = ((Double)vvar).intValue();
+                } else if(vvar instanceof Long) {
+                    d = ((Long)vvar).intValue();
                 } else {
-                    d = (int)var;
+                    d = (int)vvar;
                 }
                 return SecureString.format("%02d",d);
             }
@@ -63,6 +68,16 @@ public class TemplateEngine {
         });
     }
     public String render(String template, Map<String,Object> context) {
-        return _jinjava.render(template,context);
+        _Log.info(template);
+        _Log.info(context);
+        String res = "";
+        try {
+            res = _jinjava.render(template,context);
+        } catch(Exception e) {
+            _Log.error(e);
+            _Log.error(e.getMessage());
+        }
+        _Log.info(res);
+        return res;
     }
 }
