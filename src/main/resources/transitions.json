@@ -279,7 +279,8 @@
         "tag": "MessageKeyboardComparisonPredicate"
       },
       {
-        "correspondence": "fa702a44b70ddcae"
+        "correspondence": "fa702a44b70ddcae",
+        "src_state":"choose_payment"
       }
     ],
     [
@@ -302,6 +303,41 @@
       {
         "correspondence": "fa702a44b70ddcae",
         "src_state": "edit_address"
+      }
+    ],
+    [
+      "send",
+      "edit_phone_number",
+      {
+        "tag": "MessageKeyboardComparisonPredicate",
+        "value": "3"
+      },
+      {
+        "correspondence": "72e97b89bcab08c4"
+      }
+    ],
+    [
+      "edit_phone_number",
+      "send",
+      {
+        "tag": "IsPhoneNumberPredicate"
+      },
+      {
+        "correspondence": "fa702a44b70ddcae",
+        "src_state": "edit_phone_number"
+      }
+    ],
+    [
+      "edit_phone_number",
+      "edit_phone_number",
+      {
+        "tag": "NegationPredicate",
+        "value": {
+          "tag": "IsPhoneNumberPredicate"
+        }
+      },
+      {
+        "correspondence": "dd7404e376113591"
       }
     ],
     [
@@ -376,6 +412,18 @@
       "message": "2ae6c7859b755abf51a3289b",
       "tag": "TelegramKeyboard"
     },
+    "07defdb4543782cb": [
+      {
+        "message": "b0a3c9bdf91ea92bb36a3624",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "columns": 4,
+        "keyboard": "2c3381744a60241c14250678",
+        "message": "77fd93507a4b86849d171396",
+        "tag": "TelegramKeyboard"
+      }
+    ],
     "0f13e63d9cd69630": {
       "message": "054edccc65c193f7583a5773",
       "tag": "TelegramTextOutputMessage"
@@ -495,18 +543,6 @@
       "keyboard": "a203791aec81dfaf5a187b3d",
       "message": "eb34fa7ee27d1192ef20f960",
       "tag": "TelegramKeyboard"
-    },
-    "07defdb4543782cb":[
-      {
-        "message": "b0a3c9bdf91ea92bb36a3624",
-        "tag": "TelegramTextOutputMessage"
-      },
-      {
-        "columns": 4,
-        "keyboard": "2c3381744a60241c14250678",
-        "message": "77fd93507a4b86849d171396",
-        "tag": "TelegramKeyboard"
-      }
-    ]
+    }
   }
 }

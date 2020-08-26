@@ -136,12 +136,14 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                 } else if( ((JSONObject)o).getString("correspondence").equals("fa702a44b70ddcae") ) {
                     if(((JSONObject)o).optString("src_state").equals("edit_address")) {
                         im.right.put("address",im.left.getMsg());
-                    } else {
+                    } else if(((JSONObject)o).optString("src_state").equals("choose_payment")) {
                         TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                         int i = Integer.parseInt(tka.getMsg());
                         String paymentMethods 
                             = MiscUtils.ProcessTemplate("4ea9a63509e8ed5826a37f8a",null,im.beerlist);
                         im.right.put("payment", paymentMethods.split("\n")[i]);
+                    } else if(((JSONObject)o).optString("src_state").equals("edit_phone_number")) {
+                        im.right.put("phone_number",im.left.getMsg());
                     }
                 } else if( ((JSONObject)o).getString("correspondence").equals("48c6907046b03db8") ) {
                     JSONObject order = _GetOrder(im.right);
