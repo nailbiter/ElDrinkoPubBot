@@ -125,34 +125,6 @@
     ],
     [
       "confirm",
-      "choose_payment",
-      {
-        "tag": "ConjunctionPredicate",
-        "value": [
-          {
-            "tag": "MessageKeyboardComparisonPredicate",
-            "value": "2"
-          },
-          {
-            "tag": "JsonCheckFieldPredicate",
-            "value": {
-              "path": "$.address"
-            }
-          },
-          {
-            "tag": "JsonCheckFieldPredicate",
-            "value": {
-              "path": "$.phone_number"
-            }
-          }
-        ]
-      },
-      {
-        "correspondence": "d4fc73e4735c9719"
-      }
-    ],
-    [
-      "confirm",
       "choose_phone_number",
       {
         "tag": "ConjunctionPredicate",
