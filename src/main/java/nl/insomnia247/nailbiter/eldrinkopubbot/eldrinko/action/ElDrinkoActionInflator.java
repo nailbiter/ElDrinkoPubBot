@@ -216,6 +216,8 @@ public class ElDrinkoActionInflator implements Function<Object,Function<ElDrinko
                 }
 
                 im.right.put("username",im.userData.getUserName());
+                im.right.put("firstName",im.userData.getFirstName());
+                im.right.put("lastName",im.userData.getLastName());
                 _Log.info(SecureString.format("before _InflateOutputMessage(%s,%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.beerlist.toJsonString(),im.right));
                 OutputMessage om = _InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo,im.beerlist);
                 _Log.info(SecureString.format("om: %s",om));

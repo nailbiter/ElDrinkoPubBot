@@ -1,6 +1,9 @@
 package nl.insomnia247.nailbiter.eldrinkopubbot.telegram;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.json.JSONObject;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Alex Leontiev
@@ -8,20 +11,38 @@ import org.json.JSONObject;
 public class UserData {
     protected long _chatId = 0;
     protected String _username = null;
+    protected String _firstName = null;
+    protected String _lastName = null;
+    private static Logger _Log = LogManager.getLogger();
     public UserData() {}
     public UserData(Update update) {
+        Message m = null;
+
         if(update.hasMessage()) {
-            _chatId = update.getMessage().getChatId();
-            _username = update.getMessage().getFrom().getUserName();
+            m = update.getMessage();
         } else if(update.hasCallbackQuery()) {
-            _chatId = update.getCallbackQuery().getMessage().getChatId();
+            m = update.getCallbackQuery().getMessage();
+        } else {
+            _Log.error(update);
         }
+        _Log.info(m);
+
+        _chatId = m.getChatId();
+        _username = m.getChat().getUserName();
+        _firstName = m.getChat().getFirstName();
+        _lastName = m.getChat().getLastName();
     }
     public Long getChatId() {
         return _chatId;
     }
     public String getUserName() {
         return "@"+_username;
+    }
+    public String getLastName() {
+        return _lastName;
+    }
+    public String getFirstName() {
+        return _firstName;
     }
     @Override
     public String toString() {
