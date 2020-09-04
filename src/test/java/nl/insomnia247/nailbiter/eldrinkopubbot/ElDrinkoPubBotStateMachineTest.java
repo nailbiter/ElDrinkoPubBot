@@ -86,10 +86,13 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
                 System.exit(1);
             }
             ImmutablePair<OutputMessage,JSONObject> om = _edsm.apply(im);
-            String om_actual = new JSONObject().put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString();
-            _Log.info(String.format("om: %s",om_actual));
-            _Log.info(String.format("es: %s",_edsm.getState()));
+            String om_actual 
+                = new JSONObject()
+                  .put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString();
+            _Log.info(i);
+            _Log.info(String.format("es:\n%s\n==?\n%s",_edsm.getState(),transition.getString("es")));
             assertEquals(_edsm.getState(),transition.getString("es"));
+            _Log.info(String.format("om:\n%s\n==?\n%s",transition.getJSONObject("om").toString(),om_actual));
             assertEquals(transition.getJSONObject("om").toString(), om_actual);
         }
     }
