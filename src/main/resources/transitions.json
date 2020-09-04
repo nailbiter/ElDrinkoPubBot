@@ -180,6 +180,34 @@
       }
     ],
     [
+      "confirm",
+      "choose_payment",
+      {
+        "tag": "ConjunctionPredicate",
+        "value": [
+          {
+            "tag": "MessageKeyboardComparisonPredicate",
+            "value": "2"
+          },
+          {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.address"
+            }
+          },
+          {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.phone_number"
+            }
+          }
+        ]
+      },
+      {
+        "correspondence": "1df8ef4b2a4751f1"
+      }
+    ],
+    [
       "choose_address",
       "choose_phone_number",
       {
@@ -455,6 +483,21 @@
       {
         "keyboard": "16c4082080253eee262c9cf2",
         "message": "fdb3ef9a7dcc8e36c4fa489f",
+        "tag": "TelegramKeyboard"
+      }
+    ],
+    "1df8ef4b2a4751f1":[
+      {
+        "message": "526b3b48fb69070e6953eba3",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "message": "f540cf40794c154afbd807a6",
+        "tag": "TelegramTextOutputMessage"
+      },
+      {
+        "keyboard": "4ea9a63509e8ed5826a37f8a",
+        "message": "1dc02faec7377fc537510e30",
         "tag": "TelegramKeyboard"
       }
     ],
