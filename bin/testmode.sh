@@ -2,13 +2,9 @@
 
 
 BOT_NAME=ProtoElDrinkoPubBot
-BRANCH=staging
 
 
 git checkout master
-git branch -D $BRANCH
-git fetch
-git checkout $BRANCH
 mvn clean
 mvn compile
 
