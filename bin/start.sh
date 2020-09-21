@@ -2,7 +2,7 @@
 
 
 BOT_NAME=ElDrinkoPubBot
-TAG=$1
+TAG=`git tag|grep 'v\d\+\.\d\+'|tail -n1`
 BRANCH=master
 
 
