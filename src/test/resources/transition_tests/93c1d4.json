@@ -1,0 +1,42 @@
+{
+  "es": "choose_amount",
+  "im": {
+    "left": {
+      "tag": "TelegramTextInputMessage",
+      "value": "1.2"
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "name": "Milk Stout"
+          }
+        ]
+      },
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "NailbiterNailbiter"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramTextOutputMessage",
+      "value": {
+        "msg": "Ця кількість не є кратною 0,5 літра. Спробуйте ще раз\n"
+      }
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "name": "Milk Stout"
+          }
+        ]
+      },
+      "username": "@NailbiterNailbiter"
+    }
+  },
+  "ss": "choose_amount"
+}

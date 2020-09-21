@@ -1,0 +1,42 @@
+{
+  "es": "choose_amount",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "4"
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": "",
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramTextOutputMessage",
+      "value": {
+        "msg": "Ви замовили Pilsner. Введіть кількість в літрах кратну 0,5 літра.\n"
+      }
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": {
+        "cart": [
+          {
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    }
+  },
+  "ss": "choose_product_to_make_order"
+}

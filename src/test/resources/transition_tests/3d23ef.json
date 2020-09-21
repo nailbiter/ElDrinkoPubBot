@@ -1,0 +1,55 @@
+{
+  "es": "confirm",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "0"
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 1.5,
+            "name": "Milk Stout"
+          },
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Покласти ще",
+            "Очистити",
+            "Оформити замовлення"
+          ]
+        ],
+        "msg": "Ви замовили IPA-3.5 л.\nСума замовлення: 269,50 грн.\nСума за доставку: 0,00 грн.\nСума до сплати: 269,50 грн.\n\nЩо робимо далі?\n"
+      }
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@null"
+    }
+  },
+  "ss": "delete"
+}

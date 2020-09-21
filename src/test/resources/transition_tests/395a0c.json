@@ -1,0 +1,50 @@
+{
+  "es": "choose_phone_number",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "2"
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": {
+        "cart": [
+          {
+            "amount": 2.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@NailbiterNailbiter"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramTextOutputMessage",
+      "value": {
+        "msg": "Введiть номер телефону (тiльки цифри)\n"
+      }
+    },
+    "right": {
+      "address": "2",
+      "order": {
+        "cart": [
+          {
+            "amount": 2.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    }
+  },
+  "ss": "confirm"
+}

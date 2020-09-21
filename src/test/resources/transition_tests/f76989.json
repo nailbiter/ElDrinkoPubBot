@@ -1,0 +1,46 @@
+{
+  "es": "start",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "5"
+    },
+    "right": {
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "OutputArrayMessage",
+      "value": [
+        {
+          "tag": "TelegramImageOutputMessage",
+          "value": {
+            "image": "https://lh3.googleusercontent.com/pw/ACtC-3dbL9r_wztaawktmX1IR1V7-d5pIC84lyr74T-NDaT0sCYFBRgNrBjwoNIpOh5yXRHynTAv0o339dxOEUZ3xqUq3k_QfKyBgeP7Et0eVPN5H3ldGCmxN0AGXIPA3rAQfRtfRu0COcnDAuWtRuA8Ur4=w1110-h638-no?authuser=0",
+            "msg": "Класичний англійський світлий Ale з приємним солодовим смаком та м’якою хмельовою гіркотою, яка змінює свою інтенсивність від ковтка до ковтка. ABV 5,0%, IBU 8, OG 12,5%\r \n"
+          }
+        },
+        {
+          "tag": "TelegramKeyboard",
+          "value": {
+            "categories": [
+              [
+                "Замовити",
+                "Дивитись описи"
+              ]
+            ],
+            "msg": "Сьогодні ми пропонуємо:\n- Mariposa (83.00 грн/л)\n- IPA (77.00 грн/л)\n- Milk Stout (69.00 грн/л)\n- Wizen (54.00 грн/л)\n- Pilsner (54.00 грн/л)\n- Pale Ale (57.00 грн/л)\n- Mars (72.00 грн/л)\n- Golden Ale (74.00 грн/л)\n"
+          }
+        }
+      ]
+    },
+    "right": {
+      "username": "@null"
+    }
+  },
+  "ss": "choose_product_to_see_description"
+}

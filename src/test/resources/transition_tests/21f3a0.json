@@ -1,0 +1,45 @@
+{
+  "es": "choose_phone_number",
+  "im": {
+    "left": {
+      "tag": "TelegramTextInputMessage",
+      "value": "aaa bbb"
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "NailbiterNailbiter"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramTextOutputMessage",
+      "value": {
+        "msg": "Введiть номер телефону (тiльки цифри)\n"
+      }
+    },
+    "right": {
+      "address": "aaa bbb",
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@NailbiterNailbiter"
+    }
+  },
+  "ss": "choose_address"
+}

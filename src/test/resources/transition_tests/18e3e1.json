@@ -1,0 +1,40 @@
+{
+  "es": "choose_product_to_see_description",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "1"
+    },
+    "right": {
+      "username": "@NailbiterNailbiter"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Mariposa - 83грн.",
+            "IPA - 77грн.",
+            "Milk Stout - 69грн.",
+            "Wizen - 54грн.",
+            "Pilsner - 54грн.",
+            "Pale Ale - 57грн.",
+            "Mars - 72грн.",
+            "Golden Ale - 74грн."
+          ]
+        ],
+        "msg": "Зробіть вибір\n"
+      }
+    },
+    "right": {
+      "username": "@null"
+    }
+  },
+  "ss": "start"
+}

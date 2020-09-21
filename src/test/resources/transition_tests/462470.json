@@ -1,0 +1,44 @@
+{
+  "es": "choose_address",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "2"
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramTextOutputMessage",
+      "value": {
+        "msg": "Введіть адресу в межах Петрівського Кварталу.\n"
+      }
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@null"
+    }
+  },
+  "ss": "confirm"
+}

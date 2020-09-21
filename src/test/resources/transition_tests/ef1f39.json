@@ -1,0 +1,53 @@
+{
+  "es": "start",
+  "im": {
+    "left": {
+      "tag": "TelegramTextInputMessage",
+      "value": "/start"
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": "",
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "NailbiterNailbiter"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "OutputArrayMessage",
+      "value": [
+        {
+          "tag": "TelegramTextOutputMessage",
+          "value": {
+            "msg": "Вітаємо!\n"
+          }
+        },
+        {
+          "tag": "TelegramKeyboard",
+          "value": {
+            "categories": [
+              [
+                "Замовити",
+                "Дивитись описи"
+              ]
+            ],
+            "msg": "Сьогодні ми пропонуємо:\n1. Mariposa (83.00 грн/л)\n2. IPA (77.00 грн/л)\n3. Milk Stout (69.00 грн/л)\n4. Wizen (54.00 грн/л)\n5. Pilsner (54.00 грн/л)\n6. Pale Ale (57.00 грн/л)\n7. Mars (72.00 грн/л)\n8. Golden Ale (74.00 грн/л)\n"
+          }
+        }
+      ]
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": "",
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@NailbiterNailbiter"
+    }
+  },
+  "ss": "choose_product_to_see_description"
+}

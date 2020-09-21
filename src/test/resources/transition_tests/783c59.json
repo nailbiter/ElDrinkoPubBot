@@ -1,0 +1,50 @@
+{
+  "es": "edit_address",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "2"
+    },
+    "right": {
+      "address": "aaa bbb",
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "payment": "Термінал",
+      "phone_number": "4571146",
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramTextOutputMessage",
+      "value": {
+        "msg": "введите адрес\n"
+      }
+    },
+    "right": {
+      "address": "aaa bbb",
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "payment": "Термінал",
+      "phone_number": "4571146",
+      "username": "@null"
+    }
+  },
+  "ss": "send"
+}

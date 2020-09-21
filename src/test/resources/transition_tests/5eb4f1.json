@@ -1,0 +1,43 @@
+{
+  "es": "start",
+  "im": {
+    "left": {
+      "tag": "TelegramTextInputMessage",
+      "value": "uoeu"
+    },
+    "right": {},
+    "userData": {
+      "chatId": 340880765,
+      "username": "NailbiterNailbiter"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "OutputArrayMessage",
+      "value": [
+        {
+          "tag": "TelegramTextOutputMessage",
+          "value": {
+            "msg": "Вітаємо!\n"
+          }
+        },
+        {
+          "tag": "TelegramKeyboard",
+          "value": {
+            "categories": [
+              [
+                "Замовити",
+                "Дивитись описи"
+              ]
+            ],
+            "msg": "Сьогодні ми пропонуємо:\n- Mariposa (83.00 грн/л)\n- IPA (77.00 грн/л)\n- Milk Stout (69.00 грн/л)\n- Wizen (54.00 грн/л)\n- Pilsner (54.00 грн/л)\n- Pale Ale (57.00 грн/л)\n- Mars (72.00 грн/л)\n- Golden Ale (74.00 грн/л)\n"
+          }
+        }
+      ]
+    },
+    "right": {
+      "username": "@NailbiterNailbiter"
+    }
+  },
+  "ss": "_"
+}

@@ -1,0 +1,56 @@
+{
+  "es": "confirm",
+  "im": {
+    "left": {
+      "tag": "TelegramTextInputMessage",
+      "value": "2.5"
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": {
+        "cart": [
+          {
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "NailbiterNailbiter"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Покласти ще",
+            "Очистити",
+            "Оформити замовлення"
+          ]
+        ],
+        "msg": "Ви замовили Pilsner-2.5 л.\nСума замовлення: 135,00 грн.\nСума за доставку: 20,00 грн.\nСума до сплати: 155,00 грн.\n\nЩо робимо далі?\n"
+      }
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": {
+        "cart": [
+          {
+            "amount": 2.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@NailbiterNailbiter"
+    }
+  },
+  "ss": "choose_amount"
+}

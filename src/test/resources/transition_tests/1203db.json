@@ -1,0 +1,56 @@
+{
+  "es": "choose_payment",
+  "im": {
+    "left": {
+      "tag": "TelegramTextInputMessage",
+      "value": "45712342"
+    },
+    "right": {
+      "address": "2",
+      "order": {
+        "cart": [
+          {
+            "amount": 2.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "NailbiterNailbiter"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Готівка",
+            "Термінал"
+          ]
+        ],
+        "msg": "Оберіть форму сплати\n"
+      }
+    },
+    "right": {
+      "address": "2",
+      "order": {
+        "cart": [
+          {
+            "amount": 2.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "45712342",
+      "username": "@NailbiterNailbiter"
+    }
+  },
+  "ss": "choose_phone_number"
+}

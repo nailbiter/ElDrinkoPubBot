@@ -1,0 +1,50 @@
+{
+  "es": "confirm",
+  "im": {
+    "left": {
+      "tag": "TelegramTextInputMessage",
+      "value": "1.5"
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "name": "Milk Stout"
+          }
+        ]
+      },
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "NailbiterNailbiter"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Покласти ще",
+            "Очистити",
+            "Оформити замовлення"
+          ]
+        ],
+        "msg": "Ви замовили Milk Stout-1.5 л.\nСума замовлення: 103,50 грн.\nСума за доставку: 20,00 грн.\nСума до сплати: 123,50 грн.\n\nЩо робимо далі?\n"
+      }
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 1.5,
+            "name": "Milk Stout"
+          }
+        ]
+      },
+      "username": "@NailbiterNailbiter"
+    }
+  },
+  "ss": "confirm"
+}

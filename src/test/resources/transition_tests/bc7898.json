@@ -1,0 +1,62 @@
+{
+  "es": "choose_amount",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "2"
+    },
+    "right": {
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "0,5л пляшка ",
+            "+1",
+            "-1",
+            "0шт",
+            "1,0л пляшка ",
+            "+1",
+            "-1",
+            "0шт",
+            "1,5л пляшка ",
+            "+1",
+            "-1",
+            "0шт",
+            "2,0л пляшка ",
+            "+1",
+            "-1",
+            "0шт",
+            "3,0л пляшка ",
+            "+1",
+            "-1",
+            "0шт",
+            "Замовити 0,00л 0,00 грн."
+          ]
+        ],
+        "msg": "Ви замовляєте Milk Stout. Виберіть бажану кількість та фасування шляхом натискання кнопок \"+1\" або \"-1\" біля відповідної тари.\n"
+      }
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 0,
+            "bottles": {},
+            "name": "Milk Stout"
+          }
+        ]
+      },
+      "username": "@null"
+    }
+  },
+  "ss": "choose_product_to_make_order"
+}

@@ -1,0 +1,50 @@
+{
+  "es": "confirm",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "0"
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": {
+        "cart": [
+          {
+            "amount": 1.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Покласти ще"
+          ]
+        ],
+        "msg": "Ви замовили .\nСума замовлення: 0,00 грн.\nСума за доставку: 20,00 грн.\nСума до сплати: 20,00 грн.\n\nЩо робимо далі?\n"
+      }
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": {
+        "cart": []
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    }
+  },
+  "ss": "delete"
+}

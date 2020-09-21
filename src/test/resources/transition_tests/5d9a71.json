@@ -1,0 +1,58 @@
+{
+  "es": "confirm",
+  "im": {
+    "left": {
+      "tag": "TelegramTextInputMessage",
+      "value": "3.5"
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 1.5,
+            "name": "Milk Stout"
+          },
+          {
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "NailbiterNailbiter"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Покласти ще",
+            "Очистити",
+            "Оформити замовлення"
+          ]
+        ],
+        "msg": "Ви замовили Milk Stout-1.5 л; IPA-3.5 л.\nСума замовлення: 373,00 грн.\nСума за доставку: 0,00 грн.\nСума до сплати: 373,00 грн.\n\nЩо робимо далі?\n"
+      }
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 1.5,
+            "name": "Milk Stout"
+          },
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@NailbiterNailbiter"
+    }
+  },
+  "ss": "confirm"
+}

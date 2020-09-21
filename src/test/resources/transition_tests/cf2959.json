@@ -1,0 +1,58 @@
+{
+  "es": "delete",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "1"
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 1.5,
+            "name": "Milk Stout"
+          },
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@NailbiterNailbiter"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "1.5 литров пива \"Milk Stout\"",
+            "3.5 литров пива \"IPA\""
+          ]
+        ],
+        "msg": "Що будемо видаляти?\n"
+      }
+    },
+    "right": {
+      "order": {
+        "cart": [
+          {
+            "amount": 1.5,
+            "name": "Milk Stout"
+          },
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "username": "@null"
+    }
+  },
+  "ss": "confirm"
+}

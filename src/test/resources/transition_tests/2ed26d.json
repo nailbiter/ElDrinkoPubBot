@@ -1,0 +1,48 @@
+{
+  "es": "idle",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "0"
+    },
+    "right": {
+      "address": "2",
+      "order": {
+        "cart": [
+          {
+            "amount": 2.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "45712342",
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "start"
+          ]
+        ],
+        "msg": "Дякуємо за замовлення!\nМи опрацюємо його, якомога швидше.\nЯкщо у нас виникнуть питання ми напишемо Вам, або зателефонуємо.\n"
+      }
+    },
+    "right": {
+      "address": "2",
+      "order": "",
+      "payment": "Готівка",
+      "phone_number": "45712342",
+      "username": "@null"
+    }
+  },
+  "ss": "send"
+}

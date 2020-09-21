@@ -1,0 +1,57 @@
+{
+  "es": "send",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "0"
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "payment": "Термінал",
+      "phone_number": "1",
+      "username": "@null"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Відправити замовлення",
+            "Змінити форму сплати",
+            "Змінити адресу"
+          ]
+        ],
+        "msg": "Ви замовили: IPA-3.5 л\nАдреса замовлення: aa mm44\nФорма сплати: Готівка\nСума до сплати 269,50 грн.\n"
+      }
+    },
+    "right": {
+      "address": "aa mm44",
+      "order": {
+        "cart": [
+          {
+            "amount": 3.5,
+            "name": "IPA"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "1",
+      "username": "@null"
+    }
+  },
+  "ss": "choose_payment"
+}

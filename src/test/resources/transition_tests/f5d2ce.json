@@ -1,0 +1,57 @@
+{
+  "es": "send",
+  "im": {
+    "left": {
+      "tag": "TelegramKeyboardAnswer",
+      "value": "0"
+    },
+    "right": {
+      "address": "2",
+      "order": {
+        "cart": [
+          {
+            "amount": 2.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "45712342",
+      "username": "@NailbiterNailbiter"
+    },
+    "userData": {
+      "chatId": 340880765,
+      "username": "null"
+    }
+  },
+  "om": {
+    "left": {
+      "tag": "TelegramKeyboard",
+      "value": {
+        "categories": [
+          [
+            "Відправити замовлення",
+            "Змінити форму сплати",
+            "Змінити адресу"
+          ]
+        ],
+        "msg": "Ви замовили: Pilsner-2.5 л\nАдреса замовлення: 2\nФорма сплати: Готівка\nСума до сплати 155,00 грн.\n"
+      }
+    },
+    "right": {
+      "address": "2",
+      "order": {
+        "cart": [
+          {
+            "amount": 2.5,
+            "name": "Pilsner"
+          }
+        ]
+      },
+      "payment": "Готівка",
+      "phone_number": "45712342",
+      "username": "@null"
+    }
+  },
+  "ss": "choose_payment"
+}
