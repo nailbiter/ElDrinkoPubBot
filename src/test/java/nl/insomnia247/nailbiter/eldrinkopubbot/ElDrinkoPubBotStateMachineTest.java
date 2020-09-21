@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.JSONTools;
 
 /**
  * @author Alex Leontiev
@@ -54,7 +55,7 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
     public void testElDrinkoStateMachineConfig() {
         JSONObject eldrinko_state_machine = new JSONObject(MiscUtils.GetResource("eldrinko_state_machine",".json"));
         _Log.info(String.format("%s: %s","01c303e27fafdc26",_edsm.toJsonString()));
-        assertEquals(eldrinko_state_machine.toString(), new JSONObject(_edsm.toJsonString()).toString());
+        assertEquals(JSONTools.JSONObjectToMap(eldrinko_state_machine), JSONTools.JSONObjectToMap(new JSONObject(_edsm.toJsonString())));
     }
     private static TelegramInputMessage _ParseTelegramInputMessage(JSONObject o) throws Exception {
         if(o.getString("tag").equals("TelegramTextInputMessage")) {
@@ -73,10 +74,11 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
                 );
     }
     public void testElDrinkoStateMachineTransitions() {
-        JSONArray transition_tests = new JSONArray(MiscUtils.GetResource("transition_tests",".json"));
+        JSONArray transition_tests = new JSONObject(MiscUtils.GetResource("transition_tests",".json")).getJSONArray("transitions");
         for(int i = 0; i < transition_tests.length(); i++) {
-            _Log.info(String.format("test #%d",i));
-            JSONObject transition = transition_tests.getJSONObject(i);
+            String fn = transition_tests.getString(i);
+            _Log.info(String.format("test #%d (%s)",i,fn));
+            JSONObject transition = new JSONObject(MiscUtils.GetResource(String.format("transition_tests/%s",fn),".json"));
             ElDrinkoInputMessage im = null;
             try {
                 _edsm.setState(transition.getString("ss"));
@@ -89,11 +91,50 @@ public class ElDrinkoPubBotStateMachineTest extends TestCase {
             String om_actual 
                 = new JSONObject()
                   .put("left",new JSONObject(om.left.toJsonString())).put("right",om.right).toString();
-            _Log.info(i);
-            _Log.info(String.format("es:\n%s\n==?\n%s",_edsm.getState(),transition.getString("es")));
+            _Log.info(String.format("es(%d,%s,5113060c):\n%s\n==?\n%s",i,fn,_edsm.getState(),transition.getString("es")));
             assertEquals(_edsm.getState(),transition.getString("es"));
-            _Log.info(String.format("om:\n%s\n==?\n%s",transition.getJSONObject("om").toString(),om_actual));
-            assertEquals(transition.getJSONObject("om").toString(), om_actual);
+            _Log.info(String.format("om(%d,%s,048a2215):\n%s\n==?\n%s",i,fn,transition.getJSONObject("om").toString(),om_actual));
+            assertEquals(JSONTools.JSONObjectToMap(transition.getJSONObject("om")), JSONTools.JSONObjectToMap(new JSONObject(om_actual)));
         }
     }
 }
+//{
+//  "transitions": [
+//    "5eb4f1",
+//    "18e3e1",
+//    "f76989",
+//    "69114e",
+//    "bc7898",
+//    "d65253",
+//    "93c1d4",
+//    "dbdec3",
+//    "532308",
+//    "cf2959",
+//    "3d23ef",
+//    "462470",
+//    "21f3a0",
+//    "10276d",
+//    "1ff9a7",
+//    "36983c",
+//    "783c59",
+//    "7212df",
+//    "ba7076",
+//    "b8dc6a",
+//    "ccd65e",
+//    "437c64",
+//    "3c2548",
+//    "ef1f39",
+//    "edd9d1",
+//    "25e80f",
+//    "c4d378",
+//    "96c6c1",
+//    "85bf6b",
+//    "895e39",
+//    "a7981f",
+//    "b65c81",
+//    "395a0c",
+//    "1203db",
+//    "f5d2ce",
+//    "2ed26d"
+//  ]
+//}

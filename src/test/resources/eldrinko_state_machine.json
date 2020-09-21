@@ -222,6 +222,32 @@
         null
       ]
     ],
+    "[\"confirm\",\"choose_payment\"]": [
+      [
+        {
+          "tag": "ConjunctionPredicate",
+          "value": [
+            {
+              "tag": "MessageKeyboardComparisonPredicate",
+              "value": "2"
+            },
+            {
+              "tag": "JsonCheckFieldPredicate",
+              "value": {
+                "path": "$.address"
+              }
+            },
+            {
+              "tag": "JsonCheckFieldPredicate",
+              "value": {
+                "path": "$.phone_number"
+              }
+            }
+          ]
+        },
+        null
+      ]
+    ],
     "[\"confirm\",\"choose_phone_number\"]": [
       [
         {
