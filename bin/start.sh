@@ -2,11 +2,13 @@
 
 
 BOT_NAME=ElDrinkoPubBot
+TAG=$1
 BRANCH=master
 
 
 git checkout $BRANCH
 git pull
+git checkout $TAG
 mvn clean
 mvn compile
 
