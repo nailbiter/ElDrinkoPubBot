@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 import org.apache.commons.io.IOUtils;
 import java.net.URL;
+import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
 
 
 /**
@@ -22,20 +23,21 @@ public class Tsv implements Jsonable{
     protected List<String> _headers = new ArrayList<>();
     protected Tsv() {}
     public Tsv(URL url) {
-        InputStream in = null;
-        Cache cache = new Cache(60);
-        try {
-            String body = null;
-            if(cache.get(url.toString())==null) {
-                in = url.openStream();
-                cache.put(url.toString(),IOUtils.toString( in ));
-            }
-            _parseContent((String)cache.get(url.toString()));
-        } catch(Exception e ) {
-            System.err.format("exception: %s\n",e);
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
+//        InputStream in = null;
+//        Cache cache = new Cache(60);
+//        try {
+//            String body = null;
+//            if(cache.get(url.toString())==null) {
+//                in = url.openStream();
+//                cache.put(url.toString(),IOUtils.toString( in ));
+//            }
+//            _parseContent((String)cache.get(url.toString()));
+//        } catch(Exception e ) {
+//            System.err.format("exception: %s\n",e);
+//        } finally {
+//            IOUtils.closeQuietly(in);
+//        }
+    _parseContent(MiscUtils.GetResource("eldrinkopubbot",".tsv")); //FIXME
     }
     private void _parseContent(String content) {
         String[] lines = content.split("\n+");
