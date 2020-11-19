@@ -65,6 +65,7 @@ public class ElDrinkoStateMachine extends ExposedStateMachine<ElDrinkoInputMessa
     }
     public static void PreloadImages() {
         Tsv tsv = new Tsv(MiscUtils.SafeUrl(ElDrinkoInputMessage.BEERLIST));
+        _Log.info(SecureString.format("tsv: %s",tsv));
         for(String imgUrl:tsv.getColumn("image link")) {
             _Log.info(SecureString.format("start preloading %s",imgUrl));
             String filePath = new DownloadCache(".png").get(MiscUtils.SafeUrl(imgUrl));
