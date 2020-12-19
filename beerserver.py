@@ -8,13 +8,8 @@ import logging
 from _beerserver import get_mongo_client, get_orders
 
 
-# global var's
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
-
-# procedures
-
-
 
 
 @app.route("/refresh_db", methods=["POST"])
@@ -24,6 +19,11 @@ def refresh_db():
         coll = mongo_client.beerbot[cn]
         coll.delete_one({"id": "145766172"})
     return "done"
+
+
+@app.route("/beerlist")
+def beerlist():
+    return "beerlist"
 
 
 @app.route('/')
