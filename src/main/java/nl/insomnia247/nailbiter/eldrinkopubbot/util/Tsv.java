@@ -13,6 +13,10 @@ import java.util.stream.IntStream;
 import org.apache.commons.io.IOUtils;
 import java.net.URL;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
+import com.mongodb.MongoClient;
+import java.util.function.Consumer;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
 
 
 /**
@@ -23,21 +27,25 @@ public class Tsv implements Jsonable{
     protected List<String> _headers = new ArrayList<>();
     protected Tsv() {}
     public Tsv(URL url) {
-//        InputStream in = null;
-//        Cache cache = new Cache(60);
-//        try {
-//            String body = null;
-//            if(cache.get(url.toString())==null) {
-//                in = url.openStream();
-//                cache.put(url.toString(),IOUtils.toString( in ));
-//            }
-//            _parseContent((String)cache.get(url.toString()));
-//        } catch(Exception e ) {
-//            System.err.format("exception: %s\n",e);
-//        } finally {
-//            IOUtils.closeQuietly(in);
-//        }
-    _parseContent(MiscUtils.GetResource("eldrinkopubbot",".tsv")); //FIXME
+        _parseContent(MiscUtils.GetResource("eldrinkopubbot",".tsv")); //FIXME
+    }
+    public Tsv(MongoCollection<Document> collection) {
+        String[] _HEADERS = new String[]{"name","description","price (UAH/L)","image link"};
+        for(String s:_HEADERS) {
+            _headers.add(s);
+            _content.put(s,new ArrayList<String>());
+        }
+		Consumer<Document> printConsumer = new Consumer<Document>() {
+			   @Override
+			   public void accept(final Document document) {
+				   //System.out.println(document.toJson());
+                   JSONObject obj = new JSONObject(document.toJson());
+                   for(String s:_HEADERS) {
+                       _content.get(s).add(obj.getString(s));
+                   }
+			   }
+		};
+        collection.find().forEach(printConsumer);
     }
     private void _parseContent(String content) {
         String[] lines = content.split("\n+");

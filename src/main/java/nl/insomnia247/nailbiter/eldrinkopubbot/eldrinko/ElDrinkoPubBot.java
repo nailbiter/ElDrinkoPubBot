@@ -12,7 +12,8 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.util.PersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.MongoPersistentStorage;
 import org.bson.Document;
 import java.util.stream.Collectors;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import java.util.List;
 import java.util.Arrays;
@@ -221,22 +222,23 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     public ElDrinkoPubBot(String dbpass,String commit_hash, String botname) throws ElDrinkoStateMachine.ElDrinkoStateMachineException, StateMachineException {
         _mongoClient = _GetMongoClient(dbpass);
         _Log.info(SecureString.format("botname: %s",botname));
-        _config = _MergeJsonObjects(new JSONObject[] {
-            new JSONObject(
+        JSONObject o1 = new JSONObject(
                 _mongoClient
                 .getDatabase("beerbot")
                 .getCollection("_keyring")
                 .find(Filters.eq("id",botname))
                 .first()
-                .toJson()),
-            new JSONObject(
+                .toJson());
+        _Log.info(SecureString.format("o1: %s",o1));
+        JSONObject o2 = new JSONObject(
                 _mongoClient
                 .getDatabase("beerbot")
                 .getCollection("_settings")
                 .find(Filters.eq("id",botname))
                 .first()
-                .toJson())
-        });
+                .toJson());
+        _Log.info(SecureString.format("o2: %s",o2));
+        _config = _MergeJsonObjects(new JSONObject[] {o1,o2});
         SecureString.setHiddenInfo(_config.getJSONObject("telegram").getString("token"));
         _Log.info(SecureString.format("_config: %s\n",_config.toString()));
         _botname = botname;
@@ -250,7 +252,9 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             }
         }
         _persistentStorage = new MongoPersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
-        ElDrinkoStateMachine.PreloadImages();
+        _Log.info(SecureString.format("beerlist: %s\n",_config.getJSONObject("mongodb").getString("beerlist")));
+        System.exit(0);
+        ElDrinkoStateMachine.PreloadImages(_mongoClient.getDatabase("beerbot").getCollection(_config.getJSONObject("mongodb").getString("beerlist")));
         _edsm = new ElDrinkoStateMachine(this);
         _actionInflator = new ElDrinkoActionInflator(this, _persistentStorage, new Consumer<Document>() {
             @Override
@@ -297,7 +301,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
         return _config.getJSONObject("telegram").getString("token");
     }
 	private static MongoClient _GetMongoClient(String password) {
-        String mongo = "mongodb+srv://nailbiter:%s@cluster0-ta3pc.gcp.mongodb.net/test?retryWrites=true&w=majority";
+        String mongo = "mongodb+srv://nailbiter:%s@cluster0-ta3pc.gcp.mongodb.net/beerbot?retryWrites=true&w=majority";
 		String url = SecureString.format(mongo,password);
 		MongoClientURI uri = null;
 		try {
@@ -306,6 +310,6 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
 		catch(Exception e) {
 			_Log.info(SecureString.format("EXCEPTION!\n"));
 		}
-		return new MongoClient(uri);
+		return MongoClients.create(url);
 	}
 }
