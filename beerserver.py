@@ -1,3 +1,24 @@
+"""===============================================================================
+
+        FILE: beerserver.py
+
+       USAGE: (not intended to be directly executed)
+
+ DESCRIPTION: 
+
+     OPTIONS: ---
+REQUIREMENTS: ---
+        BUGS: ---
+       NOTES: ---
+      AUTHOR: Alex Leontiev (alozz1991@gmail.com)
+ORGANIZATION: 
+     VERSION: ---
+     CREATED: 2020-12-23T14:46:12.609298
+    REVISION: ---
+
+TODO: 
+    1. FIXUP request.url_root
+==============================================================================="""
 from flask import Flask, render_template, request
 from datetime import datetime, date
 from re import match
@@ -10,6 +31,7 @@ from _beerserver import get_mongo_client, get_orders
 
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
+_ROOT_URL = "https://48ad68dd0e23.ngrok.io/"
 
 
 @app.route("/added_beeritem", methods=["POST"])
@@ -36,7 +58,7 @@ def refresh_db():
 def _format_beerlist_table_html(mongo_client, collname):
     beerlist = pd.DataFrame([
         {
-            **({"delete": f"{request.url_root}delete_beeritem/{r['name']}"} if collname == "proto_beerlist" else {}),
+            **({"delete": f"{_ROOT_URL}delete_beeritem/{r['name']}"} if collname == "proto_beerlist" else {}),
             **r
         }
         for i, r
@@ -58,9 +80,9 @@ def _format_beerlist(mongo_client, request, msg=None):
     {_format_beerlist_table_html(mongo_client,'proto_beerlist')}
     <p>production items</p>
     {_format_beerlist_table_html(mongo_client,'beerlist')}
-    <a href="{request.url_root}add_beeritem">добавить</a><br>
-    <a href="{request.url_root}load_to_prd">загрузить в боевой бот</a><br>
-    <a href="{request.url_root}load_from_prd">обнулить изменения</a><br>
+    <a href="{_ROOT_URL}add_beeritem">добавить</a><br>
+    <a href="{_ROOT_URL}load_to_prd">загрузить в боевой бот</a><br>
+    <a href="{_ROOT_URL}load_from_prd">обнулить изменения</a><br>
     """
 
 
