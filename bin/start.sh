@@ -8,7 +8,7 @@ BRANCH=master
 
 git checkout $BRANCH
 git pull
-git checkout $TAG
+#git checkout $TAG
 ./bin/download_table.py prd
 mvn clean
 mvn compile
