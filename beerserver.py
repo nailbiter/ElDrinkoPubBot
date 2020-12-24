@@ -26,12 +26,11 @@ import re
 from pymongo import MongoClient
 import pandas as pd
 import logging
-from _beerserver import get_mongo_client, get_orders, format_beerlist_table_html
+from _beerserver import get_mongo_client, get_orders, format_beerlist_table_html, format_beerlist
 
 
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
-_ROOT_URL = "https://48ad68dd0e23.ngrok.io/"
 
 
 @app.route("/added_beeritem", methods=["POST"])
@@ -42,7 +41,7 @@ def added_beeritem():
     msg = f"added {r}"
     return f"""
     {msg}<br>
-    {_format_beerlist(mongo_client,request)}
+    {format_beerlist(mongo_client,request)}
     """
 
 
@@ -55,23 +54,6 @@ def refresh_db():
     return "done"
 
 
-def _format_beerlist(mongo_client, request, msg=None):
-    if msg is None:
-        msg_ = ""
-    else:
-        msg_ = f"{msg}<br>"
-    return f"""
-    {msg_}
-    <p>proto items</p>
-    {format_beerlist_table_html(mongo_client,'proto_beerlist')}
-    <p>production items</p>
-    {format_beerlist_table_html(mongo_client,'beerlist')}
-    <a href="{_ROOT_URL}add_beeritem">добавить</a><br>
-    <a href="{_ROOT_URL}load_to_prd">загрузить в боевой бот</a><br>
-    <a href="{_ROOT_URL}load_from_prd">обнулить изменения</a><br>
-    """
-
-
 @app.route("/load_from_prd")
 def load_from_prd():
     mongo_client = get_mongo_client()
@@ -81,7 +63,7 @@ def load_from_prd():
         mongo_client.beerbot.proto_beerlist.insert_one(
             {k: v for k, v in r.items() if k != "_id"})
     msg = f"added {len(records)} items"
-    return _format_beerlist(mongo_client, request, msg)
+    return format_beerlist(mongo_client, request, msg)
 
 
 @app.route("/load_to_prd")
@@ -93,7 +75,7 @@ def load_to_prd():
         mongo_client.beerbot.beerlist.insert_one(
             {k: v for k, v in r.items() if k != "_id"})
     msg = f"added {len(records)} items"
-    return _format_beerlist(mongo_client, request, msg)
+    return format_beerlist(mongo_client, request, msg)
 
 
 @app.route("/add_beeritem")
@@ -110,13 +92,13 @@ def delete_beeritem(name):
     mongo_client = get_mongo_client()
     res = mongo_client.beerbot.proto_beerlist.delete_one({"name": name})
     msg = f"res: {res}, removed {name}"
-    return _format_beerlist(mongo_client, request, msg)
+    return format_beerlist(mongo_client, request, msg)
 
 
 @app.route("/beerlist")
 def beerlist():
     mongo_client = get_mongo_client()
-    return _format_beerlist(mongo_client, request)
+    return format_beerlist(mongo_client, request)
 
 
 @app.route('/')

@@ -24,6 +24,9 @@ import html
 import pandas as pd
 
 
+_ROOT_URL = "https://48ad68dd0e23.ngrok.io/"
+
+
 def add_logger(f):
     logger = logging.getLogger(f.__name__)
 
@@ -72,3 +75,20 @@ def format_beerlist_table_html(mongo_client, collname):
     beerlist = beerlist.drop(columns=["_id"])
     table_html = beerlist.to_html(index=None, render_links=True)
     return table_html
+
+
+def format_beerlist(mongo_client, request, msg=None):
+    if msg is None:
+        msg_ = ""
+    else:
+        msg_ = f"{msg}<br>"
+    return f"""
+    {msg_}
+    <p>proto items</p>
+    {format_beerlist_table_html(mongo_client,'proto_beerlist')}
+    <p>production items</p>
+    {format_beerlist_table_html(mongo_client,'beerlist')}
+    <a href="{_ROOT_URL}add_beeritem">добавить</a><br>
+    <a href="{_ROOT_URL}load_to_prd">загрузить в боевой бот</a><br>
+    <a href="{_ROOT_URL}load_from_prd">обнулить изменения</a><br>
+    """
