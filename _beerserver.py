@@ -21,6 +21,7 @@ from pymongo import MongoClient
 import logging
 from datetime import datetime
 import html
+import pandas as pd
 
 
 def add_logger(f):
