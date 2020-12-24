@@ -73,7 +73,7 @@ def format_beerlist_table_html(mongo_client, collname):
         in enumerate(mongo_client.beerbot[collname].find())
     ])
     beerlist = beerlist.drop(columns=["_id"])
-    table_html = beerlist.to_html(index=None, render_links=True)
+    table_html = beerlist.to_html(index=None, render_links=True,escape=False)
     return table_html
 
 
