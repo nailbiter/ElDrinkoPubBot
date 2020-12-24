@@ -26,7 +26,7 @@ import re
 from pymongo import MongoClient
 import pandas as pd
 import logging
-from _beerserver import get_mongo_client, get_orders
+from _beerserver import get_mongo_client, get_orders, format_beerlist_table_html
 
 
 logging.basicConfig(level=logging.INFO)
@@ -55,20 +55,6 @@ def refresh_db():
     return "done"
 
 
-def _format_beerlist_table_html(mongo_client, collname):
-    beerlist = pd.DataFrame([
-        {
-            **({"delete": f"{_ROOT_URL}delete_beeritem/{r['name']}"} if collname == "proto_beerlist" else {}),
-            **r
-        }
-        for i, r
-        in enumerate(mongo_client.beerbot[collname].find())
-    ])
-    beerlist = beerlist.drop(columns=["_id"])
-    table_html = beerlist.to_html(index=None, render_links=True)
-    return table_html
-
-
 def _format_beerlist(mongo_client, request, msg=None):
     if msg is None:
         msg_ = ""
@@ -77,9 +63,9 @@ def _format_beerlist(mongo_client, request, msg=None):
     return f"""
     {msg_}
     <p>proto items</p>
-    {_format_beerlist_table_html(mongo_client,'proto_beerlist')}
+    {format_beerlist_table_html(mongo_client,'proto_beerlist')}
     <p>production items</p>
-    {_format_beerlist_table_html(mongo_client,'beerlist')}
+    {format_beerlist_table_html(mongo_client,'beerlist')}
     <a href="{_ROOT_URL}add_beeritem">добавить</a><br>
     <a href="{_ROOT_URL}load_to_prd">загрузить в боевой бот</a><br>
     <a href="{_ROOT_URL}load_from_prd">обнулить изменения</a><br>

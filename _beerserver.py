@@ -20,6 +20,8 @@ ORGANIZATION:
 from pymongo import MongoClient
 import logging
 from datetime import datetime
+import html
+
 
 def add_logger(f):
     logger = logging.getLogger(f.__name__)
@@ -28,6 +30,7 @@ def add_logger(f):
         return f(*args, logger=logger, **kwargs)
     _f.__name__ = f.__name__
     return _f
+
 
 def get_mongo_client():
     with open("secret.txt") as f:
@@ -38,7 +41,7 @@ def get_mongo_client():
 
 
 @add_logger
-def get_orders(date,logger=None):
+def get_orders(date, logger=None):
     mongo_client = get_mongo_client()
 
     if date:
@@ -54,3 +57,17 @@ def get_orders(date,logger=None):
            for o
            in mongo_client.beerbot.order_history.find(filter=search_object, sort=[("order._timestamp", -1)])]
     return res
+
+
+def format_beerlist_table_html(mongo_client, collname):
+    beerlist = pd.DataFrame([
+        {
+            **({"ctrl": "".join(map(lambda t: html.escape(f"<a href=\"{t[1]}\">{t[0]}</a>"), {"del": f"{_ROOT_URL}delete_beeritem/{r['name']}"}.items()))} if collname == "proto_beerlist" else {}),
+            **r
+        }
+        for i, r
+        in enumerate(mongo_client.beerbot[collname].find())
+    ])
+    beerlist = beerlist.drop(columns=["_id"])
+    table_html = beerlist.to_html(index=None, render_links=True)
+    return table_html
