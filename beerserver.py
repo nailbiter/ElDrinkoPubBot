@@ -80,7 +80,6 @@ def add_beeritem():
     r = mongo_client.beerbot.proto_beerlist.find_one()
     del r["_id"]
     return render_template("add_beeritem.jinja.html", r=r)
-    # return render_template("table.jinja.html", table=pd.DataFrame(orders).to_html(index=False) if orders else "none")
 
 
 @app.route("/delete_beeritem/<name>")

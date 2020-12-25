@@ -72,7 +72,7 @@ def _ctrl_items(r):
 
 
 def _format_beerlist_table_html(mongo_client, collname):
-    # FIXME: replace names with ids
+    # FIXME: replace names with ids here and in all other methods
     beerlist = pd.DataFrame([
         {
             **({"ctrl": "<br>".join(map(lambda t: (f"<a href=\"{t[1]}\">{t[0]}</a>"), _ctrl_items(r).items()))} if collname == "proto_beerlist" else {}),
