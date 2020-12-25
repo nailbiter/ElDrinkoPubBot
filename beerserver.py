@@ -98,12 +98,12 @@ def move(direction,name):
     res = res.drop(columns=["_id"])
     idx = list(res["name"]).index(name)
     res = res.to_dict(orient="records")
-    if direction=="up":
+    if direction=="down":
         if idx+1<len(res):
             t = res[idx+1]
             res[idx+1] = res[idx]
             res[idx] = t
-    elif direction=="down":
+    elif direction=="up":
         if idx>0:
             t = res[idx-1]
             res[idx-1] = res[idx]
