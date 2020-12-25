@@ -5,7 +5,7 @@
     <title></title>
   </head>
   <body>
-    {{msg|safe}} {{"<br>" if msg}}
+    {%if msg%} {{msg|safe}}<br> {%endif%}
     <p>proto items</p>
 
     <table border="1" class="dataframe">
