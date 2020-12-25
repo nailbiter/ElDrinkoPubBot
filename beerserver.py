@@ -26,7 +26,7 @@ import re
 from pymongo import MongoClient
 import pandas as pd
 import logging
-from _beerserver import get_mongo_client, get_orders, format_beerlist_table_html, format_beerlist
+from _beerserver import get_mongo_client, get_orders, format_beerlist
 
 
 logging.basicConfig(level=logging.INFO)
@@ -38,11 +38,7 @@ def added_beeritem():
     mongo_client = get_mongo_client()
     r = {k: v for k, v in request.form.items()}
     mongo_client.beerbot.proto_beerlist.insert_one(r)
-    msg = f"added {r}"
-    return f"""
-    {msg}<br>
-    {format_beerlist(mongo_client,request)}
-    """
+    return format_beerlist(mongo_client, request, render_template, msg=f"added {r}")
 
 
 @app.route("/refresh_db", methods=["POST"])
@@ -63,7 +59,7 @@ def load_from_prd():
         mongo_client.beerbot.proto_beerlist.insert_one(
             {k: v for k, v in r.items() if k != "_id"})
     msg = f"added {len(records)} items"
-    return format_beerlist(mongo_client, request, msg)
+    return format_beerlist(mongo_client, request, render_template, msg)
 
 
 @app.route("/load_to_prd")
@@ -75,7 +71,7 @@ def load_to_prd():
         mongo_client.beerbot.beerlist.insert_one(
             {k: v for k, v in r.items() if k != "_id"})
     msg = f"added {len(records)} items"
-    return format_beerlist(mongo_client, request, msg)
+    return format_beerlist(mongo_client, request, render_template, msg)
 
 
 @app.route("/add_beeritem")
@@ -92,13 +88,39 @@ def delete_beeritem(name):
     mongo_client = get_mongo_client()
     res = mongo_client.beerbot.proto_beerlist.delete_one({"name": name})
     msg = f"res: {res}, removed {name}"
-    return format_beerlist(mongo_client, request, msg)
+    return format_beerlist(mongo_client, request, render_template, msg)
+
+@app.route("/move/<direction>/<name>")
+def move(direction,name):
+    assert direction in ["up","down"]
+    mongo_client = get_mongo_client()
+    res = pd.DataFrame(mongo_client.beerbot.proto_beerlist.find())
+    res = res.drop(columns=["_id"])
+    idx = list(res["name"]).index(name)
+    res = res.to_dict(orient="records")
+    if direction=="up":
+        if idx+1<len(res):
+            t = res[idx+1]
+            res[idx+1] = res[idx]
+            res[idx] = t
+    elif direction=="down":
+        if idx>0:
+            t = res[idx-1]
+            res[idx-1] = res[idx]
+            res[idx] = t
+    
+    mongo_client.beerbot.proto_beerlist.drop()
+    for r in res:
+        mongo_client.beerbot.proto_beerlist.insert_one(r)
+
+    msg = f"moved {name} {direction}"
+    return format_beerlist(mongo_client, request, render_template, msg)
 
 
 @app.route("/beerlist")
 def beerlist():
     mongo_client = get_mongo_client()
-    return format_beerlist(mongo_client, request)
+    return format_beerlist(mongo_client, request, render_template)
 
 
 @app.route('/')

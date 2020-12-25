@@ -63,32 +63,43 @@ def get_orders(date, logger=None):
     return res
 
 
-def format_beerlist_table_html(mongo_client, collname):
+def _ctrl_items(r):
+    return {
+        "del": f"{_ROOT_URL}delete_beeritem/{r['name']}",
+        "up": f"{_ROOT_URL}move/up/{r['name']}",
+        "down": f"{_ROOT_URL}move/down/{r['name']}",
+    }
+
+
+def _format_beerlist_table_html(mongo_client, collname):
+    # FIXME: replace names with ids
     beerlist = pd.DataFrame([
         {
-            **({"ctrl": "".join(map(lambda t: html.escape(f"<a href=\"{t[1]}\">{t[0]}</a>"), {"del": f"{_ROOT_URL}delete_beeritem/{r['name']}"}.items()))} if collname == "proto_beerlist" else {}),
+            **({"ctrl": "<br>".join(map(lambda t: (f"<a href=\"{t[1]}\">{t[0]}</a>"), _ctrl_items(r).items()))} if collname == "proto_beerlist" else {}),
             **r
         }
         for i, r
         in enumerate(mongo_client.beerbot[collname].find())
     ])
     beerlist = beerlist.drop(columns=["_id"])
-    table_html = beerlist.to_html(index=None,escape=False)
-    return table_html
+#    table_html = beerlist.to_html(index=None, escape=False)
+#    return table_html
+    return beerlist.to_dict(orient="records")
 
 
-def format_beerlist(mongo_client, request, msg=None):
-    if msg is None:
-        msg_ = ""
-    else:
-        msg_ = f"{msg}<br>"
-    return f"""
-    {msg_}
-    <p>proto items</p>
-    {format_beerlist_table_html(mongo_client,'proto_beerlist')}
-    <p>production items</p>
-    {format_beerlist_table_html(mongo_client,'beerlist')}
-    <a href="{_ROOT_URL}add_beeritem">добавить</a><br>
-    <a href="{_ROOT_URL}load_to_prd">загрузить в боевой бот</a><br>
-    <a href="{_ROOT_URL}load_from_prd">обнулить изменения</a><br>
-    """
+def format_beerlist(mongo_client, request, render_template, msg=None):
+    return render_template("beerlist.jinja.html",
+                           msg=msg,
+                           ROOT_URL=_ROOT_URL,
+                           **{k: _format_beerlist_table_html(mongo_client, k) for k in ["proto_beerlist", "beerlist"]}
+                           )
+#    return f"""
+#    {msg_}
+#    <p>proto items</p>
+#    {_format_beerlist_table_html(mongo_client,'proto_beerlist')}
+#    <p>production items</p>
+#    {_format_beerlist_table_html(mongo_client,'beerlist')}
+#    <a href="{_ROOT_URL}add_beeritem">добавить</a><br>
+#    <a href="{_ROOT_URL}load_to_prd">загрузить в боевой бот</a><br>
+#    <a href="{_ROOT_URL}load_from_prd">обнулить изменения</a><br>
+#    """

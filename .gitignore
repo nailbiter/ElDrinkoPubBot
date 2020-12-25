@@ -25,3 +25,4 @@ secret.txt
 __pycache__/
 docs/
 jupyter-notebooks/
+src

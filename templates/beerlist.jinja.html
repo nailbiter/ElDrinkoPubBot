@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    {{msg}} {{"<br>" if msg}}
+    <p>proto items</p>
+
+    <table border="1" class="dataframe">
+      <thead>
+				<tr style="text-align: right;">
+          {%for fn in proto_beerlist[0]%}
+          <th>{{fn|safe}}</th>
+          {%endfor%}
+				</tr>
+			</thead>
+			<tbody>
+        {%for r in proto_beerlist%}
+        <tr>
+          {%for fn in r%}
+          <td>{{r[fn]|safe}}</td>
+          {%endfor%}
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+
+    <p>production items</p>
+
+    <table border="1" class="dataframe">
+      <thead>
+				<tr style="text-align: right;">
+          {%for fn in beerlist[0]%}
+          <th>{{fn|safe}}</th>
+          {%endfor%}
+				</tr>
+			</thead>
+			<tbody>
+        {%for r in beerlist%}
+        <tr>
+          {%for fn in r%}
+          <td>{{r[fn]|safe}}</td>
+          {%endfor%}
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+
+    <a href="{{ROOT_URL}}add_beeritem">добавить</a><br>
+    <a href="{{ROOT_URL}}load_to_prd">загрузить в боевой бот</a><br>
+    <a href="{{ROOT_URL}}load_from_prd">обнулить изменения</a><br>
+  </body>
+</html>
+
