@@ -253,7 +253,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
         }
         _persistentStorage = new MongoPersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
         _Log.info(SecureString.format("beerlist: %s\n",_config.getJSONObject("mongodb").getString("beerlist")));
-        System.exit(0);
+        //System.exit(0);
         ElDrinkoStateMachine.PreloadImages(_mongoClient.getDatabase("beerbot").getCollection(_config.getJSONObject("mongodb").getString("beerlist")));
         _edsm = new ElDrinkoStateMachine(this);
         _actionInflator = new ElDrinkoActionInflator(this, _persistentStorage, new Consumer<Document>() {
