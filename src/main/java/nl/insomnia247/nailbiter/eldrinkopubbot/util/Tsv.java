@@ -41,7 +41,7 @@ public class Tsv implements Jsonable{
 				   //System.out.println(document.toJson());
                    JSONObject obj = new JSONObject(document.toJson());
                    for(String s:_HEADERS) {
-                       _content.get(s).add(obj.getString(s));
+                       _content.get(s).add(obj.get(s).toString());
                    }
 			   }
 		};
