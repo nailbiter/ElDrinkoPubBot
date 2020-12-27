@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import nl.insomnia247.nailbiter.eldrinkopubbot.telegram.UserData;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.Tsv;
 import nl.insomnia247.nailbiter.eldrinkopubbot.util.MiscUtils;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 
 /**
  * @author Alex Leontiev
@@ -15,17 +17,18 @@ public class ElDrinkoInputMessage {
     public final static String BEERLIST = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGSUiAeapo7eHNfA1v9ov_Cc2oCjWNsmcpadN6crtxJ236uDOKt_C_cR1hsXCyqZucp_lQoeRHlu0k/pub?gid=0&single=true&output=tsv";
     public JSONObject right = null;
     public UserData userData;
-    public Tsv beerlist = new Tsv(MiscUtils.SafeUrl(BEERLIST));
+    public Tsv beerlist = null;
     public ElDrinkoInputMessage(TelegramInputMessage i, JSONObject o, UserData u, Tsv b) {
         left = i;
         right = o;
         userData = u;
         beerlist = b;
     }
-    public ElDrinkoInputMessage(TelegramInputMessage i, JSONObject o, UserData u) {
+    public ElDrinkoInputMessage(TelegramInputMessage i, JSONObject o, UserData u, MongoCollection<Document> coll) {
         left = i;
         right = o;
         userData = u;
+        beerlist = new Tsv(coll);
     }
     @Override
     public String toString() {
