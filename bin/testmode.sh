@@ -5,7 +5,7 @@ BOT_NAME=ProtoElDrinkoPubBot
 
 
 git checkout master
-./bin/download_table.py stg
+#./bin/download_table.py stg
 mvn clean
 mvn compile
 
