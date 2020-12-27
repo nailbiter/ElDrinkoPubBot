@@ -63,8 +63,8 @@ public class ElDrinkoStateMachine extends ExposedStateMachine<ElDrinkoInputMessa
         super("_");
         _sendOrderCallback = sendOrderCallback;
     }
-    public static void PreloadImages() {
-        Tsv tsv = new Tsv(MiscUtils.SafeUrl(ElDrinkoInputMessage.BEERLIST));
+    public static void PreloadImages(MongoCollection<Document> coll) {
+        Tsv tsv = new Tsv(coll);
         _Log.info(SecureString.format("tsv: %s",tsv));
         for(String imgUrl:tsv.getColumn("image link")) {
             _Log.info(SecureString.format("start preloading %s",imgUrl));

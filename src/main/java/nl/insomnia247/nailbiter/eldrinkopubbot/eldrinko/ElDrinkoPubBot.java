@@ -12,7 +12,8 @@ import nl.insomnia247.nailbiter.eldrinkopubbot.util.PersistentStorage;
 import nl.insomnia247.nailbiter.eldrinkopubbot.mongodb.MongoPersistentStorage;
 import org.bson.Document;
 import java.util.stream.Collectors;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import java.util.List;
 import java.util.Arrays;
@@ -106,7 +107,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             return new TelegramTextInputMessage(m.getText());
         } else if(u.hasCallbackQuery()) {
             Integer replyMessageId = null;
-		    String call_data = u.getCallbackQuery().getData();
+            String call_data = u.getCallbackQuery().getData();
             if(u.getCallbackQuery().getMessage().getReplyMarkup()!=null && u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard()!=null) {
                 _Log.info(SecureString.format("inline markup: %s\n",u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard()));
                 List<List<InlineKeyboardButton>> buttons = u.getCallbackQuery().getMessage().getReplyMarkup().getKeyboard();
@@ -126,7 +127,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                                 _Log.info("it's old, so we ignore it");
                                 return null;
                             }
-                            
+
                             _Log.info(sendMessage);
                             try {
                                 execute(new DeleteMessage(u.getCallbackQuery().getMessage().getChatId(),u.getCallbackQuery().getMessage().getMessageId()));
@@ -176,7 +177,14 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 .getDatabase("beerbot")
                 .getCollection(_config.getJSONObject("mongodb").getString("data"))
                 .find(Filters.eq("id",ud.toString())).first();
-            ElDrinkoInputMessage im = new ElDrinkoInputMessage(tim, data==null ? new JSONObject() : new JSONObject(data.toJson()).getJSONObject("data"), ud);
+            ElDrinkoInputMessage im = new ElDrinkoInputMessage(
+                    tim,
+                    data==null ? new JSONObject() : new JSONObject(data.toJson()).getJSONObject("data"), 
+                    ud,
+                    _mongoClient
+                        .getDatabase("beerbot")
+                        .getCollection(_config.getJSONObject("mongodb").getString("beerlist"))
+                    );
 
             _Log.info(SecureString.format("ss(%s): %s",im.userData,_edsm.getState()));
             _Log.info(SecureString.format("im(%s): %s",im.userData,im.toJsonString()));
@@ -221,22 +229,23 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     public ElDrinkoPubBot(String dbpass,String commit_hash, String botname) throws ElDrinkoStateMachine.ElDrinkoStateMachineException, StateMachineException {
         _mongoClient = _GetMongoClient(dbpass);
         _Log.info(SecureString.format("botname: %s",botname));
-        _config = _MergeJsonObjects(new JSONObject[] {
-            new JSONObject(
+        JSONObject o1 = new JSONObject(
                 _mongoClient
                 .getDatabase("beerbot")
                 .getCollection("_keyring")
                 .find(Filters.eq("id",botname))
                 .first()
-                .toJson()),
-            new JSONObject(
+                .toJson());
+        _Log.info(SecureString.format("o1: %s",o1));
+        JSONObject o2 = new JSONObject(
                 _mongoClient
                 .getDatabase("beerbot")
                 .getCollection("_settings")
                 .find(Filters.eq("id",botname))
                 .first()
-                .toJson())
-        });
+                .toJson());
+        _Log.info(SecureString.format("o2: %s",o2));
+        _config = _MergeJsonObjects(new JSONObject[] {o1,o2});
         SecureString.setHiddenInfo(_config.getJSONObject("telegram").getString("token"));
         _Log.info(SecureString.format("_config: %s\n",_config.toString()));
         _botname = botname;
@@ -250,7 +259,9 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             }
         }
         _persistentStorage = new MongoPersistentStorage(_mongoClient.getDatabase("beerbot").getCollection("var"),"id",botname);
-        ElDrinkoStateMachine.PreloadImages();
+        _Log.info(SecureString.format("beerlist: %s\n",_config.getJSONObject("mongodb").getString("beerlist")));
+        //System.exit(0);
+        ElDrinkoStateMachine.PreloadImages(_mongoClient.getDatabase("beerbot").getCollection(_config.getJSONObject("mongodb").getString("beerlist")));
         _edsm = new ElDrinkoStateMachine(this);
         _actionInflator = new ElDrinkoActionInflator(this, _persistentStorage, new Consumer<Document>() {
             @Override
@@ -296,16 +307,16 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     public String getBotToken() {
         return _config.getJSONObject("telegram").getString("token");
     }
-	private static MongoClient _GetMongoClient(String password) {
-        String mongo = "mongodb+srv://nailbiter:%s@cluster0-ta3pc.gcp.mongodb.net/test?retryWrites=true&w=majority";
-		String url = SecureString.format(mongo,password);
-		MongoClientURI uri = null;
-		try {
-			uri = new MongoClientURI(url);
-		}
-		catch(Exception e) {
-			_Log.info(SecureString.format("EXCEPTION!\n"));
-		}
-		return new MongoClient(uri);
-	}
+    private static MongoClient _GetMongoClient(String password) {
+        String mongo = "mongodb+srv://nailbiter:%s@cluster0-ta3pc.gcp.mongodb.net/beerbot?retryWrites=true&w=majority";
+        String url = SecureString.format(mongo,password);
+        MongoClientURI uri = null;
+        try {
+            uri = new MongoClientURI(url);
+        }
+        catch(Exception e) {
+            _Log.info(SecureString.format("EXCEPTION!\n"));
+        }
+        return MongoClients.create(url);
+    }
 }
