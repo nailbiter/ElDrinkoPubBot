@@ -20,7 +20,7 @@ public class IsPhoneNumberPredicate extends ElDrinkoCondition {
             return false;
         }
         TelegramTextInputMessage ttim = (TelegramTextInputMessage) tim.left;
-        boolean res = Pattern.matches("\\d+",ttim.getMsg());
+        boolean res = Pattern.matches("\\d{10}",ttim.getMsg());
         _Log.info(SecureString.format("res: %s",res));
         return res;
     }
