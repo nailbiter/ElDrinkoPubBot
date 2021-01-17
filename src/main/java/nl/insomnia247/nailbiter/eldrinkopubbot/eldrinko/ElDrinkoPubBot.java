@@ -193,11 +193,20 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
             _Log.info(SecureString.format("om(%s): %s"
                         ,im.userData,new JSONArray().put(new JSONObject(om.left.toJsonString())).put(om.right).toString()));
 
-            _mongoClient.getDatabase("beerbot").getCollection(_config.getJSONObject("mongodb").getString("data"))
-                .updateOne(Filters.eq("id",ud.toString()),Updates.set("data",Document.parse(om.right.toString())),new UpdateOptions().upsert(true));
+            _updateUserData(om.right,ud.toString());
             statesColl.updateOne(Filters.eq("id",ud.toString()),Updates.set("state",_edsm.getState()),new UpdateOptions().upsert(true));
             _execute(om.left,ud);
         }
+    }
+    void _updateUserData(JSONObject userData, String id) {
+        String data_db_name = _config.getJSONObject("mongodb").getString("data");
+        _Log.info(SecureString.format("userData: %s",userData));
+        _Log.info(SecureString.format("id: %s",id));
+        _Log.info(SecureString.format("data_db_name: %s",data_db_name));
+        _mongoClient
+            .getDatabase("beerbot")
+            .getCollection(data_db_name)
+            .updateOne(Filters.eq("id",id),Updates.set("data",Document.parse(userData.toString())),new UpdateOptions().upsert(true));
     }
     void _execute(OutputMessage om, UserData ud) {
         try {
