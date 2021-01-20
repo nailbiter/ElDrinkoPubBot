@@ -21,7 +21,6 @@ TODO:
 ==============================================================================="""
 from flask import Flask, render_template, request
 from datetime import datetime, date
-from re import match
 import re
 from pymongo import MongoClient
 import pandas as pd
@@ -37,17 +36,15 @@ app = Flask(__name__)
 def added_beeritem():
     mongo_client = get_mongo_client()
     r = {k: v for k, v in request.form.items()}
-    mongo_client.beerbot.proto_beerlist.insert_one(r)
-    return format_beerlist(mongo_client, request, render_template, msg=f"added {r}")
-
-
-@app.route("/refresh_db", methods=["POST"])
-def refresh_db():
-    mongo_client = get_mongo_client()
-    for cn in ["proto_data"]:
-        coll = mongo_client.beerbot[cn]
-        coll.delete_one({"id": "145766172"})
-    return "done"
+    # TODO: validation: beer name and category should exist, price should be number
+    price_fn = "price (UAH/L)"
+    if re.match(r"^\d+$", r[price_fn]) is None:
+        r[price_fn] = int(r[price_fn])
+        msg = "could not add {r} because \"{r[price_fn]}\" is not a number"
+    else:
+        msg = f"added {r}"
+        mongo_client.beerbot.proto_beerlist.insert_one(r)
+    return format_beerlist(mongo_client, request, render_template, msg=msg)
 
 
 @app.route("/load_from_prd")
@@ -89,25 +86,26 @@ def delete_beeritem(name):
     msg = f"res: {res}, removed {name}"
     return format_beerlist(mongo_client, request, render_template, msg)
 
-@app.route("/move/<direction>/<name>")
-def move(direction,name):
-    assert direction in ["up","down"]
+
+@app.route("/move_beeritem/<direction>/<name>")
+def move_beeritem(direction, name):
+    assert direction in ["up", "down"]
     mongo_client = get_mongo_client()
     res = pd.DataFrame(mongo_client.beerbot.proto_beerlist.find())
     res = res.drop(columns=["_id"])
     idx = list(res["name"]).index(name)
     res = res.to_dict(orient="records")
-    if direction=="down":
-        if idx+1<len(res):
+    if direction == "down":
+        if idx+1 < len(res):
             t = res[idx+1]
             res[idx+1] = res[idx]
             res[idx] = t
-    elif direction=="up":
-        if idx>0:
+    elif direction == "up":
+        if idx > 0:
             t = res[idx-1]
             res[idx-1] = res[idx]
             res[idx] = t
-    
+
     mongo_client.beerbot.proto_beerlist.drop()
     for r in res:
         mongo_client.beerbot.proto_beerlist.insert_one(r)
@@ -121,6 +119,20 @@ def beerlist():
     mongo_client = get_mongo_client()
     return format_beerlist(mongo_client, request, render_template)
 
+@app.route("/categories")
+def categories():
+    mongo_client = get_mongo_client()
+    return render_template("categories.jinja.html",mongo_client=mongo_client,url_root=request.url_root)
+
+
+@app.route("/refresh_db", methods=["POST"])
+def refresh_db():
+    mongo_client = get_mongo_client()
+    for cn in ["proto_data"]:
+        coll = mongo_client.beerbot[cn]
+        coll.delete_one({"id": "145766172"})
+    return "done"
+
 
 @app.route('/')
 @app.route('/<date>')
@@ -131,7 +143,7 @@ def hello_world(date=None):
         date = None
     elif date == "refresh_db":
         return render_template("refresh_db.jinja.html")
-    elif date != "all" and match(r"^\d{4}-\d{2}-\d{2}$", date) is None:
+    elif date != "all" and re.match(r"^\d{4}-\d{2}-\d{2}$", date) is None:
         return f"""date should be in the format "YYYY-MM-DD" (or absent)!<br>(received: "{date}")"""
     else:
         raise NotImplementedError

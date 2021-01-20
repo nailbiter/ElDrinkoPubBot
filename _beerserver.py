@@ -66,8 +66,8 @@ def get_orders(date, logger=None):
 def _ctrl_items(r):
     return {
         "del": f"{_ROOT_URL}delete_beeritem/{r['name']}",
-        "up": f"{_ROOT_URL}move/up/{r['name']}",
-        "down": f"{_ROOT_URL}move/down/{r['name']}",
+        "up": f"{_ROOT_URL}move_beeritem/up/{r['name']}",
+        "down": f"{_ROOT_URL}move_beeritem/down/{r['name']}",
     }
 
 
@@ -94,13 +94,3 @@ def format_beerlist(mongo_client, request, render_template, msg=None):
                            ROOT_URL=_ROOT_URL,
                            **{k: _format_beerlist_table_html(mongo_client, k) for k in ["proto_beerlist", "beerlist"]}
                            )
-#    return f"""
-#    {msg_}
-#    <p>proto items</p>
-#    {_format_beerlist_table_html(mongo_client,'proto_beerlist')}
-#    <p>production items</p>
-#    {_format_beerlist_table_html(mongo_client,'beerlist')}
-#    <a href="{_ROOT_URL}add_beeritem">добавить</a><br>
-#    <a href="{_ROOT_URL}load_to_prd">загрузить в боевой бот</a><br>
-#    <a href="{_ROOT_URL}load_from_prd">обнулить изменения</a><br>
-#    """

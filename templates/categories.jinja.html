@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    {%for prefix,collname in [["proto","proto_categories"],["production","categories"]]%}
+    <p>{{prefix}} items</p>
+
+    <table border="1" class="dataframe">
+      <thead>
+				<tr style="text-align: right;">
+          <th>ctrl</th>
+          {%for fn in mongo_client.beerbot[collname].find()[0]%}
+          {%if fn!="_id"%}
+          <th>{{fn|safe}}</th>
+          {%endif%}
+          {%endfor%}
+				</tr>
+			</thead>
+      <tbody>
+        {%for r in mongo_client.beerbot[collname].find()%}
+        <tr>
+          <td>
+            {%set r_idx = loop.index-1%}
+            {%for written_name,method_name in [["del","delete_category"],["up","move_category/up"],["down","move_category/down"]]%}
+            <a href="{{root_url}}/{{method_name}}/{{r_idx}}">{{written_name}}</a>
+            {%endfor%}
+          </td>
+          {%for fn in r%}
+          {%if fn!="_id"%}
+          <td>{{r[fn]|safe}}</td>
+          {%endif%}
+          {%endfor%}
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+  {%endfor%}
+  </body>
+</html>
+
