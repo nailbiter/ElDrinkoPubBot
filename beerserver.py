@@ -119,6 +119,14 @@ def beerlist():
     mongo_client = get_mongo_client()
     return format_beerlist(mongo_client, request, render_template)
 
+#@app.route("/delete_category/<int:idx>")
+#def delete_category(idx):
+#    mongo_client = get_mongo_client()
+#    return render_template("categories.jinja.html",mongo_client=mongo_client,url_root=request.url_root)
+
+@app.route("/add_category")
+def add_category():
+    pass
 @app.route("/categories")
 def categories():
     mongo_client = get_mongo_client()

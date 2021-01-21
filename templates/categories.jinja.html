@@ -5,6 +5,9 @@
     <title></title>
   </head>
   <body>
+    {%if msg%}
+    <p>{{msg}}</p>
+    {%endif%}
     {%for prefix,collname in [["proto","proto_categories"],["production","categories"]]%}
     <p>{{prefix}} items</p>
 
@@ -37,6 +40,9 @@
         {%endfor%}
       </tbody>
     </table>
+    {%if prefix=="proto"%}
+    <a href="{{root_url}}/add_category">add category</a>
+    {%endif%}
   {%endfor%}
   </body>
 </html>
