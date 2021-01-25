@@ -5,7 +5,7 @@
     <title></title>
   </head>
   <body>
-      <form action="/added_beeritem" method="POST">
+      <form action="/{{action}}" method="POST">
         {%for k in r%}
         <p>{{k}}</p>
         <input name="{{k}}" type="text"></input>
@@ -16,4 +16,3 @@
       </form>
   </body>
 </html>
-

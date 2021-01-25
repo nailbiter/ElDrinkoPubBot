@@ -76,7 +76,7 @@ def add_beeritem():
     mongo_client = get_mongo_client()
     r = mongo_client.beerbot.proto_beerlist.find_one()
     del r["_id"]
-    return render_template("add_beeritem.jinja.html", r=r)
+    return render_template("add_item.jinja.html", r=list(r),action="added_beeritem")
 
 
 @app.route("/delete_beeritem/<name>")
@@ -126,7 +126,24 @@ def beerlist():
 
 @app.route("/add_category")
 def add_category():
-    pass
+    mongo_client = get_mongo_client()
+    r = mongo_client.beerbot.proto_categories.find_one()
+    del r["_id"]
+    return render_template("add_item.jinja.html", r=list(r),action="added_category")
+
+@app.route("/added_category", methods=["POST"])
+def added_category():
+    mongo_client = get_mongo_client()
+    r = {k: v for k, v in request.form.items()}
+    #FIXME: validation
+    msg = f"added {r}"
+    mongo_client.beerbot.proto_categories.insert_one(r)
+    return render_template("categories.jinja.html",
+        mongo_client=mongo_client,
+        url_root=request.url_root,
+        msg=msg
+    )
+
 @app.route("/categories")
 def categories():
     mongo_client = get_mongo_client()
