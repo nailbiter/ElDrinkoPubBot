@@ -22,6 +22,7 @@ import logging
 from datetime import datetime
 import html
 import pandas as pd
+from jinja2 import Template
 
 
 def add_logger(f):
@@ -88,8 +89,17 @@ def _format_beerlist_table_html(mongo_client, collname, url_root):
 
 # FIXME: pull this logic into template
 def format_beerlist(mongo_client, request, render_template, url_root, msg=None):
-    return render_template("beerlist.jinja.html",
-                           msg=msg,
-                           ROOT_URL=url_root,
-                           **{k: _format_beerlist_table_html(mongo_client, k, url_root) for k in ["proto_beerlist", "beerlist"]}
+    if msg is None:
+        return render_template("beerlist.jinja.html",
+                               msg=msg,
+                               ROOT_URL=url_root,
+                               **{k: _format_beerlist_table_html(mongo_client, k, url_root) for k in ["proto_beerlist", "beerlist"]}
                            )
+    else:
+        return Template("""
+        <p>{{msg}}</p>
+        <a href="{{url_root}}/beerlist">go here</a>
+        """).render({
+            "msg":msg,
+            "url_root":url_root,
+        })
