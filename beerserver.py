@@ -50,27 +50,33 @@ def added_beeritem():
 @app.route("/load_from_prd")
 def load_from_prd():
     mongo_client = get_mongo_client()
-    records = list(mongo_client.beerbot.beerlist.find())
-    mongo_client.beerbot.proto_beerlist.drop()
-    for r in records:
-        mongo_client.beerbot.proto_beerlist.insert_one(
-            {k: v for k, v in r.items() if k != "_id"})
-    msg = f"added {len(records)} items"
-    return format_beerlist(mongo_client, request, render_template, msg)
+    msgs = []
+    for coll in ["beerlist","categories"]:
+        records = list(mongo_client.beerbot[coll].find())
+        mongo_client.beerbot[f"proto_{coll}"].drop()
+        for r in records:
+            mongo_client.beerbot[f"proto_{coll}"].insert_one(
+                {k: v for k, v in r.items() if k != "_id"})
+        msgs.append(f"added {len(records)} items to proto_{coll}")
+    return format_beerlist(mongo_client, request, render_template, msg="<br>".join(msgs))
 
 
 @app.route("/load_to_prd")
 def load_to_prd():
     mongo_client = get_mongo_client()
-    records = list(mongo_client.beerbot.proto_beerlist.find())
-    mongo_client.beerbot.beerlist.drop()
-    for r in records:
-        mongo_client.beerbot.beerlist.insert_one(
-            {k: v for k, v in r.items() if k != "_id"})
-    msg = f"added {len(records)} items"
-    return format_beerlist(mongo_client, request, render_template, msg)
+    msgs = []
+    for coll in ["beerlist","categories"]:
+        records = list(mongo_client.beerbot[f"proto_{coll}"].find())
+        mongo_client.beerbot[coll].drop()
+        for r in records:
+            mongo_client.beerbot[coll].insert_one(
+                {k: v for k, v in r.items() if k != "_id"})
+        msgs.append(f"added {len(records)} items to {coll}")
+
+    return format_beerlist(mongo_client, request, render_template, msg="<br>".join(msgs))
 
 
+#FIXME: merge with add_category
 @app.route("/add_beeritem")
 def add_beeritem():
     mongo_client = get_mongo_client()
@@ -79,39 +85,85 @@ def add_beeritem():
     return render_template("add_item.jinja.html", r=list(r),action="added_beeritem")
 
 
-@app.route("/delete_beeritem/<name>")
-def delete_beeritem(name):
+@app.route("/delete/<what>/<name>")
+def delete_beeritem(what,name):
     mongo_client = get_mongo_client()
-    res = mongo_client.beerbot.proto_beerlist.delete_one({"name": name})
-    msg = f"res: {res}, removed {name}"
-    return format_beerlist(mongo_client, request, render_template, msg)
+
+    if what=="beeritem":
+        res = mongo_client.beerbot.proto_beerlist.delete_one({"name": name})
+        msg = f"res: {res}, removed {name}"
+        return format_beerlist(mongo_client, request, render_template, msg)
+    if what=="category":
+        if mongo_client.beerbot.proto_beerlist.find_one({"category":name}) is not None:
+            msg = f"cannot remove {name}, since some beerlist items depend on it"
+        else:
+            res = mongo_client.beerbot.proto_categories.delete_one({"name": name})
+            msg = f"res: {res}, removed {name}"
+
+        return render_template("categories.jinja.html",
+            mongo_client=mongo_client,
+            url_root=request.url_root,
+            msg=msg
+        )
+    else:
+        raise NotImplementedError(f"what: {what}")
 
 
-@app.route("/move_beeritem/<direction>/<name>")
-def move_beeritem(direction, name):
+@app.route("/move/<what>/<direction>/<name>")
+def move(what,direction, name):
     assert direction in ["up", "down"]
     mongo_client = get_mongo_client()
-    res = pd.DataFrame(mongo_client.beerbot.proto_beerlist.find())
-    res = res.drop(columns=["_id"])
-    idx = list(res["name"]).index(name)
-    res = res.to_dict(orient="records")
-    if direction == "down":
-        if idx+1 < len(res):
-            t = res[idx+1]
-            res[idx+1] = res[idx]
-            res[idx] = t
-    elif direction == "up":
-        if idx > 0:
-            t = res[idx-1]
-            res[idx-1] = res[idx]
-            res[idx] = t
+    if what=="beeritem":
+        res = pd.DataFrame(mongo_client.beerbot.proto_beerlist.find())
+        res = res.drop(columns=["_id"])
+        idx = list(res["name"]).index(name)
+        res = res.to_dict(orient="records")
+        if direction == "down":
+            if idx+1 < len(res):
+                t = res[idx+1]
+                res[idx+1] = res[idx]
+                res[idx] = t
+        elif direction == "up":
+            if idx > 0:
+                t = res[idx-1]
+                res[idx-1] = res[idx]
+                res[idx] = t
 
-    mongo_client.beerbot.proto_beerlist.drop()
-    for r in res:
-        mongo_client.beerbot.proto_beerlist.insert_one(r)
+        mongo_client.beerbot.proto_beerlist.drop()
+        for r in res:
+            mongo_client.beerbot.proto_beerlist.insert_one(r)
 
-    msg = f"moved {name} {direction}"
-    return format_beerlist(mongo_client, request, render_template, msg)
+        msg = f"moved {name} {direction}"
+        return format_beerlist(mongo_client, request, render_template, msg)
+    elif what=="category":
+        #FIXME: merge with logic in previous clause, use one function
+        res = pd.DataFrame(mongo_client.beerbot.proto_categories.find())
+        res = res.drop(columns=["_id"])
+        idx = int(name)
+        res = res.to_dict(orient="records")
+        if direction == "down":
+            if idx+1 < len(res):
+                t = res[idx+1]
+                res[idx+1] = res[idx]
+                res[idx] = t
+        elif direction == "up":
+            if idx > 0:
+                t = res[idx-1]
+                res[idx-1] = res[idx]
+                res[idx] = t
+
+        mongo_client.beerbot.proto_categories.drop()
+        for r in res:
+            mongo_client.beerbot.proto_categories.insert_one(r)
+
+        msg = f"moved {name} {direction}"
+        return render_template("categories.jinja.html",
+            mongo_client=mongo_client,
+            url_root=request.url_root,
+            msg=msg
+        )
+    else:
+        raise NotImplementedError(f"what: {what}")
 
 
 @app.route("/beerlist")
@@ -135,9 +187,11 @@ def add_category():
 def added_category():
     mongo_client = get_mongo_client()
     r = {k: v for k, v in request.form.items()}
-    #FIXME: validation
-    msg = f"added {r}"
-    mongo_client.beerbot.proto_categories.insert_one(r)
+    if mongo_client.beerbot.proto_categories.find_one({"name":r["name"]}) is not None:
+        msg = f"cannot add {r} (already present)"
+    else:
+        msg = f"added {r}"
+        mongo_client.beerbot.proto_categories.insert_one(r)
     return render_template("categories.jinja.html",
         mongo_client=mongo_client,
         url_root=request.url_root,

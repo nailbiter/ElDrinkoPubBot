@@ -27,7 +27,7 @@
         <tr>
           <td>
             {%set r_idx = loop.index-1%}
-            {%for written_name,method_name in [["del","delete_category"],["up","move_category/up"],["down","move_category/down"]]%}
+            {%for written_name,method_name in [["del","delete/category"],["up","move/category/up"],["down","move/category/down"]]%}
             <a href="{{root_url}}/{{method_name}}/{{r_idx}}">{{written_name}}</a>
             {%endfor%}
           </td>

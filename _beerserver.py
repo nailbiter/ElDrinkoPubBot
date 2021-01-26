@@ -65,9 +65,9 @@ def get_orders(date, logger=None):
 
 def _ctrl_items(r):
     return {
-        "del": f"{_ROOT_URL}delete_beeritem/{r['name']}",
-        "up": f"{_ROOT_URL}move_beeritem/up/{r['name']}",
-        "down": f"{_ROOT_URL}move_beeritem/down/{r['name']}",
+        "del": f"{_ROOT_URL}delete/beeritem/{r['name']}",
+        "up": f"{_ROOT_URL}move/beeritem/up/{r['name']}",
+        "down": f"{_ROOT_URL}move/beeritem/down/{r['name']}",
     }
 
 
@@ -88,6 +88,7 @@ def _format_beerlist_table_html(mongo_client, collname):
     return beerlist.to_dict(orient="records")
 
 
+#FIXME: pull this logic into template
 def format_beerlist(mongo_client, request, render_template, msg=None):
     return render_template("beerlist.jinja.html",
                            msg=msg,
