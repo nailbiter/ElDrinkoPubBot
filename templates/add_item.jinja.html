@@ -6,9 +6,17 @@
   </head>
   <body>
       <form action="/{{action}}" method="POST">
-        {%for k in r%}
+        {%for k,v in r.items()%}
         <p>{{k}}</p>
+        {%if v=="text"%}
         <input name="{{k}}" type="text"></input>
+        {%else%}
+        <select name="{{k}}">
+          {%for vv in v%}
+          <option value="{{vv}}">{{vv}}</option>
+          {%endfor%}
+        </select>
+        {%endif%}
         {%endfor%}
         <br>
         <br>
