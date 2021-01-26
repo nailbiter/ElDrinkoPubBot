@@ -44,7 +44,7 @@ def added_beeritem():
     price_fn = "price (UAH/L)"
     if re.match(r"^\d+$", r[price_fn]) is None:
         msg = f"could not add {r} because \"{r[price_fn]}\" is not a number"
-    elif mongo_client.beerbot.proto_beerlist.find_one({"name":r["name"]}) is not None:
+    elif mongo_client.beerbot.proto_beerlist.find_one({"name": r["name"]}) is not None:
         msg = f"could not add {r} because name \"{r['name']}\" already exists"
     else:
         msg = f"added {r}"
@@ -88,13 +88,13 @@ def add_beeritem():
     mongo_client = get_mongo_client()
     r = mongo_client.beerbot.proto_beerlist.find_one()
     del r["_id"]
-    return render_template("add_item.jinja.html", 
-        r={
-            **{k:"text" for k in r if k!="category"}, 
-            "category":[r["name"] for r in mongo_client.beerbot.proto_categories.find()]
-        }, 
-        action="added_beeritem"
-    )
+    return render_template("add_item.jinja.html",
+                           r={
+                               **{k: "text" for k in r if k != "category"},
+                               "category": [r["name"] for r in mongo_client.beerbot.proto_categories.find()]
+                           },
+                           action="added_beeritem"
+                           )
 
 
 @app.route("/delete/<what>/<name>")
@@ -106,12 +106,18 @@ def delete_beeritem(what, name):
         msg = f"res: {res}, removed {name}"
         return format_beerlist(mongo_client, request, render_template, request.url_root, msg)
     if what == "category":
-        if mongo_client.beerbot.proto_beerlist.find_one({"category": name}) is not None:
-            msg = f"cannot remove {name}, since some beerlist items depend on it"
+        if re.match(r"^\d+$", name) is None:
+            msg = f"{name} is not a number"
         else:
-            res = mongo_client.beerbot.proto_categories.delete_one({
-                                                                   "name": name})
-            msg = f"res: {res}, removed {name}"
+            name = int(name)
+            name = mongo_client.beerbot.proto_categories.find_one(skip=name)[
+                "name"]
+            if mongo_client.beerbot.proto_beerlist.find_one({"category": name}) is not None:
+                msg = f"cannot remove {name}, since some beerlist items depend on it"
+            else:
+                res = mongo_client.beerbot.proto_categories.delete_one({
+                                                                       "name": name})
+                msg = f"res: {res}, removed {name}"
 
         return render_template("categories.jinja.html",
                                mongo_client=mongo_client,
@@ -184,18 +190,13 @@ def beerlist():
     mongo_client = get_mongo_client()
     return format_beerlist(mongo_client, request, render_template, request.url_root)
 
-# @app.route("/delete_category/<int:idx>")
-# def delete_category(idx):
-#    mongo_client = get_mongo_client()
-#    return render_template("categories.jinja.html",mongo_client=mongo_client,url_root=request.url_root)
-
 
 @app.route("/add_category")
 def add_category():
     mongo_client = get_mongo_client()
     r = mongo_client.beerbot.proto_categories.find_one()
     del r["_id"]
-    return render_template("add_item.jinja.html", r={r:"text"for k in r}, action="added_category")
+    return render_template("add_item.jinja.html", r={r: "text"for k in r}, action="added_category")
 
 
 @app.route("/added_category", methods=["POST"])

@@ -94,12 +94,12 @@ def format_beerlist(mongo_client, request, render_template, url_root, msg=None):
                                msg=msg,
                                ROOT_URL=url_root,
                                **{k: _format_beerlist_table_html(mongo_client, k, url_root) for k in ["proto_beerlist", "beerlist"]}
-                           )
+                               )
     else:
         return Template("""
         <p>{{msg}}</p>
         <a href="{{url_root}}/beerlist">go here</a>
         """).render({
-            "msg":msg,
-            "url_root":url_root,
+            "msg": msg,
+            "url_root": url_root,
         })
