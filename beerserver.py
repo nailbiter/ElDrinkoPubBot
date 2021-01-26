@@ -40,13 +40,15 @@ def added_beeritem():
     mongo_client = get_mongo_client()
     logger.info("got {r}")
     r = {k: v for k, v in request.form.items()}
-    # TODO: validation: beer name and category should exist, price should be number
+    # TODO: validation: beer name should be new
     price_fn = "price (UAH/L)"
     if re.match(r"^\d+$", r[price_fn]) is None:
-        r[price_fn] = int(r[price_fn])
-        msg = "could not add {r} because \"{r[price_fn]}\" is not a number"
+        msg = f"could not add {r} because \"{r[price_fn]}\" is not a number"
+    elif mongo_client.beerbot.proto_beerlist.find_one({"name":r["name"]}) is not None:
+        msg = f"could not add {r} because name \"{r['name']}\" already exists"
     else:
         msg = f"added {r}"
+        r[price_fn] = int(r[price_fn])
         mongo_client.beerbot.proto_beerlist.insert_one(r)
     return format_beerlist(mongo_client, request, render_template, request.url_root, msg=msg)
 
