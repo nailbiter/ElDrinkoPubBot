@@ -196,7 +196,7 @@ def add_category():
     mongo_client = get_mongo_client()
     r = mongo_client.beerbot.proto_categories.find_one()
     del r["_id"]
-    return render_template("add_item.jinja.html", r={r: "text"for k in r}, action="added_category")
+    return render_template("add_item.jinja.html", r={k: "text"for k in r}, action="added_category")
 
 
 @app.route("/added_category", methods=["POST"])
