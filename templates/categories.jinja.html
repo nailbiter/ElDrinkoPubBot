@@ -7,7 +7,7 @@
   <body>
     {%if msg%}
       <p>{{msg}}</p>
-      <a href="{{url_root}}/categories">go here</a>
+      <a href="{{root_url}}/categories">go here</a>
     {%else%}
       {%for prefix,collname in [["proto","proto_categories"],["production","categories"]]%}
       <p>{{prefix}} items</p>

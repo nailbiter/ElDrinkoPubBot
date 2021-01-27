@@ -19,6 +19,7 @@ ORGANIZATION:
 TODO: 
     1(done). FIXUP request.url_root
     2. correct redirect
+    3. change all `url_root`
 ==============================================================================="""
 from flask import Flask, render_template, request
 from datetime import datetime, date
@@ -178,7 +179,6 @@ def move(what, direction, name):
         msg = f"moved {name} {direction}"
         return render_template("categories.jinja.html",
                                mongo_client=mongo_client,
-                               url_root=request.url_root,
                                msg=msg
                                )
     else:
@@ -210,7 +210,6 @@ def added_category():
         mongo_client.beerbot.proto_categories.insert_one(r)
     return render_template("categories.jinja.html",
                            mongo_client=mongo_client,
-                           url_root=request.url_root,
                            msg=msg
                            )
 
@@ -218,7 +217,7 @@ def added_category():
 @app.route("/categories")
 def categories():
     mongo_client = get_mongo_client()
-    return render_template("categories.jinja.html", mongo_client=mongo_client, url_root=request.url_root)
+    return render_template("categories.jinja.html", mongo_client=mongo_client)
 
 
 @app.route("/refresh_db", methods=["POST"])
