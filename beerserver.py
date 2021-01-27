@@ -91,8 +91,9 @@ def add_beeritem():
     del r["_id"]
     return render_template("add_item.jinja.html",
                            r={
-                               **{k: "text" for k in r if k != "category"},
-                               "category": [r["name"] for r in mongo_client.beerbot.proto_categories.find()]
+                               **{k: "text" for k in r if k not in ["category", "units"]},
+                               "category": [r["name"] for r in mongo_client.beerbot.proto_categories.find()],
+                               "units": ["bottles","штуки","пачки"]
                            },
                            action="added_beeritem"
                            )
