@@ -15,7 +15,9 @@
       <table border="1" class="dataframe">
         <thead>
           <tr style="text-align: right;">
+            {%if prefix=="proto"%}
             <th>ctrl</th>
+            {%endif%}
             {%for fn in mongo_client.beerbot[collname].find()[0]%}
             {%if fn!="_id"%}
             <th>{{fn|safe}}</th>
@@ -26,12 +28,14 @@
         <tbody>
           {%for r in mongo_client.beerbot[collname].find()%}
           <tr>
+            {%if prefix=="proto"%}
             <td>
               {%set r_idx = loop.index-1%}
               {%for written_name,method_name in [["del","delete/category"],["up","move/category/up"],["down","move/category/down"]]%}
               <a href="{{root_url}}/{{method_name}}/{{r_idx}}">{{written_name}}</a>
               {%endfor%}
             </td>
+            {%endif%}
             {%for fn in r%}
             {%if fn!="_id"%}
             <td>{{r[fn]|safe}}</td>
@@ -48,4 +52,3 @@
     {%endif%}  
   </body>
 </html>
-

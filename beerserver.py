@@ -27,7 +27,7 @@ import re
 from pymongo import MongoClient
 import pandas as pd
 import logging
-from _beerserver import get_mongo_client, get_orders, format_beerlist
+from _beerserver import get_mongo_client, get_orders
 import logging
 
 
@@ -51,7 +51,8 @@ def added_beeritem():
         msg = f"added {r}"
         r[price_fn] = int(r[price_fn])
         mongo_client.beerbot.proto_beerlist.insert_one(r)
-    return format_beerlist(mongo_client, request, render_template, request.url_root, msg=msg)
+    #return format_beerlist(mongo_client, request, render_template, request.url_root, msg=msg)
+    return render_template("beerlist.jinja.html",mongo_client=mongo_client,msg=msg)
 
 
 @app.route("/load_from_prd")
@@ -65,7 +66,8 @@ def load_from_prd():
             mongo_client.beerbot[f"proto_{coll}"].insert_one(
                 {k: v for k, v in r.items() if k != "_id"})
         msgs.append(f"added {len(records)} items to proto_{coll}")
-    return format_beerlist(mongo_client, request, render_template, request.url_root, msg="<br>".join(msgs))
+    #return format_beerlist(mongo_client, request, render_template, request.url_root, msg="<br>".join(msgs))
+    return render_template("beerlist.jinja.html",mongo_client=mongo_client,msg="<br>".join(msgs))
 
 
 @app.route("/load_to_prd")
@@ -80,7 +82,8 @@ def load_to_prd():
                 {k: v for k, v in r.items() if k != "_id"})
         msgs.append(f"added {len(records)} items to {coll}")
 
-    return format_beerlist(mongo_client, request, render_template, request.url_root, msg="<br>".join(msgs))
+    #return format_beerlist(mongo_client, request, render_template, request.url_root, msg="<br>".join(msgs))
+    return render_template("beerlist.jinja.html",mongo_client=mongo_client,msg="<br>".join(msgs))
 
 
 # FIXME: merge with add_category
@@ -106,7 +109,8 @@ def delete_beeritem(what, name):
     if what == "beeritem":
         res = mongo_client.beerbot.proto_beerlist.delete_one({"name": name})
         msg = f"res: {res}, removed {name}"
-        return format_beerlist(mongo_client, request, render_template, request.url_root, msg)
+        #return format_beerlist(mongo_client, request, render_template, request.url_root, msg)
+        return render_template("beerlist.jinja.html",mongo_client=mongo_client,msg=msg)
     if what == "category":
         if re.match(r"^\d+$", name) is None:
             msg = f"{name} is not a number"
@@ -155,7 +159,8 @@ def move(what, direction, name):
             mongo_client.beerbot.proto_beerlist.insert_one(r)
 
         msg = f"moved {name} {direction}"
-        return format_beerlist(mongo_client, request, render_template, request.url_root, msg=msg)
+        #return format_beerlist(mongo_client, request, render_template, request.url_root, msg=msg)
+        return render_template("beerlist.jinja.html",mongo_client=mongo_client,msg=msg)
     elif what == "category":
         # FIXME: merge with logic in previous clause, use one function
         res = pd.DataFrame(mongo_client.beerbot.proto_categories.find())
@@ -189,7 +194,8 @@ def move(what, direction, name):
 @app.route("/beerlist")
 def beerlist():
     mongo_client = get_mongo_client()
-    return format_beerlist(mongo_client, request, render_template, request.url_root)
+    #return format_beerlist(mongo_client, request, render_template, request.url_root)
+    return render_template("beerlist.jinja.html",mongo_client=mongo_client)
 
 
 @app.route("/add_category")

@@ -5,52 +5,56 @@
     <title></title>
   </head>
   <body>
-    {%if msg%} {{msg|safe}}<br> {%endif%}
-    <p>proto items</p>
+    {%if msg%}
+      <p>{{msg}}</p>
+      <a href="{{root_url}}/beerlist">go here</a>
+    {%else%}
+      {%for prefix,collname in [["proto","proto_beerlist"],["production","beerlist"]]%}
+      <p>{{prefix}} items</p>
 
-    <table border="1" class="dataframe">
-      <thead>
-				<tr style="text-align: right;">
-          {%for fn in proto_beerlist[0]%}
-          <th>{{fn|safe}}</th>
+      <table border="1" class="dataframe">
+        <thead>
+          <tr style="text-align: right;">
+            {%if prefix=="proto"%}
+            <th>ctrl</th>
+            {%endif%}
+            {%for fn in mongo_client.beerbot[collname].find()[0]%}
+            {%if fn!="_id"%}
+            <th>{{fn|safe}}</th>
+            {%endif%}
+            {%endfor%}
+          </tr>
+        </thead>
+        <tbody>
+          {%for r in mongo_client.beerbot[collname].find()%}
+          <tr>
+            {%if prefix=="proto"%}
+            <td>
+              {%set r_idx = loop.index-1%}
+              {%for written_name,method_name in [["del","delete/category"],["up","move/beeritem/up"],["down","move/beeritem/down"]]%}
+              <a href="{{root_url}}/{{method_name}}/{{r.name}}">{{written_name}}</a>
+              {%endfor%}
+            </td>
+            {%endif%}
+            {%for fn in r%}
+            {%if fn!="_id"%}
+              {%if fn=="image link"%}
+              <td><a href="{{r[fn]}}">{{r[fn]}}</a></td>
+              {%else%}
+              <td>{{r[fn]}}</td>
+              {%endif%}
+            {%endif%}
+            {%endfor%}
+          </tr>
           {%endfor%}
-				</tr>
-			</thead>
-			<tbody>
-        {%for r in proto_beerlist%}
-        <tr>
-          {%for fn in r%}
-          <td>{{r[fn]|safe}}</td>
-          {%endfor%}
-        </tr>
-        {%endfor%}
-      </tbody>
-    </table>
-
-    <p>production items</p>
-
-    <table border="1" class="dataframe">
-      <thead>
-				<tr style="text-align: right;">
-          {%for fn in beerlist[0]%}
-          <th>{{fn|safe}}</th>
-          {%endfor%}
-				</tr>
-			</thead>
-			<tbody>
-        {%for r in beerlist%}
-        <tr>
-          {%for fn in r%}
-          <td>{{r[fn]|safe}}</td>
-          {%endfor%}
-        </tr>
-        {%endfor%}
-      </tbody>
-    </table>
-
-    <a href="{{ROOT_URL}}add_beeritem">добавить</a><br>
-    <a href="{{ROOT_URL}}load_to_prd">загрузить в боевой бот</a><br>
-    <a href="{{ROOT_URL}}load_from_prd">обнулить изменения</a><br>
+        </tbody>
+      </table>
+      {%if prefix=="proto"%}
+      <a href="{{root_url}}/add_beeritem">add beeritem</a><br>
+      <a href="{{root_url}}/load_to_prd">загрузить в боевой бот</a><br>
+      <a href="{{root_url}}/load_from_prd">обнулить изменения</a><br>
+      {%endif%}
+    {%endfor%}
+    {%endif%}  
   </body>
 </html>
-
