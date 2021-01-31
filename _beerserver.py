@@ -89,6 +89,8 @@ def _format_beerlist_table_html(mongo_client, collname, url_root):
 
 # FIXME: pull this logic into template
 def format_beerlist(mongo_client, request, render_template, url_root, msg=None):
+    logger = logging.getLogger("format_beerlist")
+    logger.info(f"url_root: {url_root}")
     if msg is None:
         return render_template("beerlist.jinja.html",
                                msg=msg,
