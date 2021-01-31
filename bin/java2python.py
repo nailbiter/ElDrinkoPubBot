@@ -42,7 +42,8 @@ def _system(cmd,logger=None):
 @click.command()
 @click.option("--j2py-exe",default="~/Downloads/java2python-0.5.1/bin/j2py")
 @click.option("--output-source-tree",type=click.Path(),default="src/main/python")
-def java2python(j2py_exe,output_source_tree):
+@_add_logger
+def java2python(j2py_exe,output_source_tree,logger=None):
     if True:
         logging.basicConfig(level=logging.INFO)
     _system(f"rm -rf {output_source_tree}")
@@ -51,9 +52,16 @@ def java2python(j2py_exe,output_source_tree):
         for name in files:
             if not name.endswith(".java"):
                 continue
+
+            name = path.join(root,name)
+            name = path.relpath(name,_INPUT_SOURCE_TREE)
             dir_,_ = path.split(name)
             os.makedirs(path.join(output_source_tree,dir_),exist_ok=True)
-            _system(f"{j2py_exe} {os.path.join(root,name)} {os.path.join(output_source_tree,name)}")
+
+            dest_name = path.join(output_source_tree,name)
+            dest_name = path.splitext(dest_name)[0]+".py"
+
+            _system(f"{j2py_exe} {os.path.join(_INPUT_SOURCE_TREE,name)} {dest_name}")
 #        for name in dirs:
 #            print(os.path.join(root, name))
 
