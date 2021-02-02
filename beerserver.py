@@ -39,8 +39,8 @@ app = Flask(__name__)
 def added_beeritem():
     logger = logging.getLogger(request.path)
     mongo_client = get_mongo_client()
-    logger.info(f"got {r}")
     r = {k: v for k, v in request.form.items()}
+    logger.info(f"got {r}")
     # TODO: validation: beer name should be new
     price_fn = "price (UAH/L)"
     if re.match(r"^\d+$", r[price_fn]) is None:
