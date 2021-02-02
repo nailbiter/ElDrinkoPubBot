@@ -31,7 +31,7 @@
             {%if prefix=="proto"%}
             <td>
               {%set r_idx = loop.index-1%}
-              {%for written_name,method_name in [["del","delete/category"],["up","move/beeritem/up"],["down","move/beeritem/down"]]%}
+              {%for written_name,method_name in [["del","delete/beeritem"],["up","move/beeritem/up"],["down","move/beeritem/down"]]%}
               <a href="{{root_url}}/{{method_name}}/{{r.name}}">{{written_name}}</a>
               {%endfor%}
             </td>
