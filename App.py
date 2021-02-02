@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-"""===============================================================================
-
-        FILE: App.py
-=======
 #!/usr/bin/env python3
 """===============================================================================
 
-        FILE: app.py
->>>>>>> beerbot-python-raspberry-2
-
+        FILE: App.py
        USAGE: (not intended to be directly executed)
 
  DESCRIPTION: 
@@ -25,11 +18,6 @@ ORGANIZATION:
 
 ==============================================================================="""
 
-<<<<<<< HEAD
-
-if __name__ == "__main__":
-    pass
-=======
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler, Filters
 from pymongo import MongoClient
@@ -38,7 +26,7 @@ import json
 import os
 from os import path
 import atexit
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.ElDrinkoPubBot import ElDrinkoPubBot
+from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_pub_bot import ElDrinkoPubBot
 
 class _AtExitHook:
     def __init__(self,pidfile):
@@ -62,17 +50,18 @@ def App(mongo_url,environment):
             for kk
             in ["_settings","_keyring"]
     ]
-    click.echo(json.dumps(settings,indent=2))
-    click.echo(json.dumps(keyring,indent=2))
+#    click.echo(json.dumps(settings,indent=2))
+#    click.echo(json.dumps(keyring,indent=2))
     atexit.register(_AtExitHook(pidfile))
     click.echo("here")
 
-#    telegram_token = keyring["telegram"]["token"]
-#    updater = Updater(token, use_context=True)
-#    bot = updater.bot
-#    updater.dispatcher.add_handler(MessageHandler(
-#        filters=Filters.all, callback=ElDrinkoPubBot()))
+    updater = Updater(keyring["telegram"]["token"], use_context=True)
+    bot = updater.bot
+    updater.dispatcher.add_handler(MessageHandler(
+        filters=Filters.all, callback=ElDrinkoPubBot(settings)))
+    updater.start_polling()
+    updater.idle()
+
 
 if __name__=="__main__":
     App()
->>>>>>> beerbot-python-raspberry-2

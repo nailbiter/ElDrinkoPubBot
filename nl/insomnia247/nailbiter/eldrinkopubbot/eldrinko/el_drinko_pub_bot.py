@@ -18,8 +18,12 @@ ORGANIZATION:
 
 ==============================================================================="""
 
+import logging
+
 class ElDrinkoPubBot:
-    def __init__(self):
-        pass
-    def __call__(self,update,context):
-        pass
+    def __init__(self, settings):
+        self._logger = logging.getLogger(self.__class__.__name__)
+
+    def __call__(self, update, context):
+        self._logger.info(f"message> {update.message}")
+        update.message.reply_text(text="text")
