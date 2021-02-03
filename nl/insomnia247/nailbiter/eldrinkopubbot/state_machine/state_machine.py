@@ -81,7 +81,7 @@ class StateMachine:
         for ss,es,c,a in json.loads(s):
             condition = conditionInflator(c)
             action = actionInflator(a)
-            if ss is not None and es in not None:
+            if ss is not None and es is not None:
                 self.addTransition(ss,es,condition,action)
             elif ss is None and es is not None:
                 for s in self._states:
