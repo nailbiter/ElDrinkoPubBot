@@ -22,6 +22,7 @@ import logging
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
 from pymongo import MongoClient
 import os
+import subprocess
 
 
 class ElDrinkoPubBot:
@@ -30,13 +31,20 @@ class ElDrinkoPubBot:
         print(settings)
         mongo_client = MongoClient(os.environ["MONGO_URL"])
         self._mongo_client = mongo_client
+
         ElDrinkoStateMachine.PreloadImages(
             mongo_client.beerbot[settings["mongodb"]["beerlist"]])
-        exit(0)
+
+        commit = subprocess.getoutput("git rev-parse HEAD")
+        commit = commit[:7]
+        self.send_message(f"updated! now at {commit}","developerChatIds",is_markdown=True)
 
     def __call__(self, update, context):
         self._logger.info(f"message> {update.message}")
         update.message.reply_text(text="text")
 
-    def send_message(self):
-        pass
+    def send_message(self,message,recipient,is_markdown=False):
+        if recipient=="developerChatIds":
+            is_markdown = True
+            message = f"`(> {message} <)`"
+        return    
