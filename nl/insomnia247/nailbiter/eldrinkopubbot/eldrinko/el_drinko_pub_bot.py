@@ -26,10 +26,10 @@ import subprocess
 
 
 class ElDrinkoPubBot:
-    def __init__(self, settings):
+    def __init__(self, settings, bot, mongo_url):
         self._logger = logging.getLogger(self.__class__.__name__)
         print(settings)
-        mongo_client = MongoClient(os.environ["MONGO_URL"])
+        mongo_client = MongoClient(mongo_url)
         self._mongo_client = mongo_client
 
         ElDrinkoStateMachine.PreloadImages(
@@ -47,4 +47,4 @@ class ElDrinkoPubBot:
         if recipient=="developerChatIds":
             is_markdown = True
             message = f"`(> {message} <)`"
-        return    
+        #HERE:    https://python-telegram-bot.readthedocs.io/en/latest/telegram.bot.html#telegram.Bot.sendMessage
