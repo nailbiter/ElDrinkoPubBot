@@ -42,7 +42,7 @@ class DownloadCache:
         slice_ = self._cache_df[[url == url_ for url_ in self._cache_df.url]]
         res = None
         if len(slice_) > 0:
-            res = len(slice_["filename"])[0]
+            res = list(slice_["filename"])[0]
         else:
             fn = path.join(self._tmp_folder, f"{uuid.uuid4()}{self._extension}")
             os.system(f"wget -O {fn} \"{url}\"")

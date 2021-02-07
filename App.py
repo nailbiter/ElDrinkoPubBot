@@ -27,6 +27,7 @@ import os
 from os import path
 import atexit
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_pub_bot import ElDrinkoPubBot
+import logging
 
 
 class _AtExitHook:
@@ -41,8 +42,11 @@ class _AtExitHook:
 @click.command()
 @click.option("--mongo-url", envvar="MONGO_URL")
 @click.option("--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot")
-def App(mongo_url, environment):
+@click.option("--debug/--no-debug",default=False)
+def App(mongo_url, environment,debug):
     pidfile = f".tmp/{environment}.txt"
+    if debug:
+        logging.basicConfig(level=logging.INFO)
     assert not path.isfile(
         pidfile), "only one instance of ElDrinkoPubBot allowed to run"
     with open(pidfile, "w") as f:
@@ -68,6 +72,8 @@ def App(mongo_url, environment):
     )
     updater.dispatcher.add_handler(
         MessageHandler(filters=Filters.all, callback=edbp))
+    updater.dispatcher.add_handler(
+        CallbackQueryHandler(callback=edbp))
     updater.start_polling()
     updater.idle()
 

@@ -31,3 +31,5 @@ class ElDrinkoStateMachine(ExposedStateMachine):
         for r in coll.find():
             print(r)
             dc(r["image link"])
+    def _didNotFoundSuitableTransition(self,im):        
+        pass
