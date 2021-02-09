@@ -46,7 +46,7 @@ class _AtExitHook:
 def App(mongo_url, environment,debug):
     pidfile = f".tmp/{environment}.txt"
     if debug:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO, filename=f".log/{environment}.log.txt")
     assert not path.isfile(
         pidfile), "only one instance of ElDrinkoPubBot allowed to run"
     with open(pidfile, "w") as f:
@@ -66,7 +66,7 @@ def App(mongo_url, environment,debug):
     updater = Updater(keyring["telegram"]["token"], use_context=True)
     bot = updater.bot
     edbp = ElDrinkoPubBot(
-        settings=settings,
+        settings={**settings,"id":environment},
         bot=bot,
         mongo_url=mongo_url,
     )
