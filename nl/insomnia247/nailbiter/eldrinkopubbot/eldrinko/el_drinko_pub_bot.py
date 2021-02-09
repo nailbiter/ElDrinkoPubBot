@@ -1,16 +1,3 @@
-import logging
-from nl.insomnia247.nailbiter.eldrinkopubbot.util.persistent_storage import PersistentStorage
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_inflator import ElDrinkoActionInflator
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition.el_drinko_condition_inflator import ElDrinkoConditionInflator
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
-from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
-from pymongo import MongoClient
-import os
-import subprocess
-
-
 """===============================================================================
 
         FILE: nl/insomnia247/nailbiter/eldrinkopubbot/ElDrinkoPubBot.py
@@ -30,6 +17,19 @@ ORGANIZATION:
     REVISION: ---
 
 ==============================================================================="""
+
+import logging
+from nl.insomnia247.nailbiter.eldrinkopubbot.util.persistent_storage import PersistentStorage
+from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
+from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_inflator import ElDrinkoActionInflator
+from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition.el_drinko_condition_inflator import ElDrinkoConditionInflator
+from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
+from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+from pymongo import MongoClient
+import os
+import subprocess
+import pandas as pd
 
 
 class ElDrinkoPubBot:
@@ -92,9 +92,16 @@ class ElDrinkoPubBot:
                 "state_machine_states").find_one({"id": str(chat_id)})
             state = doc["state"] if doc is not None else "_"
             self._logger.info(f"state: {state}")
-            # self._edsm.setState(state)
-            #eim = ElDrinkoInputMessage(input_message=im, )
-            #self._logger.info(f"eim: {eim}")
+            self._edsm.setState(state)
+            eim = ElDrinkoInputMessage(
+                input_message=im, 
+                data=self._get_collection("data").find_one({"id":str(chat_id)}),
+                user_data=str(chat_id),
+                beerlist=pd.DataFrame(self._get_collection("beerlist").find())
+            )
+            self._logger.info(f"eim: {eim}")
+            om = self._edsm(eim)
+            self._logger.info(f"om: {om}")
 
 #        keyboard = [
 #            [InlineKeyboardButton("3", callback_data=str("three")),
