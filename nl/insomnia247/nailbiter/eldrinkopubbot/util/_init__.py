@@ -17,3 +17,9 @@ ORGANIZATION:
     REVISION: ---
 
 ==============================================================================="""
+
+import re
+def parse_ukrainian_float(s):
+    m = re.match(r"(-?\d+)(,\d+)?",s)
+    assert m is not None
+    return float(s.replace(",","."))

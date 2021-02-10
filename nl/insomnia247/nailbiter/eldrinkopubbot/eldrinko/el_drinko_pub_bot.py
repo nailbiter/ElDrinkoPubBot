@@ -25,6 +25,7 @@ from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_in
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition.el_drinko_condition_inflator import ElDrinkoConditionInflator
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
+from nl.insomnia247.nailbiter.eldrinkopubbot.telegram.user_data import UserData
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 from pymongo import MongoClient
 import os
@@ -33,7 +34,7 @@ import pandas as pd
 
 
 class ElDrinkoPubBot:
-    def __init__(self, settings, bot, mongo_url):
+    def __init__(self, settings, bot, mongo_url, template_folder):
         self._logger = logging.getLogger(self.__class__.__name__)
         # print(settings)
         self._settings = settings
@@ -47,7 +48,8 @@ class ElDrinkoPubBot:
         _actionInflator = ElDrinkoActionInflator(
             self.send_message,
             PersistentStorage(mongo_client.beerbot.var,settings["id"]),
-            self.insert_order
+            self.insert_order,
+            template_folder=template_folder
         )
         _conditionInflator = ElDrinkoConditionInflator()
 
@@ -86,7 +88,7 @@ class ElDrinkoPubBot:
         self._logger.info(f"message> {update.message}")
         # update.message.reply_text(text="text")
         im = self._createInputMessage(update)
-        chat_id = update.effective_message.chat_id
+        chat_id = UserData(update)
         if im is not None:
             doc = self._get_collection(
                 "state_machine_states").find_one({"id": str(chat_id)})
@@ -96,7 +98,7 @@ class ElDrinkoPubBot:
             eim = ElDrinkoInputMessage(
                 input_message=im, 
                 data=self._get_collection("data").find_one({"id":str(chat_id)}),
-                user_data=str(chat_id),
+                user_data=chat_id,
                 beerlist=pd.DataFrame(self._get_collection("beerlist").find())
             )
             self._logger.info(f"eim: {eim}")

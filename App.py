@@ -41,12 +41,14 @@ class _AtExitHook:
 
 @click.command()
 @click.option("--mongo-url", envvar="MONGO_URL")
+@click.option("--template-folder", type=click.Path(), default="src/main/resources")
 @click.option("--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot")
-@click.option("--debug/--no-debug",default=False)
-def App(mongo_url, environment,debug):
+@click.option("--debug/--no-debug", default=False)
+def App(mongo_url, environment, debug, template_folder):
     pidfile = f".tmp/{environment}.txt"
     if debug:
-        logging.basicConfig(level=logging.INFO, filename=f".log/{environment}.log.txt")
+        logging.basicConfig(level=logging.INFO,
+                            filename=f".log/{environment}.log.txt")
     assert not path.isfile(
         pidfile), "only one instance of ElDrinkoPubBot allowed to run"
     with open(pidfile, "w") as f:
@@ -66,9 +68,10 @@ def App(mongo_url, environment,debug):
     updater = Updater(keyring["telegram"]["token"], use_context=True)
     bot = updater.bot
     edbp = ElDrinkoPubBot(
-        settings={**settings,"id":environment},
+        settings={**settings, "id": environment},
         bot=bot,
         mongo_url=mongo_url,
+        template_folder=template_folder
     )
     updater.dispatcher.add_handler(
         MessageHandler(filters=Filters.all, callback=edbp))
