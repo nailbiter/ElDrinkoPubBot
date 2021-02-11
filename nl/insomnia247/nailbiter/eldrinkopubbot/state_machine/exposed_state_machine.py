@@ -20,10 +20,13 @@ ORGANIZATION:
 
 from nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.state_machine import StateMachine
 
+
 class ExposedStateMachine(StateMachine):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-    def setState(self,state):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def setState(self, state):
         self._setState(state)
+
     def getState(self):
-        self._current_state
+        return self._current_state

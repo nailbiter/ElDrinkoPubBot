@@ -18,21 +18,30 @@ ORGANIZATION:
 
 ==============================================================================="""
 
+
 class UserData:
-    def __init__(self,update):
+    def __init__(self, update):
         self._chat_id = update.effective_message.chat_id
         effective_user = update.effective_user
         self._username = effective_user.username
         self._first_name = effective_user.first_name
         self._last_name = effective_user.last_name
+
     def __str__(self):
         return str(self._chat_id)
+
+    @property
+    def chat_id(self):
+        return self._chat_id
+
     @property
     def username(self):
         return self._username
+
     @property
     def first_name(self):
         return self._first_name
+
     @property
     def last_name(self):
         return self._last_name

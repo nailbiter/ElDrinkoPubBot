@@ -43,12 +43,15 @@ class _AtExitHook:
 @click.option("--mongo-url", envvar="MONGO_URL")
 @click.option("--template-folder", type=click.Path(), default="src/main/resources")
 @click.option("--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot")
-@click.option("--debug/--no-debug", default=False)
+@click.option("--debug/--no-debug", default=True)
 def App(mongo_url, environment, debug, template_folder):
     pidfile = f".tmp/{environment}.txt"
     if debug:
         logging.basicConfig(level=logging.INFO,
-                            filename=f".log/{environment}.log.txt")
+                            filename=f".log/{environment}.log.txt",
+                            format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                            datefmt='%Y-%m-%d:%H:%M:%S',
+                            )
     assert not path.isfile(
         pidfile), "only one instance of ElDrinkoPubBot allowed to run"
     with open(pidfile, "w") as f:

@@ -48,7 +48,9 @@ def parse_ukrainian_float(s):
 def process_template(jinja_env,template_name,additional_context, tsv):
     context = {}
     context["products"] = [list(r.values())for r in tsv.to_dict(orient="records")]
-    if additionalContext is not None:
-        for k,v in additionalContext.items():
+    if additional_context is not None:
+        for k,v in additional_context.items():
             context[k] = v
-    return jinja_env.render(f"{template_name}.txt").render(context)
+    jinja_env.filters["myprintf_int"] = lambda x:f"{int(x):02d}"
+    jinja_env.filters["myprintf"] = lambda x:f"{float(x):.2d}".replace(".",",")
+    return jinja_env.get_template(f"{template_name}.txt").render(context)

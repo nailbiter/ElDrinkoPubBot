@@ -19,12 +19,13 @@ ORGANIZATION:
 ==============================================================================="""
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
 from nl.insomnia247.nailbiter.eldrinkopubbot.util import parse_ukrainian_float, process_template
-from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage
+from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage, TelegramArrayOutputMessage
 from jinja2 import Environment, Template
 from jinja2.loaders import FileSystemLoader
 import json
 from datetime import datetime
 import pytz
+import logging
 
 #    private static JSONObject _GetOrder(JSONObject obj) {
 #        JSONObject order = obj.optJSONObject("order");
@@ -87,6 +88,7 @@ class ElDrinkoActionInflator:
         self._jinja_env = Environment(loader=FileSystemLoader(template_folder))
         self._date_time_formatter = _DateTimeFormatter()
         self._transitions = None
+        self._logger = logging.getLogger(self.__class__.__name__)
         with open(f"{template_folder}/transitions.json") as f:
             self._transitions = json.load(f)
 
@@ -98,13 +100,13 @@ class ElDrinkoActionInflator:
 #                _Log.info(SecureString.format("here with %s,%s",o,im));
 #                if( (((JSONObject)o).getString("correspondence")).equals("9c851972cb7438c5") || (((JSONObject)o).getString("correspondence")).equals("07defdb4543782cb")) {
         if o["correspondence"] in ["9c851972cb7438c5", "07defdb4543782cb"]:
-#                    _Log.info(SecureString.format("%s",o));
-#                    if ((((JSONObject)o).optString("src_state")).equals("choose_product_to_make_order")) {
+            #                    _Log.info(SecureString.format("%s",o));
+            #                    if ((((JSONObject)o).optString("src_state")).equals("choose_product_to_make_order")) {
             if o["src_state"] == "choose_product_to_make_order":
-#                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
-#                        int i = Integer.parseInt(tka.getMsg());
-#                        Tsv tsv = im.beerlist;
-#                        JSONObject order = im.right.optJSONObject("order");
+                #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
+                #                        int i = Integer.parseInt(tka.getMsg());
+                #                        Tsv tsv = im.beerlist;
+                #                        JSONObject order = im.right.optJSONObject("order");
                 tka = im.input_message
                 i = int(tka.message)
                 tsv = im.beerlist
@@ -128,11 +130,11 @@ class ElDrinkoActionInflator:
                 im.data["order"] = order
 #                    } else if( ((JSONObject)o).optString("type").equals("validButton") ) {
             elif o["type"] == "validButton":
-#                        _Log.info(SecureString.format("%s",im.left.getMsg()));
-#                        _Log.info(SecureString.format("%s",im.right));
-#                        JSONArray cart = im.right.getJSONObject("order").getJSONArray("cart");
-#                        JSONObject lastItem = cart.getJSONObject(cart.length()-1);
-#                        JSONObject bottles = lastItem.getJSONObject("bottles");
+                #                        _Log.info(SecureString.format("%s",im.left.getMsg()));
+                #                        _Log.info(SecureString.format("%s",im.right));
+                #                        JSONArray cart = im.right.getJSONObject("order").getJSONArray("cart");
+                #                        JSONObject lastItem = cart.getJSONObject(cart.length()-1);
+                #                        JSONObject bottles = lastItem.getJSONObject("bottles");
                 cart = im.data["order"]["cart"]
                 lastItem = cart[-1]
                 bottles = lastItem["bottles"]
@@ -162,8 +164,8 @@ class ElDrinkoActionInflator:
                 amount = 0.0
 #                        for(String s: BOTTLE_TYPES) {
                 for s in BOTTLE_TYPES:
-#                            try {
-#                                amount += MiscUtils.ParseFloat(s) * bottles.optInt(s,0);
+                    #                            try {
+                    #                                amount += MiscUtils.ParseFloat(s) * bottles.optInt(s,0);
                     try:
                         amount += parse_ukrainian_float(s) * bottles.get(s, 0)
 #                            } catch (MiscUtils.ParseFloatException e) {
@@ -178,9 +180,9 @@ class ElDrinkoActionInflator:
 #                } else if( ((JSONObject)o).getString("correspondence").equals("5e11c9696e9b38f0") ) {
         elif o["correspondence"] == "5e11c9696e9b38f0":
             if o["src_state"] == "delete":
-#                    if(((JSONObject)o).optString("src_state").equals("delete")) {
-#                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
-#                        int i = Integer.parseInt(tka.getMsg());
+                #                    if(((JSONObject)o).optString("src_state").equals("delete")) {
+                #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
+                #                        int i = Integer.parseInt(tka.getMsg());
                 tka = im.input_message
                 i = int(tka.message)
 #                        JSONObject order = im.right.optJSONObject("order");
@@ -194,25 +196,25 @@ class ElDrinkoActionInflator:
 #                    }
 #                } else if( (((JSONObject)o).getString("correspondence").equals("72e97b89bcab08c4") && ((JSONObject)o).getString("src_state").equals("choose_address")) ||  ((JSONObject)o).getString("correspondence").equals("774ed3e0f5ef17cf")) {
         elif (o["correspondence"] == "72e97b89bcab08c4" and o["src_state"] == "choose_payment") or o["correspondence"] == "774ed3e0f5ef17cf":
-#                    im.right.put("address",im.left.getMsg());
+            #                    im.right.put("address",im.left.getMsg());
             im.data["address"] = im.input_message.message
 #                } else if( ((JSONObject)o).getString("correspondence").equals("8e0edde4a3199d0c") ) {
         elif o["correspondence"] == "8e0edde4a3199d0c":
-#                    im.right.put("phone_number",im.left.getMsg());
+            #                    im.right.put("phone_number",im.left.getMsg());
             im.data["phone_number"] = im.input_message.message
 #                } else if( ((JSONObject)o).getString("correspondence").equals("fa702a44b70ddcae") ) {
         elif o["correspondence"] == "fa702a44b70ddcae":
-#                    if(((JSONObject)o).optString("src_state").equals("edit_address")) {
-#                        im.right.put("address",im.left.getMsg());
+            #                    if(((JSONObject)o).optString("src_state").equals("edit_address")) {
+            #                        im.right.put("address",im.left.getMsg());
             if o["src_state"] == "edit_address":
                 im.data["address"] = im.input_message.message
 #                    } else if(((JSONObject)o).optString("src_state").equals("choose_payment")) {
             elif o["src_state"] == "choose_payment":
-#                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
-#                        int i = Integer.parseInt(tka.getMsg());
-#                        String paymentMethods
-#                            = MiscUtils.ProcessTemplate("4ea9a63509e8ed5826a37f8a",null,im.beerlist);
-#                        im.right.put("payment", paymentMethods.split("\n")[i]);
+                #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
+                #                        int i = Integer.parseInt(tka.getMsg());
+                #                        String paymentMethods
+                #                            = MiscUtils.ProcessTemplate("4ea9a63509e8ed5826a37f8a",null,im.beerlist);
+                #                        im.right.put("payment", paymentMethods.split("\n")[i]);
                 tka = im.input_message
                 i = int(tka.message)
                 paymentMethods = self._jinja_env.get_template(
@@ -225,8 +227,8 @@ class ElDrinkoActionInflator:
 #                    }
 #                } else if( ((JSONObject)o).getString("correspondence").equals("48c6907046b03db8") ) {
         elif o["correspondence"] == "48c6907046b03db8":
-#                    JSONObject order = _GetOrder(im.right);
-#                    order.put("uid",im.userData.getUserName());
+            #                    JSONObject order = _GetOrder(im.right);
+            #                    order.put("uid",im.userData.getUserName());
             order = _get_order(im.data)
             order["uid"] = im.user_data.username
 #                    order.put("count",_IncrementOrderCount(_masterPersistentStorage));
@@ -269,58 +271,59 @@ class ElDrinkoActionInflator:
 #
 #                _Log.info(SecureString.format("before _GetOrder(%s)",im.right));
 #                JSONObject ppo = _GetOrder(im.right);
-    ppo = _get_order(im.data)
+        ppo = _get_order(im.data)
 #                _Log.info(SecureString.format("_OrderObjectToJinjaContext(%s,%s)",ppo,im.beerlist.toJsonString()));
 #                Map<String,Object> map = _OrderObjectToJinjaContext(ppo,im.beerlist);
 #                Object oo = null;
-    map_ = ElDrinkoActionInflator._order_object_to_jinja_context(ppo, im.beerlist)
-    oo = None
+        map_ = ElDrinkoActionInflator._order_object_to_jinja_context(
+            ppo, im.beerlist)
+        oo = None
 #                _Log.info(SecureString.format("after _GetOrder(%s)",im.right));
 #
 #                if( (((JSONObject)o).getString("correspondence")).equals("72aa7197071b6503") ) {
-    if o["correspondence"] == "72aa7197071b6503":
-#                    TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
-#                    Tsv tsv = im.beerlist;
-        tka = im.input_message
-        tsv = im.beerlist
+        if o["correspondence"] == "72aa7197071b6503":
+            #                    TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
+            #                    Tsv tsv = im.beerlist;
+            tka = im.input_message
+            tsv = im.beerlist
 #                    String imgUrl
 #                        = tsv.getColumn("image link").get(Integer.parseInt(tka.getMsg()));
-        imgUrl = list(tsv["image link"])[int(tka.message)]
+            imgUrl = list(tsv["image link"])[int(tka.message)]
 #                    map.put("i",Integer.parseInt(tka.getMsg()));
 #                    oo = MiscUtils.SafeUrl(imgUrl);
-        map_["i"] = int(tka.message)
-        oo = imgUrl
+            map_["i"] = int(tka.message)
+            oo = imgUrl
 #                } else if((((JSONObject)o).getString("correspondence")).equals("9c851972cb7438c5") || (((JSONObject)o).getString("correspondence")).equals("07defdb4543782cb") ) {
-    elif o["correspondence"] == "9c851972cb7438c5" or o["correspondence"] == "07defdb4543782cb":
-#                    Map<String,Object> beerVolumes = new HashMap<>();
-#                    Tsv tsv = im.beerlist;
-#
-#                    float totalVolume = 0.0f;
-        beerVolumes = {}
-        tsv = im.beerlist
-        totalVolume = 0.0
+        elif o["correspondence"] == "9c851972cb7438c5" or o["correspondence"] == "07defdb4543782cb":
+            #                    Map<String,Object> beerVolumes = new HashMap<>();
+            #                    Tsv tsv = im.beerlist;
+            #
+            #                    float totalVolume = 0.0f;
+            beerVolumes = {}
+            tsv = im.beerlist
+            totalVolume = 0.0
 
 #                    JSONArray cart = im.right.getJSONObject("order").getJSONArray("cart");
 #                    JSONObject bottles = cart.getJSONObject(cart.length()-1).getJSONObject("bottles");
 #                    String beerName = cart.getJSONObject(cart.length()-1).getString("name");
-        cart = im.data["order"]["cart"]
-        bottles = cart[-1]["bottles"]
-        beerName = cart[-1]["name"]
+            cart = im.data["order"]["cart"]
+            bottles = cart[-1]["bottles"]
+            beerName = cart[-1]["name"]
 #                    for(String s:BOTTLE_TYPES) {
-        for s in ElDrinkoActionInflator.BOTTLE_TYPES:
-#                        float volume = 0.0f;
-#                        try {
-#                            volume = MiscUtils.ParseFloat(s);
-#                        } catch (MiscUtils.ParseFloatException e) {
-#                            _Log.error(e);
-#                        }
-#                        totalVolume += volume*bottles.optInt(s);
-            volume = 0.0
-            try:
-                volume = parse_ukrainian_float(s)
-            finally:
-                pass
-            totalVolume += volume*bottles.get(s, 0)
+            for s in ElDrinkoActionInflator.BOTTLE_TYPES:
+                #                        float volume = 0.0f;
+                #                        try {
+                #                            volume = MiscUtils.ParseFloat(s);
+                #                        } catch (MiscUtils.ParseFloatException e) {
+                #                            _Log.error(e);
+                #                        }
+                #                        totalVolume += volume*bottles.optInt(s);
+                volume = 0.0
+                try:
+                    volume = parse_ukrainian_float(s)
+                finally:
+                    pass
+                totalVolume += volume*bottles.get(s, 0)
 #                    }
 #                    int i = IterableUtils.indexOf(tsv.getColumn("name"),new Predicate<String>(){
 #                        @Override
@@ -328,56 +331,60 @@ class ElDrinkoActionInflator:
 #                            return n.equals(beerName);
 #                        }
 #                    });
-        i = next(i_ for i_, name in enumerate(
-            list(tsv["name"])) if name == beerName)
+            i = next(i_ for i_, name in enumerate(
+                list(tsv["name"])) if name == beerName)
 #                    float totalPrice = 0.0f;
-        totalPrice = 0.0
+            totalPrice = 0.0
 #                    try {
 #                        totalPrice = totalVolume*MiscUtils.ParseFloat(tsv.getColumn("price (UAH/L)").get(i));
 #                    } catch (MiscUtils.ParseFloatException e) {
 #                        _Log.error(e);
 #                    }
-        try:
-            totalPrice = totalVolume * \
-                parse_ukrainian_float(list(tsv["price (UAH/L)"])[i])
+            try:
+                totalPrice = totalVolume * \
+                    parse_ukrainian_float(list(tsv["price (UAH/L)"])[i])
 #                    map.put("totalVolume",totalVolume);
 #                    map.put("totalPrice",totalPrice);
-        finally:
-            pass
-        map_["totalVolume"] = totalVolume
-        map_["totalPrice"] = totalPrice
+            finally:
+                pass
+            map_["totalVolume"] = totalVolume
+            map_["totalPrice"] = totalPrice
 #                    _Log.info(SecureString.format("map: %s",map));
 #                }
 #
 #                im.right.put("username",im.userData.getUserName());
 #                im.right.put("firstName",im.userData.getFirstName());
 #                im.right.put("lastName",im.userData.getLastName());
-    im.data["username"] = im.user_data.username
-    im.data["firstName"] = im.user_data.first_name
-    im.data["lastName"] = im.user_data.last_name
+        im.data["username"] = im.user_data.username
+        im.data["firstName"] = im.user_data.first_name
+        im.data["lastName"] = im.user_data.last_name
 #                _Log.info(SecureString.format("before _InflateOutputMessage(%s,%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.beerlist.toJsonString(),im.right));
 #                OutputMessage om = _InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo,im.beerlist);
-    om = self._inflate_output_message(
-        o["correspondence"], map_, oo, im.beerlist)
+        om = self._inflate_output_message(
+            o["correspondence"], map_, oo, im.beerlist)
 #                _Log.info(SecureString.format("om: %s",om));
 #                return new ImmutablePair<OutputMessage,JSONObject>(om,im.right);
+        return (om, im.data)
 
     def __call__(self, obj):
         return lambda eim: self._call(obj, eim)
 #    private static OutputMessage _InflateOutputMessage(String code, Map<String,Object> env, Object obj, Tsv tsv) {
+
     def _inflate_output_message(self, code, env, obj, tsv):
-#        Object m = _TRANSITIONS.getJSONObject("transitions").get(code);
-#        _Log.info(SecureString.format("m: %s",m));
-#        return _InflateOutputMessageFromJson(m,env,obj,tsv);
+        #        Object m = _TRANSITIONS.getJSONObject("transitions").get(code);
+        #        _Log.info(SecureString.format("m: %s",m));
+        #        return _InflateOutputMessageFromJson(m,env,obj,tsv);
+        self._logger.info(code)
         m = self._transitions["transitions"][code]
-        return self._inflate_output_message(m, env, obj, tsv)
+        return self._inflate_output_message_from_json(m, env, obj, tsv)
 #    }
 #    private static TelegramKeyboard _InflateTelegramKeyboard(Map<String,Object> env,String msgTemplateResName, String keysTemplateResName,Tsv tsv,int columns) {
+
     def _inflate_telegram_keyboard(self, env, msgTemplateResName, keysTemplateResName, tsv, columns):
-#        String keyboardKeys = MiscUtils.ProcessTemplate(keysTemplateResName,env,tsv);
-#        String keyboardMsg = MiscUtils.ProcessTemplate(msgTemplateResName,env,tsv);
+        #        String keyboardKeys = MiscUtils.ProcessTemplate(keysTemplateResName,env,tsv);
+        #        String keyboardMsg = MiscUtils.ProcessTemplate(msgTemplateResName,env,tsv);
         keyboardKeys = process_template(
-            self._jinja_env, keysTemplateResName, env, tsv.split("\n"))
+            self._jinja_env, keysTemplateResName, env, tsv).strip().split("\n")
         keyboardMsg = process_template(
             self._jinja_env, msgTemplateResName, env, tsv)
 #        _Log.info(SecureString.format("keyboardMsg: %s",keyboardMsg));
@@ -393,39 +400,39 @@ class ElDrinkoActionInflator:
 #        _Log.info(m);
 #        if(m instanceof JSONArray) {
         if isinstance(m, list):
-#            List<OutputMessage> msgs = new ArrayList<>();
-#            _Log.info(SecureString.format(" %s ",m));
-#            for(int i = 0; i < ((JSONArray)m).length();i++) {
-#                msgs.add(_InflateOutputMessageFromJson(((JSONArray)m).get(i),env,obj,tsv));
-#            }
+            #            List<OutputMessage> msgs = new ArrayList<>();
+            #            _Log.info(SecureString.format(" %s ",m));
+            #            for(int i = 0; i < ((JSONArray)m).length();i++) {
+            #                msgs.add(_InflateOutputMessageFromJson(((JSONArray)m).get(i),env,obj,tsv));
+            #            }
             msgs = [self._inflate_output_message_from_json(
                 mm, env, obj, tsv) for mm in m]
 #            return new OutputArrayMessage(msgs.toArray(OutputMessage[]::new));
-            return msgs
+            return TelegramArrayOutputMessage(messages=msgs)
 #        } else {
         else:
-#            JSONObject msg = (JSONObject)m;
+            #            JSONObject msg = (JSONObject)m;
             msg = m
 #            String tag = msg.getString("tag");
             tag = msg["tag"]
 #            if(tag.equals("TelegramTextOutputMessage")) {
             if tag == "TelegramTextOutputMessage":
-#                return new TelegramTextOutputMessage(MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv));
+                #                return new TelegramTextOutputMessage(MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv));
                 return TelegramTextOutputMessage(process_template(self._jinja_env, msg["message"], env, tsv))
 #            } else if(tag.equals("TelegramKeyboard")) {
             elif tag == "TelegramKeyboard":
-#                return _InflateTelegramKeyboard(
-#                        env, msg.getString("message"), msg.getString("keyboard"),tsv,msg.optInt("columns",2));
+                #                return _InflateTelegramKeyboard(
+                #                        env, msg.getString("message"), msg.getString("keyboard"),tsv,msg.optInt("columns",2));
                 return self._inflate_telegram_keyboard(env, msg["message"], msg["keyboard"], tsv, msg.get("columns", 2))
 #            } else if(tag.equals("TelegramImageOutputMessage")) {
             elif tag == "TelegramImageOutputMessage":
-#                return new TelegramImageOutputMessage(
-#                        MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv)
-#                        , (URL)obj);
+                #                return new TelegramImageOutputMessage(
+                #                        MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv)
+                #                        , (URL)obj);
                 return TelegramImageOutputMessage(message=process_template(self._jinja_env, msg["message"], env, tsv), url=obj)
 #            } else {
             else:
-#                return null;
+                #                return null;
                 return None
 #            }
 #        }
@@ -454,10 +461,10 @@ class ElDrinkoActionInflator:
         cart = order["cart"]
 #        for(int i = 0; i < cart.length(); i++) {
         for i, obj in enumerate(cart):
-#            JSONObject obj = cart.getJSONObject(i);
-#            if(!obj.has("amount")) {
-#                continue;
-#            }
+            #            JSONObject obj = cart.getJSONObject(i);
+            #            if(!obj.has("amount")) {
+            #                continue;
+            #            }
             if "amount" not in obj:
                 continue
 #            float beerPrice = Float.parseFloat(products.stream()
@@ -470,12 +477,12 @@ class ElDrinkoActionInflator:
             sum_ += beerPrice * obj["amount"]
 #        }
 #        orderMap.put("sum",sum);
-        orderMap["sum"]= sum_
+        orderMap["sum"] = sum_
 #        orderMap.put("delivery_fee",sum>=250 ? (double)0.0 : (double)20.0);
-        orderMap["delivery_fee"]= (0.0 if sum_ >= 250 else 20.0)
+        orderMap["delivery_fee"] = (0.0 if sum_ >= 250 else 20.0)
 #        _Log.info(orderMap.toString());
 #        context.put("order",orderMap);
-        context["order"]= orderMap
+        context["order"] = orderMap
 #        _Log.info(SecureString.format("context: %s",context));
 #        return context;
 #    }

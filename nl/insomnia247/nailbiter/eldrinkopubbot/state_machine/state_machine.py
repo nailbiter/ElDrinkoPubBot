@@ -30,9 +30,6 @@ class StateMachine:
         self._transitions = {}
         self._logger = logging.getLogger(self.__class__.__name__)
 
-    def inflateTransitionsFromJSON(self, conditionInflator, actionInflator, s):
-        pass
-
     def addTransition(self, from_, to, transition_condition, transition_action):
         self._states.add(from_)
         self._states.add(to)
@@ -47,16 +44,24 @@ class StateMachine:
         self._onSetStateCallback(state)
 
     def _onSetStateCallback(self, state):
-        self._logger.info(f"state: {state}")
+        self._logger.info(f"set state: {state}")
 
     def __call__(self, input_message):
         for state in self._states:
+            self._logger.info(f"{self._current_state} => {state}")
             if (self._current_state, state) not in self._transitions:
+                self._logger.info("no transitions")
                 continue
-            for transition_condition, transition_action in self._transitions[(self._current_state, state)]:
-                if transition_condition(im):
+            for i, (transition_condition, transition_action) in enumerate(self._transitions[(self._current_state, state)]):
+                self._logger.info(f"checking condition {transition_condition}")
+                if transition_condition(input_message):
+                    self._logger.info("take")
                     self._setState(state)
-                    return transition_action(input_message)
+                    res = transition_action(input_message)
+                    self._logger.info(f"res: {res}")
+                    return res
+                else:
+                    self._logger.info("pass")
         self._didNotFoundSuitableTransition(input_message)
         return None
 
@@ -67,7 +72,7 @@ class StateMachine:
     def __str__(self):
         return "\n".join([f"{s} => {e}"for s, e in self._transitions])
 
-    def toJsonString(self,predicatePrinter=lambda _:None, transitionPrinter=lambda _:None):
+    def toJsonString(self, predicatePrinter=lambda _: None, transitionPrinter=lambda _: None):
         return json.dumps({
             "currentState": self._current_state,
             "states": {s: 1 for s in self._states},
@@ -77,14 +82,16 @@ class StateMachine:
                 in self._transitions.items()
             },
         })
-    def inflateTransitionsFromJSON(self,conditionInflator, actionInflator, s):
-        for ss,es,c,a in json.loads(s):
+
+    def inflateTransitionsFromJSON(self, conditionInflator, actionInflator, s):
+        for ss, es, c, a in json.loads(s):
             condition = conditionInflator(c)
             action = actionInflator(a)
             if ss is not None and es is not None:
-                self.addTransition(ss,es,condition,action)
+                self.addTransition(ss, es, condition, action)
             elif ss is None and es is not None:
                 for s in self._states:
-                    self.addTransition(s,es,condition,action)
+                    self.addTransition(s, es, condition, action)
             else:
                 raise NotImplementedError(f"{ss,es}")
+        self._logger.info(self._states)

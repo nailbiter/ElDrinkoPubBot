@@ -24,9 +24,10 @@ from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_in
 class WidgetPredicate:
     def __init__(self,type_):
         self._type = type_
-    def __call__(self,im):
+    def __call__(self,eim):
         if not instanceof(im,TelegramKeyboardAnswer):
             return False
+        im = eim.input_message
         i = int(im.message);
 #        _Log.info(SecureString.format("i: %d",i));
 #        int numProducts = ElDrinkoActionInflator.BOTTLE_TYPES.length;
@@ -51,4 +52,4 @@ class WidgetPredicate:
 #        _Log.error(SecureString.format("_type: %s",_type));
 #        return false;
         return False
-    }
+#    }
