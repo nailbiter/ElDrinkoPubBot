@@ -22,3 +22,6 @@ from collections import namedtuple
 
 TelegramTextInputMessage = namedtuple("TelegramTextInputMessage","message")
 TelegramKeyboardAnswer = namedtuple("TelegramKeyboardAnswer", "message")
+TelegramKeyboard = namedtuple("TelegramKeyboard","message keyboard columns")
+TelegramTextOutputMessage = namedtuple("TelegramTextOutputMessage","message")
+TelegramImageOutputMessage = namedtuple("TelegramImageOutputMessage","message url")
