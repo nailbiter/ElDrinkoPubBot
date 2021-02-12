@@ -96,7 +96,7 @@ def add_beeritem():
                            r={
                                **{k: "text" for k in r if k not in ["category", "units"]},
                                "category": [r["name"] for r in mongo_client.beerbot.proto_categories.find()],
-                               "unit": ["литры","штуки","пачки"]
+                               "unit": ["литры","штуки","пачки"] #FIXME: take from db: `units`
                            },
                            action="added_beeritem"
                            )
