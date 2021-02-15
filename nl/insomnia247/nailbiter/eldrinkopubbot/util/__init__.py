@@ -19,12 +19,15 @@ ORGANIZATION:
 ==============================================================================="""
 
 import re
-def parse_ukrainian_float(s):
-    m = re.match(r"(-?\d+)(,\d+)?",s)
-    assert m is not None
-    return float(s.replace(",","."))
+import logging
 
-#FIXME: eliminate this
+
+def parse_ukrainian_float(s):
+    m = re.match(r"(-?\d+)(,\d+)?", s)
+    assert m is not None
+    return float(s.replace(",", "."))
+
+# FIXME: eliminate this
 #    public static String ProcessTemplate(String templateName, Map<String, Object> additionalContext, Tsv tsv) {
 #        TemplateEngine _jinjava = new TemplateEngine();
 #        Map<String,Object> context = new HashMap<>();
@@ -41,16 +44,45 @@ def parse_ukrainian_float(s):
 #        String template = MiscUtils.GetResource(templateName);
 #        _Log.info(SecureString.format("template: %s",template));
 #        String renderedTemplate = MiscUtils.GetResource(templateName);
-#        renderedTemplate = _jinjava.render(template, context);	
+#        renderedTemplate = _jinjava.render(template, context);
 #        _Log.info(SecureString.format("renderedTemplate: %s",renderedTemplate));
 #        return renderedTemplate;
 #    }
-def process_template(jinja_env,template_name,additional_context, tsv):
-    context = {}
-    context["products"] = [list(r.values())for r in tsv.to_dict(orient="records")]
+
+
+def add_logger(f):
+    logger = logging.getLogger(f.__name__)
+
+    def _f(*args, **kwargs):
+        return f(*args, logger=logger, **kwargs)
+    _f.__name__ = f.__name__
+    return _f
+
+
+@add_logger
+def _myprintf_int(x, logger=None):
+    logger.debug(f"x: {x}")
+    res = f"{int(x):02d}"
+    logger.debug(f"res: {res}")
+    return res
+
+
+@add_logger
+def _myprintf(x, logger=None):
+    logger.debug(f"x: {x}")
+    res = f"{float(x):.2f}".replace(".", ",")
+    logger.debug(f"res: {res}")
+    return res
+
+
+def process_template(jinja_env, template_name, additional_context, tsv):
+    context = {
+        "products": [list(r.values())for r in tsv.to_dict(orient="records")],
+        "beerlist_df": tsv,
+    }
     if additional_context is not None:
-        for k,v in additional_context.items():
+        for k, v in additional_context.items():
             context[k] = v
-    jinja_env.filters["myprintf_int"] = lambda x:f"{int(x):02d}"
-    jinja_env.filters["myprintf"] = lambda x:f"{float(x):.2d}".replace(".",",")
+    jinja_env.filters["myprintf_int"] = _myprintf_int
+    jinja_env.filters["myprintf"] = _myprintf
     return jinja_env.get_template(f"{template_name}.txt").render(context)

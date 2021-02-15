@@ -21,17 +21,37 @@ ORGANIZATION:
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_inflator import ElDrinkoActionInflator
 
-class WidgetPredicate:
-    def __init__(self,type_):
+
+class MessageKeyboardComparisonPredicate:
+    def __init__(self, value=None, button_title=None):
+        # return lambda x: isinstance(x.input_message, TelegramKeyboardAnswer) and (o.get("value", None) is None or x.input_message.message == o.get("value", None))
+        self._value = value
+        self._button_title = button_title
+
+    def __call__(self, eim):
+        im = eim.input_message
+        if not isinstance(im, TelegramKeyboardAnswer):
+            return False
+        if self._value is not None and im.message != self._value:
+            return False
+        if self._button_title is not None and im.button_title != self._button_title:
+            return False
+        return True
+
+
+class WidgetPredicate(MessageKeyboardComparisonPredicate):
+    def __init__(self, type_):
+        super().__init__()
         self._type = type_
-    def __call__(self,eim):
-        if not instanceof(im,TelegramKeyboardAnswer):
+
+    def __call__(self, eim):
+        if not super()(eim):
             return False
         im = eim.input_message
-        i = int(im.message);
+        i = int(im.message)
 #        _Log.info(SecureString.format("i: %d",i));
 #        int numProducts = ElDrinkoActionInflator.BOTTLE_TYPES.length;
-        numProducts = len(ElDrinkoPubBot.BOTTLE_TYPES)
+        numProducts = len(ElDrinkoActionInflator.BOTTLE_TYPES)
 #        _Log.info(SecureString.format("numProducts: %d",numProducts));
 #        _Log.info(SecureString.format("type: %s",_type));
 #
@@ -43,11 +63,11 @@ class WidgetPredicate:
 #            return (i==4*numProducts) || ((i%4!=1) && (i%4!=2));
 #        }
         if self._type == "finishButton":
-            return i==4*numProducts
-        elif self._type=="validButton":
-            return i<4*numProducts and ((i%4==1) or (i%4==2))
-        elif self._type=="invalidButton":
-            return i==4*numProducts or (i%4!=1 and i%4!=2)
+            return i == 4*numProducts
+        elif self._type == "validButton":
+            return i < 4*numProducts and ((i % 4 == 1) or (i % 4 == 2))
+        elif self._type == "invalidButton":
+            return i != 4*numProducts and i % 4 != 1 and i % 4 != 2
 #
 #        _Log.error(SecureString.format("_type: %s",_type));
 #        return false;

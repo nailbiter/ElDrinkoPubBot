@@ -33,4 +33,4 @@ class PersistentStorage:
 
     def set(self, key, val):
         self._coll.update_one({self._field_name: self._field_value}, {
-                              key: val}, upsert=True)
+                              "$set": {key: val}}, upsert=True)

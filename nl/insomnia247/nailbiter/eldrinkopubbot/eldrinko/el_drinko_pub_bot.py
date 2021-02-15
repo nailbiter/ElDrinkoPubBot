@@ -44,8 +44,8 @@ class ElDrinkoPubBot:
         mongo_client = MongoClient(mongo_url)
         self._mongo_client = mongo_client
 
-        #FIXME: actually, preloading is not necessary => remove `PreloadImages` method and `DownloadCache` class
-        #ElDrinkoStateMachine.PreloadImages(self._get_collection("beerlist"))
+        # FIXME: actually, preloading is not necessary => remove `PreloadImages` method and `DownloadCache` class
+        # ElDrinkoStateMachine.PreloadImages(self._get_collection("beerlist"))
         self._edsm = ElDrinkoStateMachine(self)
         _actionInflator = ElDrinkoActionInflator(
             self.send_message,
@@ -54,8 +54,7 @@ class ElDrinkoPubBot:
             template_folder=template_folder
         )
         _conditionInflator = ElDrinkoConditionInflator()
-        with open(f"{template_folder}/transitions.json") as f:
-            transitions = json.load(f)
+        transitions = _actionInflator.transitions
         self._edsm.inflateTransitionsFromJSON(
             _conditionInflator, _actionInflator, json.dumps(transitions["correspondence"]))
 
@@ -88,11 +87,13 @@ class ElDrinkoPubBot:
             keyboard = em.reply_markup.inline_keyboard
             self._logger.info(f"keyboard: {keyboard}")
             self._logger.info(f"callback_query: {update.callback_query}")
+            button_title = list(itertools.chain(*keyboard)
+                                )[int(update.callback_query.data)].text
             self._send_message(update.effective_message.chat_id, {
-#                               "text": update.callback_query.data,
-                               "text": list(itertools.chain(*keyboard))[int(update.callback_query.data)].text,
+                #                               "text": update.callback_query.data,
+                               "text": button_title,
                                })
-            return TelegramKeyboardAnswer(update.callback_query.data)
+            return TelegramKeyboardAnswer(message=update.callback_query.data, button_title=button_title)
         else:
             return None
 
@@ -107,10 +108,14 @@ class ElDrinkoPubBot:
             state = doc["state"] if doc is not None else "_"
             self._logger.info(f"state: {state}")
             self._edsm.setState(state)
+            obj = self._get_collection("data").find_one({"id": str(chat_id)})
+            if obj is None:
+                data = {}
+            else:
+                data = obj["data"]
             eim = ElDrinkoInputMessage(
                 input_message=im,
-                data=self._get_collection(
-                    "data").find_one({"id": str(chat_id)}),
+                data=data,
                 user_data=chat_id,
                 beerlist=pd.DataFrame(self._get_collection("beerlist").find())
             )
@@ -121,40 +126,42 @@ class ElDrinkoPubBot:
             self._updateUserData(data, str(chat_id))
 #            statesColl.updateOne(Filters.eq("id",ud.toString()),Updates.set("state",_edsm.getState()),new UpdateOptions().upsert(true));
             states_coll.update_one({"id": str(chat_id)}, {
-                                   "$set": {"state": self._edsm.getState()}})
+                                   "$set": {"state": self._edsm.getState()}}, upsert=True)
 #            _execute(om.left,ud);
             self._execute(om, chat_id)
 
-#        keyboard = [
-#            [InlineKeyboardButton("3", callback_data=str("three")),
-#             InlineKeyboardButton("4", callback_data=str("four"))]
-#        ]
-#        if update.message is not None:
-#            self._send_message(update.effective_message.chat_id, {
-#                               "text": "text", "reply_markup": InlineKeyboardMarkup(keyboard)})
     def _execute(self, om, user_data):
         self._logger.info(om)
         if isinstance(om, TelegramArrayOutputMessage):
             for om_ in om.messages:
-                self._execute(om_,user_data)
+                self._execute(om_, user_data)
         elif isinstance(om, TelegramTextOutputMessage):
-            self._send_message(user_data.chat_id, {"text":om.message})
+            self._send_message(user_data.chat_id, {
+                               "text": om.message, "parse_mode": "Markdown"})
         elif isinstance(om, TelegramKeyboard):
             self._send_message(
-                user_data.chat_id, 
+                user_data.chat_id,
                 {
-                    "text":om.message, 
-                    "reply_markup":InlineKeyboardMarkup([
-                        [InlineKeyboardButton(om.keyboard[i+j], callback_data=str(i+j)) for j in range(om.columns)] 
-                        for i 
-                        in range(0,len(om.keyboard),om.columns)
+                    "text": om.message,
+                    "parse_mode": "Markdown",
+                    "reply_markup": InlineKeyboardMarkup([
+                        [
+                            InlineKeyboardButton(
+                                om.keyboard[i+j], callback_data=str(i+j))
+                            for j in
+                            range(om.columns)
+                            if i+j < len(om.keyboard)
+                        ]
+                        for i
+                        in range(0, len(om.keyboard), om.columns)
                     ])
                 }
             )
-        elif isinstance(om,TelegramImageOutputMessage):
-            self._bot.send_photo(chat_id=str(user_data), photo=om.url,caption=om.message)
+        elif isinstance(om, TelegramImageOutputMessage):
+            self._bot.send_photo(chat_id=str(user_data),
+                                 photo=om.url, caption=om.message)
         else:
-            raise NotImplementedError(str((om,user_data)))
+            raise NotImplementedError(str((om, user_data)))
 
 #    void _updateUserData(JSONObject userData, String id) {
 #        String data_db_name = _config.getJSONObject("mongodb").getString("data");
@@ -168,7 +175,7 @@ class ElDrinkoPubBot:
 #    }
     def _updateUserData(self, data, id_):
         self._get_collection("data").update_one(
-            {"id": id_}, {"$set": {"data": data}})
+            {"id": id_}, {"$set": {"data": data}}, upsert=True)
 
     def _send_message(self, chat_id, msg):
         sent_msg = self._bot.sendMessage(chat_id=chat_id, **msg)

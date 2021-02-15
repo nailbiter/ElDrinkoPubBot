@@ -19,7 +19,7 @@ ORGANIZATION:
 ==============================================================================="""
 import re
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition import WidgetPredicate
+from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition import WidgetPredicate, MessageKeyboardComparisonPredicate
 import functools
 import jsonpath_ng
 import logging
@@ -52,7 +52,7 @@ class ElDrinkoConditionInflator:
         elif o["tag"] == "MessageComparisonPredicate":
             return lambda x: x.input_message.message == o["value"]
         elif o["tag"] == "MessageKeyboardComparisonPredicate":
-            return lambda x: isinstance(x.input_message, TelegramKeyboardAnswer) and (o.get("value", None) is None or x.input_message.message == o.get("value", None))
+            return MessageKeyboardComparisonPredicate(**{k:v for k,v in o.items() if k!="tag"})
         elif o["tag"] == "ConjunctionPredicate":
             return lambda x: functools.reduce(lambda x_, y_: x_ and y_, [self(o_)(x) for o_ in o["value"]], True)
         elif o["tag"] == "JsonCheckFieldPredicate":

@@ -89,8 +89,14 @@ class ElDrinkoActionInflator:
         self._date_time_formatter = _DateTimeFormatter()
         self._transitions = None
         self._logger = logging.getLogger(self.__class__.__name__)
+        self._transitions = {}
         with open(f"{template_folder}/transitions.json") as f:
-            self._transitions = json.load(f)
+            self._transitions["transitions"] = json.load(f)
+        with open(f"{template_folder}/correspondence.json") as f:
+            self._transitions["correspondence"] = json.load(f)
+    @property
+    def transitions(self):
+        return self._transitions
 
     def _call(self, o, im):
         """return (outmessage, user_data_update)"""
@@ -102,7 +108,7 @@ class ElDrinkoActionInflator:
         if o["correspondence"] in ["9c851972cb7438c5", "07defdb4543782cb"]:
             #                    _Log.info(SecureString.format("%s",o));
             #                    if ((((JSONObject)o).optString("src_state")).equals("choose_product_to_make_order")) {
-            if o["src_state"] == "choose_product_to_make_order":
+            if o.get("src_state",None) == "choose_product_to_make_order":
                 #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                 #                        int i = Integer.parseInt(tka.getMsg());
                 #                        Tsv tsv = im.beerlist;
@@ -124,8 +130,8 @@ class ElDrinkoActionInflator:
                 if order is None:
                     order = {"cart": []}
                 obj = {}
-                name = list(beerlist["name"])[i]
-                obj = {**obj, "name": name, "bottles": [], "amount": 0}
+                name = list(tsv["name"])[i]
+                obj = {**obj, "name": name, "bottles": {}, "amount": 0}
                 order["cart"].append(obj)
                 im.data["order"] = order
 #                    } else if( ((JSONObject)o).optString("type").equals("validButton") ) {
@@ -142,13 +148,13 @@ class ElDrinkoActionInflator:
                 _i = int(im.input_message.message)
 #                        _Log.info(SecureString.format("_i: %d",_i));
 #                        int idx = _i/4;
-                idx = _i/4
+                idx = int(_i/4)
 #                        _Log.info(SecureString.format("idx: %d",idx));
 #                        boolean shouldAdd = _i%4==1;
                 shouldAdd = _i % 4 == 1
 #                        _Log.info(SecureString.format("shouldAdd: %s",shouldAdd));
 #                        String bottleType = BOTTLE_TYPES[idx];
-                bottleType = BOTTLE_TYPES[idx]
+                bottleType = ElDrinkoActionInflator.BOTTLE_TYPES[idx]
 #
 #                        if( !bottles.has(bottleType) ) {
 #                            bottles.put(bottleType,0);
@@ -163,7 +169,7 @@ class ElDrinkoActionInflator:
 #                        float amount = 0.0f;
                 amount = 0.0
 #                        for(String s: BOTTLE_TYPES) {
-                for s in BOTTLE_TYPES:
+                for s in ElDrinkoActionInflator.BOTTLE_TYPES:
                     #                            try {
                     #                                amount += MiscUtils.ParseFloat(s) * bottles.optInt(s,0);
                     try:
@@ -179,8 +185,8 @@ class ElDrinkoActionInflator:
 #                    }
 #                } else if( ((JSONObject)o).getString("correspondence").equals("5e11c9696e9b38f0") ) {
         elif o["correspondence"] == "5e11c9696e9b38f0":
-            if o["src_state"] == "delete":
                 #                    if(((JSONObject)o).optString("src_state").equals("delete")) {
+            if o.get("src_state",None) == "delete":
                 #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                 #                        int i = Integer.parseInt(tka.getMsg());
                 tka = im.input_message
@@ -195,7 +201,7 @@ class ElDrinkoActionInflator:
                 cart = [x for i_, x in enumerate(cart) if i_ != i]
 #                    }
 #                } else if( (((JSONObject)o).getString("correspondence").equals("72e97b89bcab08c4") && ((JSONObject)o).getString("src_state").equals("choose_address")) ||  ((JSONObject)o).getString("correspondence").equals("774ed3e0f5ef17cf")) {
-        elif (o["correspondence"] == "72e97b89bcab08c4" and o["src_state"] == "choose_payment") or o["correspondence"] == "774ed3e0f5ef17cf":
+        elif (o["correspondence"] == "72e97b89bcab08c4" and o.get("src_state",None) == "choose_address") or o["correspondence"] == "774ed3e0f5ef17cf":
             #                    im.right.put("address",im.left.getMsg());
             im.data["address"] = im.input_message.message
 #                } else if( ((JSONObject)o).getString("correspondence").equals("8e0edde4a3199d0c") ) {
@@ -206,10 +212,10 @@ class ElDrinkoActionInflator:
         elif o["correspondence"] == "fa702a44b70ddcae":
             #                    if(((JSONObject)o).optString("src_state").equals("edit_address")) {
             #                        im.right.put("address",im.left.getMsg());
-            if o["src_state"] == "edit_address":
+            if o.get("src_state",None) == "edit_address":
                 im.data["address"] = im.input_message.message
 #                    } else if(((JSONObject)o).optString("src_state").equals("choose_payment")) {
-            elif o["src_state"] == "choose_payment":
+            elif o.get("src_state",None) == "choose_payment":
                 #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                 #                        int i = Integer.parseInt(tka.getMsg());
                 #                        String paymentMethods
@@ -222,7 +228,7 @@ class ElDrinkoActionInflator:
                 im.data["payment"] = paymentMethods[i]
 #                    } else if(((JSONObject)o).optString("src_state").equals("edit_phone_number")) {
 #                        im.right.put("phone_number",im.left.getMsg());
-            elif o["src_state"] == "edit_phone_number":
+            elif o.get("src_state",None) == "edit_phone_number":
                 im.data["phone_number"] = im.input_message.message
 #                    }
 #                } else if( ((JSONObject)o).getString("correspondence").equals("48c6907046b03db8") ) {
@@ -294,6 +300,12 @@ class ElDrinkoActionInflator:
             map_["i"] = int(tka.message)
             oo = imgUrl
 #                } else if((((JSONObject)o).getString("correspondence")).equals("9c851972cb7438c5") || (((JSONObject)o).getString("correspondence")).equals("07defdb4543782cb") ) {
+        elif o["correspondence"]=="02503b04d94259c5":
+            r = im.beerlist.query(f"name=='{im.input_message.button_title}'").to_dict(orient="records")[0]
+            oo = r["image link"]
+            map_["description"] = r["description"]
+        elif o["correspondence"]=="18ca55e51d11ba24":
+            map_["category"] = im.input_message.button_title
         elif o["correspondence"] == "9c851972cb7438c5" or o["correspondence"] == "07defdb4543782cb":
             #                    Map<String,Object> beerVolumes = new HashMap<>();
             #                    Tsv tsv = im.beerlist;
@@ -306,9 +318,16 @@ class ElDrinkoActionInflator:
 #                    JSONArray cart = im.right.getJSONObject("order").getJSONArray("cart");
 #                    JSONObject bottles = cart.getJSONObject(cart.length()-1).getJSONObject("bottles");
 #                    String beerName = cart.getJSONObject(cart.length()-1).getString("name");
-            cart = im.data["order"]["cart"]
-            bottles = cart[-1]["bottles"]
-            beerName = cart[-1]["name"]
+            data = im.data
+            self._logger.info(f"data: {data}")
+            order = data["order"]
+            self._logger.info(f"order: {order}")
+            cart = order["cart"]
+            self._logger.info(f"cart: {cart}")
+            last_item_in_cart = cart[-1]
+            bottles = last_item_in_cart["bottles"]
+            self._logger.info(f"bottles: {bottles}")
+            beerName = last_item_in_cart["name"]
 #                    for(String s:BOTTLE_TYPES) {
             for s in ElDrinkoActionInflator.BOTTLE_TYPES:
                 #                        float volume = 0.0f;
@@ -342,7 +361,7 @@ class ElDrinkoActionInflator:
 #                    }
             try:
                 totalPrice = totalVolume * \
-                    parse_ukrainian_float(list(tsv["price (UAH/L)"])[i])
+                    (list(tsv["price (UAH/L)"])[i])
 #                    map.put("totalVolume",totalVolume);
 #                    map.put("totalPrice",totalPrice);
             finally:
@@ -385,6 +404,9 @@ class ElDrinkoActionInflator:
         #        String keyboardMsg = MiscUtils.ProcessTemplate(msgTemplateResName,env,tsv);
         keyboardKeys = process_template(
             self._jinja_env, keysTemplateResName, env, tsv).strip().split("\n")
+        self._logger.debug(f"keyboardKeys: {keyboardKeys}")
+        keyboardKeys = [l for l in keyboardKeys if len(l.strip())>0]
+        self._logger.debug(f"keyboardKeys: {keyboardKeys}")
         keyboardMsg = process_template(
             self._jinja_env, msgTemplateResName, env, tsv)
 #        _Log.info(SecureString.format("keyboardMsg: %s",keyboardMsg));

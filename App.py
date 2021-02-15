@@ -28,6 +28,7 @@ from os import path
 import atexit
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_pub_bot import ElDrinkoPubBot
 import logging
+from datetime import datetime
 
 
 class _AtExitHook:
@@ -41,14 +42,14 @@ class _AtExitHook:
 
 @click.command()
 @click.option("--mongo-url", envvar="MONGO_URL")
-@click.option("--template-folder", type=click.Path(), default="src/main/resources")
+@click.option("--template-folder", type=click.Path(),envvar="TEMPLATE_FOLDER")
 @click.option("--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot")
 @click.option("--debug/--no-debug", default=True)
 def App(mongo_url, environment, debug, template_folder):
     pidfile = f".tmp/{environment}.txt"
     if debug:
         logging.basicConfig(level=logging.INFO,
-                            filename=f".log/{environment}.log.txt",
+                            filename=f".log/{environment}_{datetime.now().strftime('%Y%m%d%H%M%S')}.log.txt",
                             format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
                             datefmt='%Y-%m-%d:%H:%M:%S',
                             )

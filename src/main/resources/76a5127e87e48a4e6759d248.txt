@@ -1,3 +1,6 @@
-{%for p in products-%}
-{{p[1]}} - {{p[3]|myprintf_int}}грн.
+{%for r in beerlist_df.to_dict(orient="records")-%}
+{%-if r["category"]=="Напої"-%}
+{{r.name}} - {{r['price (UAH/L)']|myprintf_int}}грн.
+{%-endif%}
 {%endfor-%}
+list other snacks

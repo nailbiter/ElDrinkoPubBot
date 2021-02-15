@@ -1,0 +1,430 @@
+[
+  [
+    null,
+    "start",
+    {
+      "tag": "MessageComparisonPredicate",
+      "value": "/start"
+    },
+    {
+      "correspondence": "75f676187e00dd85",
+      "src_state": "null"
+    }
+  ],
+  [
+    "_",
+    "start",
+    {
+      "tag": "TrivialPredicate"
+    },
+    {
+      "correspondence": "75f676187e00dd85"
+    }
+  ],
+  [
+    "start",
+    "choose_product_to_see_description",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "1"
+    },
+    {
+      "correspondence": "950c3e4921e05d14"
+    }
+  ],
+  [
+    "choose_product_to_see_description",
+    "choose_category_to_see_description",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "button_title": "list other snacks"
+    },
+    {
+      "correspondence": "2aa9198cbca5cb21"
+    }
+  ],
+  [
+    "choose_category_to_see_description",
+    "choose_snack_to_see_description",
+    {
+      "tag": "MessageKeyboardComparisonPredicate"
+    },
+    {
+      "correspondence": "18ca55e51d11ba24"
+    }
+  ],
+  [
+    "choose_snack_to_see_description",
+    "start",
+    {
+      "tag": "MessageKeyboardComparisonPredicate"
+    },
+    {
+      "correspondence": "02503b04d94259c5"
+    }
+  ],
+  [
+    "choose_product_to_see_description",
+    "start",
+    {
+      "tag": "MessageKeyboardComparisonPredicate"
+    },
+    {
+      "correspondence": "72aa7197071b6503"
+    }
+  ],
+  [
+    "start",
+    "choose_product_to_make_order",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "0"
+    },
+    {
+      "correspondence": "f4a78dc2c6339be1"
+    }
+  ],
+  [
+    "choose_product_to_make_order",
+    "choose_amount",
+    {
+      "tag": "MessageKeyboardComparisonPredicate"
+    },
+    {
+      "correspondence": "9c851972cb7438c5",
+      "src_state": "choose_product_to_make_order"
+    }
+  ],
+  [
+    "choose_amount",
+    "choose_amount",
+    {
+      "tag": "WidgetPredicate",
+      "value": "validButton"
+    },
+    {
+      "correspondence": "9c851972cb7438c5",
+      "src_state": "choose_amount",
+      "type": "validButton"
+    }
+  ],
+  [
+    "choose_amount",
+    "choose_amount",
+    {
+      "tag": "WidgetPredicate",
+      "value": "invalidButton"
+    },
+    {
+      "correspondence": "07defdb4543782cb",
+      "src_state": "choose_amount",
+      "type": "invalidButton"
+    }
+  ],
+  [
+    "choose_amount",
+    "confirm",
+    {
+      "tag": "WidgetPredicate",
+      "value": "finishButton"
+    },
+    {
+      "correspondence": "5e11c9696e9b38f0"
+    }
+  ],
+  [
+    "confirm",
+    "choose_product_to_make_order",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "0"
+    },
+    {
+      "correspondence": "f4a78dc2c6339be1"
+    }
+  ],
+  [
+    "confirm",
+    "delete",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "1"
+    },
+    {
+      "correspondence": "04dc388df66f8e8c"
+    }
+  ],
+  [
+    "delete",
+    "confirm",
+    {
+      "tag": "MessageKeyboardComparisonPredicate"
+    },
+    {
+      "correspondence": "5e11c9696e9b38f0",
+      "src_state": "delete"
+    }
+  ],
+  [
+    "confirm",
+    "choose_phone_number",
+    {
+      "tag": "ConjunctionPredicate",
+      "value": [
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "2"
+        },
+        {
+          "tag": "JsonCheckFieldPredicate",
+          "value": {
+            "path": "$.address"
+          }
+        },
+        {
+          "tag": "NegationPredicate",
+          "value": {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.phone_number"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "correspondence": "02b6ac70d65c067e"
+    }
+  ],
+  [
+    "confirm",
+    "choose_address",
+    {
+      "tag": "ConjunctionPredicate",
+      "value": [
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "2"
+        },
+        {
+          "tag": "NegationPredicate",
+          "value": {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.address"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "correspondence": "0f13e63d9cd69630"
+    }
+  ],
+  [
+    "confirm",
+    "choose_payment",
+    {
+      "tag": "ConjunctionPredicate",
+      "value": [
+        {
+          "tag": "MessageKeyboardComparisonPredicate",
+          "value": "2"
+        },
+        {
+          "tag": "JsonCheckFieldPredicate",
+          "value": {
+            "path": "$.address"
+          }
+        },
+        {
+          "tag": "JsonCheckFieldPredicate",
+          "value": {
+            "path": "$.phone_number"
+          }
+        }
+      ]
+    },
+    {
+      "correspondence": "1df8ef4b2a4751f1"
+    }
+  ],
+  [
+    "choose_address",
+    "choose_phone_number",
+    {
+      "tag": "ConjunctionPredicate",
+      "value": [
+        {
+          "tag": "IsTextMessagePredicate"
+        },
+        {
+          "tag": "NegationPredicate",
+          "value": {
+            "tag": "JsonCheckFieldPredicate",
+            "value": {
+              "path": "$.phone_number"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "correspondence": "72e97b89bcab08c4",
+      "src_state": "choose_address"
+    }
+  ],
+  [
+    "choose_address",
+    "choose_payment",
+    {
+      "tag": "ConjunctionPredicate",
+      "value": [
+        {
+          "tag": "IsTextMessagePredicate"
+        },
+        {
+          "tag": "JsonCheckFieldPredicate",
+          "value": {
+            "path": "$.phone_number"
+          }
+        }
+      ]
+    },
+    {
+      "correspondence": "774ed3e0f5ef17cf"
+    }
+  ],
+  [
+    "choose_phone_number",
+    "choose_payment",
+    {
+      "tag": "IsPhoneNumberPredicate"
+    },
+    {
+      "correspondence": "8e0edde4a3199d0c"
+    }
+  ],
+  [
+    "choose_phone_number",
+    "choose_phone_number",
+    {
+      "tag": "TrivialPredicate"
+    },
+    {
+      "correspondence": "dd7404e376113591"
+    }
+  ],
+  [
+    "choose_payment",
+    "send",
+    {
+      "tag": "MessageKeyboardComparisonPredicate"
+    },
+    {
+      "correspondence": "fa702a44b70ddcae",
+      "src_state": "choose_payment"
+    }
+  ],
+  [
+    "send",
+    "edit_address",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "2"
+    },
+    {
+      "correspondence": "177680903e499486"
+    }
+  ],
+  [
+    "edit_address",
+    "send",
+    {
+      "tag": "IsTextMessagePredicate"
+    },
+    {
+      "correspondence": "fa702a44b70ddcae",
+      "src_state": "edit_address"
+    }
+  ],
+  [
+    "send",
+    "edit_phone_number",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "3"
+    },
+    {
+      "correspondence": "72e97b89bcab08c4",
+      "src_state": "send"
+    }
+  ],
+  [
+    "edit_phone_number",
+    "send",
+    {
+      "tag": "IsPhoneNumberPredicate"
+    },
+    {
+      "correspondence": "fa702a44b70ddcae",
+      "src_state": "edit_phone_number"
+    }
+  ],
+  [
+    "edit_phone_number",
+    "edit_phone_number",
+    {
+      "tag": "NegationPredicate",
+      "value": {
+        "tag": "IsPhoneNumberPredicate"
+      }
+    },
+    {
+      "correspondence": "dd7404e376113591"
+    }
+  ],
+  [
+    "send",
+    "choose_payment",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "1"
+    },
+    {
+      "correspondence": "8e0edde4a3199d0c"
+    }
+  ],
+  [
+    "send",
+    "idle",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "0"
+    },
+    {
+      "correspondence": "48c6907046b03db8"
+    }
+  ],
+  [
+    "idle",
+    "start",
+    {
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "0"
+    },
+    {
+      "correspondence": "19ed501387d9bc4d"
+    }
+  ],
+  [
+    "choose_amount",
+    "choose_amount",
+    {
+      "tag": "TrivialPredicate"
+    },
+    {
+      "correspondence": "d72f0c922c788133"
+    }
+  ]
+]
