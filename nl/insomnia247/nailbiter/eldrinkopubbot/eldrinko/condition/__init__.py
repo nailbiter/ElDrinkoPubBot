@@ -20,22 +20,24 @@ ORGANIZATION:
 
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_inflator import ElDrinkoActionInflator
+import re
+import logging
 
 
 class MessageKeyboardComparisonPredicate:
-    def __init__(self, value=None, button_title=None):
-        # return lambda x: isinstance(x.input_message, TelegramKeyboardAnswer) and (o.get("value", None) is None or x.input_message.message == o.get("value", None))
-        self._value = value
-        self._button_title = button_title
+    def __init__(self, value=None):
+        self._value = value if value is None else int(value)
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     def __call__(self, eim):
         im = eim.input_message
         if not isinstance(im, TelegramKeyboardAnswer):
             return False
-        if self._value is not None and im.message != self._value:
-            return False
-        if self._button_title is not None and im.button_title != self._button_title:
-            return False
+        if self._value is not None and re.match(r"\d+", im.message) is not None:
+            self._logger.info(f"message: {im.message}")
+            self._logger.info(f"len: {len(im.keyboard)}")
+            self._logger.info(self._value)
+            return (int(im.message)-self._value) % len(im.keyboard) == 0
         return True
 
 

@@ -27,3 +27,4 @@ __pycache__
 src/main/resources/eldrinkopubbot.tsv
 .envrc.secret
 download_cache.db
+Digraph.gv*

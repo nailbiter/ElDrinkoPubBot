@@ -181,5 +181,10 @@
     "keyboard": "a203791aec81dfaf5a187b3d",
     "message": "eb34fa7ee27d1192ef20f960",
     "tag": "TelegramKeyboard"
+  },
+  "12f00bba97cabd0d": {
+    "tag": "TelegramKeyboard",
+    "keyboard": "0072c52da29f8e52aecc21c4",
+    "message": "e1497231ededf21368def1f5"
   }
 }

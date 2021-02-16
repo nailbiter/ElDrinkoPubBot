@@ -86,14 +86,14 @@ class ElDrinkoPubBot:
             self._logger.info(f"em: {em}")
             keyboard = em.reply_markup.inline_keyboard
             self._logger.info(f"keyboard: {keyboard}")
+            keyboard = list(itertools.chain(*keyboard))
             self._logger.info(f"callback_query: {update.callback_query}")
-            button_title = list(itertools.chain(*keyboard)
-                                )[int(update.callback_query.data)].text
+            button_title = keyboard[int(update.callback_query.data)].text
             self._send_message(update.effective_message.chat_id, {
-                #                               "text": update.callback_query.data,
                                "text": button_title,
                                })
-            return TelegramKeyboardAnswer(message=update.callback_query.data, button_title=button_title)
+            return TelegramKeyboardAnswer(message=update.callback_query.data, button_title=button_title,
+                                          keyboard=keyboard)
         else:
             return None
 

@@ -304,7 +304,7 @@ class ElDrinkoActionInflator:
             r = im.beerlist.query(f"name=='{im.input_message.button_title}'").to_dict(orient="records")[0]
             oo = r["image link"]
             map_["description"] = r["description"]
-        elif o["correspondence"]=="18ca55e51d11ba24":
+        elif o["correspondence"] in ["18ca55e51d11ba24","12f00bba97cabd0d"]:
             map_["category"] = im.input_message.button_title
         elif o["correspondence"] == "9c851972cb7438c5" or o["correspondence"] == "07defdb4543782cb":
             #                    Map<String,Object> beerVolumes = new HashMap<>();

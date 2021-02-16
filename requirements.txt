@@ -7,6 +7,7 @@ cryptography==3.3.1
 decorator==4.4.2
 dnspython==2.0.0
 Flask==1.1.2
+graphviz==0.16
 idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.11.2
@@ -28,7 +29,6 @@ requests-oauthlib==1.1.0
 six==1.15.0
 tornado==6.1
 tqdm==4.56.0
-trello @ file:///Users/nailbiter/for/forpython/trello
 tzlocal==2.1
 urllib3==1.25.11
 Werkzeug==1.0.1

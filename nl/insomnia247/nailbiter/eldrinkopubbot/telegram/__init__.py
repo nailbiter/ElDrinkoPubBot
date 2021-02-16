@@ -22,7 +22,7 @@ from collections import namedtuple
 
 #input message types
 TelegramTextInputMessage = namedtuple("TelegramTextInputMessage","message")
-TelegramKeyboardAnswer = namedtuple("TelegramKeyboardAnswer", "message button_title")
+TelegramKeyboardAnswer = namedtuple("TelegramKeyboardAnswer", "message button_title keyboard")
 #output message types
 TelegramArrayOutputMessage = namedtuple("TelegramArrayOutputMessage","messages")
 TelegramKeyboard = namedtuple("TelegramKeyboard","message keyboard columns")

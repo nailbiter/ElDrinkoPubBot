@@ -64,8 +64,6 @@ def App(mongo_url, environment, debug, template_folder):
         for kk
         in ["_settings", "_keyring"]
     ]
-#    click.echo(json.dumps(settings,indent=2))
-#    click.echo(json.dumps(keyring,indent=2))
     atexit.register(_AtExitHook(pidfile))
     click.echo("here")
 

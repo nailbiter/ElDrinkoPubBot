@@ -23,24 +23,31 @@ import click
 import json
 import random
 import os
+from os import path
+from graphviz import Digraph
+import json
+
+_ANYSTATE = "da0b607fc3f252df"
 
 def _get_random_string(k=16):
-    return "".join(random.choices(population=list("01234567890abcdef"),k=k))
+    return "".join(random.choices(population=list("01234567890abcdef"), k=k))
+
 
 @click.group()
-@click.option("--template-folder", type=click.Path(),envvar="TEMPLATE_FOLDER")
+@click.option("--template-folder", type=click.Path(), envvar="TEMPLATE_FOLDER")
 @click.pass_context
-def edit_transitions(ctx,**kwargs):
+def edit_transitions(ctx, **kwargs):
     ctx.ensure_object(dict)
-    for k,v in kwargs.items():
+    for k, v in kwargs.items():
         ctx.obj[k] = v
 
+
 @edit_transitions.command()
-@click.option("-m","--message-type",type=click.Choice(["TelegramKeyboard"]))
-@click.option("--create-files/--no-create-files",default=True)
-@click.option("--create-new-transition/--no-create-new-transition",default=True)
+@click.option("-m", "--message-type", type=click.Choice(["TelegramKeyboard"]))
+@click.option("--create-files/--no-create-files", default=True)
+@click.option("--create-new-transition/--no-create-new-transition", default=True)
 @click.pass_context
-def add_transition(ctx,message_type,create_files,create_new_transition):
+def add_transition(ctx, message_type, create_files, create_new_transition):
     transitions_fn = f"{ctx.obj['template_folder']}/transitions.json"
     with open(transitions_fn) as f:
         transitions = json.load(f)
@@ -48,22 +55,47 @@ def add_transition(ctx,message_type,create_files,create_new_transition):
         last_key = _get_random_string()
     else:
         last_key = list(transitions.keys())[-1]
-    if message_type=="TelegramKeyboard":
+    if message_type == "TelegramKeyboard":
         keyboard = _get_random_string(24)
         message = _get_random_string(24)
         transitions[last_key] = {
-            "tag":"TelegramKeyboard",
-            "keyboard":keyboard,
-            "message":message
+            "tag": "TelegramKeyboard",
+            "keyboard": keyboard,
+            "message": message
         }
-        with open(transitions_fn,"w") as f:
-            json.dump(transitions,f,indent=2)
+        with open(transitions_fn, "w") as f:
+            json.dump(transitions, f, indent=2)
         if create_files:
-            for k in [keyboard,message]:
+            for k in [keyboard, message]:
                 fn = f"{ctx.obj['template_folder']}/{k}.txt"
                 os.system(f"touch {fn} && git add {fn}")
     else:
         raise NotImplementedError(message_type)
 
-if __name__=="__main__":
+
+@edit_transitions.command()
+@click.option("--gv-filename", type=click.Path(), default=".tmp/state_machine.gv")
+@click.option("--pic-filename", type=click.Path())
+@click.pass_context
+def print_gv(ctx, gv_filename, pic_filename):
+#    if pic_filename is None:
+#        base,ext = path.splitext(gv_filename)
+#        pic_filename = f"{base}.png"
+    data = {}
+    for k in "transitions correspondence".split(" "):
+        fn = path.join(ctx.obj["template_folder"],f"{k}.json")
+        with open(fn) as f:
+            data[k] = json.load(f)
+
+    #click.echo(data["correspondence"])
+    dot = Digraph()
+#    dot.node("A")
+#    dot.node("B")
+    dot.edges([(ss if ss is not None else _ANYSTATE,es) for ss,es,_,corr in data["correspondence"]])
+    dot.node(_ANYSTATE,label="ANY STATE")
+    dot.view()
+        
+
+
+if __name__ == "__main__":
     edit_transitions()
