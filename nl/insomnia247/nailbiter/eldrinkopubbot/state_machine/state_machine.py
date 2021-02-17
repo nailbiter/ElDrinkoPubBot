@@ -86,7 +86,7 @@ class StateMachine:
         self._logger.info(self._states)
         for ss, es, c, a in transitions:
             condition = conditionInflator(c)
-            action = actionInflator(a)
+            action = actionInflator(a, start_state=ss,end_state=ss)
             if ss is not None and es is not None:
                 self.addTransition(ss, es, condition, action)
             elif ss is None and es is not None:

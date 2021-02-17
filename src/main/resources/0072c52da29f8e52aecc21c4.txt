@@ -1,7 +1,9 @@
-{%for t in BOTTLES-%}
-{{t}}л пляшка 
+{%- for r in beerlist_df.to_dict(orient='records') %}
+{%-if r.category==data.order.cart[-1].category%}
+{{r.name}}
 +1
 -1
-{{(order.cart|last)["bottles"][t]|default(0)}}шт
-{%endfor-%}
-Замовити {{totalVolume|myprintf}}л {{totalPrice|myprintf}} грн.
+{{data.order.cart[-1].goods.get(r.name,0)}}шт
+{%-endif%}
+{%-endfor%}
+Замовити 

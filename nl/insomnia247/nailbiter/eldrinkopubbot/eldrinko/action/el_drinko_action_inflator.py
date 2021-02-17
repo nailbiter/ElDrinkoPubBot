@@ -98,7 +98,7 @@ class ElDrinkoActionInflator:
     def transitions(self):
         return self._transitions
 
-    def _call(self, o, im):
+    def _call(self, o, im, start_state, end_state):
         """return (outmessage, user_data_update)"""
 #        return new Function<ElDrinkoInputMessage, ImmutablePair<OutputMessage,JSONObject>>() {
 #            @Override
@@ -268,9 +268,9 @@ class ElDrinkoActionInflator:
                     "3804e512b18b339fe8786dbd.txt").render({**map_}),
                 str(im.userData)
             )
-            im.data["order"] = ""  # FIXME: this should be done prettier
+            im.data["order"] = {}  # FIXME: this should be done prettier
         elif o["correspondence"] == "75f676187e00dd85" and o.get("src_state", None) is None:
-            im.data["order"] = ""
+            im.data["order"] = {}
 #                } else if( ((JSONObject)o).getString("correspondence").equals("75f676187e00dd85") && ((JSONObject)o).optString("src_state").equals("null") ) {
 #                    im.right.put("order","");
 #                }
@@ -304,8 +304,15 @@ class ElDrinkoActionInflator:
             r = im.beerlist.query(f"name=='{im.input_message.button_title}'").to_dict(orient="records")[0]
             oo = r["image link"]
             map_["description"] = r["description"]
-        elif o["correspondence"] in ["18ca55e51d11ba24","12f00bba97cabd0d"]:
+        elif o["correspondence"] =="18ca55e51d11ba24":
             map_["category"] = im.input_message.button_title
+        elif o["correspondence"]=="12f00bba97cabd0d":
+            #TODO
+            #map_["category"] = im.input_message.button_title
+            order = im.data.get("order",{})
+            cart = order.get("cart",[])
+            cart.append({"category":im.input_message.button_title, "goods":{}})
+            im.data["order"] = {**order, "cart":cart}
         elif o["correspondence"] == "9c851972cb7438c5" or o["correspondence"] == "07defdb4543782cb":
             #                    Map<String,Object> beerVolumes = new HashMap<>();
             #                    Tsv tsv = im.beerlist;
@@ -380,13 +387,13 @@ class ElDrinkoActionInflator:
 #                _Log.info(SecureString.format("before _InflateOutputMessage(%s,%s,%s,%s),%s",((JSONObject)o).getString("correspondence"),map,oo,im.beerlist.toJsonString(),im.right));
 #                OutputMessage om = _InflateOutputMessage(((JSONObject)o).getString("correspondence"),map,oo,im.beerlist);
         om = self._inflate_output_message(
-            o["correspondence"], map_, oo, im.beerlist)
+            o["correspondence"], {**map_, "data": im.data}, oo, im.beerlist)
 #                _Log.info(SecureString.format("om: %s",om));
 #                return new ImmutablePair<OutputMessage,JSONObject>(om,im.right);
         return (om, im.data)
 
-    def __call__(self, obj):
-        return lambda eim: self._call(obj, eim)
+    def __call__(self, obj, start_state, end_state):
+        return lambda eim: self._call(obj, eim, start_state, end_state)
 #    private static OutputMessage _InflateOutputMessage(String code, Map<String,Object> env, Object obj, Tsv tsv) {
 
     def _inflate_output_message(self, code, env, obj, tsv):
