@@ -17,6 +17,7 @@ import com.mongodb.MongoClient;
 import java.util.function.Consumer;
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 
 
 /**
@@ -26,9 +27,6 @@ public class Tsv implements Jsonable{
     protected Map<String,List<String>> _content = new HashMap<>();
     protected List<String> _headers = new ArrayList<>();
     protected Tsv() {}
-    public Tsv(URL url) {
-        _parseContent(MiscUtils.GetResource("eldrinkopubbot",".tsv")); //FIXME
-    }
     public Tsv(MongoCollection<Document> collection) {
         String[] _HEADERS = new String[]{"name","description","price (UAH/L)","image link"};
         for(String s:_HEADERS) {
@@ -45,7 +43,7 @@ public class Tsv implements Jsonable{
                    }
 			   }
 		};
-        collection.find().forEach(printConsumer);
+        collection.find(Filters.eq("category","Напої")).forEach(printConsumer);
     }
     private void _parseContent(String content) {
         String[] lines = content.split("\n+");
