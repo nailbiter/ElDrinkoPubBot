@@ -117,6 +117,19 @@
     }
   ],
   [
+    "choose_snack_amount",
+    "choose_snack_amount",
+    {
+      "tag": "WidgetPredicate",
+      "value": "validButton"
+    },
+    {
+      "correspondence": "9c851972cb7438c5",
+      "src_state": "choose_amount",
+      "type": "validButton"
+    }
+  ],
+  [
     "choose_amount",
     "choose_amount",
     {

@@ -29,6 +29,7 @@ import json
 
 _ANYSTATE = "da0b607fc3f252df"
 
+
 def _get_random_string(k=16):
     return "".join(random.choices(population=list("01234567890abcdef"), k=k))
 
@@ -73,28 +74,41 @@ def add_transition(ctx, message_type, create_files, create_new_transition):
         raise NotImplementedError(message_type)
 
 
+_EDGE_STYLES = {
+    "ConjunctionPredicate": {"style":"dotted"},
+    "IsPhoneNumberPredicate": {"style":"dashed"},
+    "IsTextMessagePredicate": {"style":"bold"},
+    "MessageComparisonPredicate": {"arrowhead":"ediamond"},
+    "MessageKeyboardComparisonPredicate": {"arrowhead":"diamond"},
+    "NegationPredicate": {"arrowhead":"obox"},
+    "WidgetPredicate": {"arrowhead":"box"},
+    "TrivialPredicate": {},
+}
+
+
 @edit_transitions.command()
 @click.option("--gv-filename", type=click.Path(), default=".tmp/state_machine.gv")
 @click.option("--pic-filename", type=click.Path())
 @click.pass_context
 def print_gv(ctx, gv_filename, pic_filename):
-#    if pic_filename is None:
-#        base,ext = path.splitext(gv_filename)
-#        pic_filename = f"{base}.png"
+    #    if pic_filename is None:
+    #        base,ext = path.splitext(gv_filename)
+    #        pic_filename = f"{base}.png"
     data = {}
     for k in "transitions correspondence".split(" "):
-        fn = path.join(ctx.obj["template_folder"],f"{k}.json")
+        fn = path.join(ctx.obj["template_folder"], f"{k}.json")
         with open(fn) as f:
             data[k] = json.load(f)
 
-    #click.echo(data["correspondence"])
+    # click.echo(data["correspondence"])
     dot = Digraph()
-#    dot.node("A")
-#    dot.node("B")
-    dot.edges([(ss if ss is not None else _ANYSTATE,es) for ss,es,_,corr in data["correspondence"]])
-    dot.node(_ANYSTATE,label="ANY STATE")
+    for ss, es, cond, corr in data["correspondence"]:
+        if ss is None:
+            ss = _ANYSTATE
+        dot.edge(ss, es, **_EDGE_STYLES[cond["tag"]])
+    click.echo(_EDGE_STYLES)
+    dot.node(_ANYSTATE, label="ANY STATE")
     dot.view()
-        
 
 
 if __name__ == "__main__":
