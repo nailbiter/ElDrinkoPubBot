@@ -53,7 +53,13 @@ class WidgetPredicate(MessageKeyboardComparisonPredicate):
         i = int(im.message)
 #        _Log.info(SecureString.format("i: %d",i));
 #        int numProducts = ElDrinkoActionInflator.BOTTLE_TYPES.length;
-        numProducts = len(ElDrinkoActionInflator.BOTTLE_TYPES)
+        if "name" in eim.data["order"]["cart"][-1]:
+            numProducts = len(ElDrinkoActionInflator.BOTTLE_TYPES)
+        elif "category" in eim.data["order"]["cart"][-1]:
+            category = eim.data["order"]["cart"][-1]["category"]
+            numProducts = len(eim.beerlist_df.query(f"category==\"{category}\""))
+        else:
+            raise NotImplementedError
 #        _Log.info(SecureString.format("numProducts: %d",numProducts));
 #        _Log.info(SecureString.format("type: %s",_type));
 #
@@ -74,4 +80,3 @@ class WidgetPredicate(MessageKeyboardComparisonPredicate):
 #        _Log.error(SecureString.format("_type: %s",_type));
 #        return false;
         return False
-#    }

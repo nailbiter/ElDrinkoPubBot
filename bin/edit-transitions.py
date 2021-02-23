@@ -105,8 +105,11 @@ def print_gv(ctx, gv_filename, pic_filename):
     for ss, es, cond, corr in data["correspondence"]:
         if ss is None:
             ss = _ANYSTATE
-        dot.edge(ss, es, **_EDGE_STYLES[cond["tag"]])
-    click.echo(_EDGE_STYLES)
+        label = corr["correspondence"][:6]
+#        if "value" in cond:
+#            label = f"{label},{corr['value']}"
+        dot.edge(ss, es, label=label,**_EDGE_STYLES[cond["tag"]])
+    click.echo(json.dumps(_EDGE_STYLES,indent=2))
     dot.node(_ANYSTATE, label="ANY STATE")
     dot.view()
 
