@@ -44,7 +44,7 @@ def edit_transitions(ctx, **kwargs):
 
 
 @edit_transitions.command()
-@click.option("-m", "--message-type", type=click.Choice(["TelegramKeyboard"]))
+@click.option("-m", "--message-type", type=click.Choice(["TelegramKeyboard", "TelegramArrayOutputMessage", "TelegramTextOutputMessage"]))
 @click.option("--create-files/--no-create-files", default=True)
 @click.option("--create-new-transition/--no-create-new-transition", default=True)
 @click.pass_context
@@ -56,32 +56,45 @@ def add_transition(ctx, message_type, create_files, create_new_transition):
         last_key = _get_random_string()
     else:
         last_key = list(transitions.keys())[-1]
+
+    files_to_create = []
     if message_type == "TelegramKeyboard":
         keyboard = _get_random_string(24)
         message = _get_random_string(24)
         transitions[last_key] = {
-            "tag": "TelegramKeyboard",
+            "tag": message_type,
             "keyboard": keyboard,
             "message": message
         }
-        with open(transitions_fn, "w") as f:
-            json.dump(transitions, f, indent=2)
-        if create_files:
-            for k in [keyboard, message]:
-                fn = f"{ctx.obj['template_folder']}/{k}.txt"
-                os.system(f"touch {fn} && git add {fn}")
+        files_to_create = [keyboard, message]
+    elif message_type=="TelegramTextOutputMessage":
+        message = _get_random_string(24)
+        transitions[last_key] = {
+            "tag": message_type,
+            "message": message
+        }
+        files_to_create = [message]
+    elif message_type == "TelegramArrayOutputMessage":
+        transitions[last_key] = []
     else:
         raise NotImplementedError(message_type)
 
+    if create_files:
+        for k in files_to_create:
+            fn = f"{ctx.obj['template_folder']}/{k}.txt"
+            os.system(f"touch {fn} && git add {fn}")
+    with open(transitions_fn, "w") as f:
+        json.dump(transitions, f, indent=2)
+
 
 _EDGE_STYLES = {
-    "ConjunctionPredicate": {"style":"dotted"},
-    "IsPhoneNumberPredicate": {"style":"dashed"},
-    "IsTextMessagePredicate": {"style":"bold"},
-    "MessageComparisonPredicate": {"arrowhead":"ediamond"},
-    "MessageKeyboardComparisonPredicate": {"arrowhead":"diamond"},
-    "NegationPredicate": {"arrowhead":"obox"},
-    "WidgetPredicate": {"arrowhead":"box"},
+    "ConjunctionPredicate": {"style": "dotted"},
+    "IsPhoneNumberPredicate": {"style": "dashed"},
+    "IsTextMessagePredicate": {"style": "bold"},
+    "MessageComparisonPredicate": {"arrowhead": "ediamond"},
+    "MessageKeyboardComparisonPredicate": {"arrowhead": "diamond"},
+    "NegationPredicate": {"arrowhead": "obox"},
+    "WidgetPredicate": {"arrowhead": "box"},
     "TrivialPredicate": {},
 }
 
@@ -108,8 +121,8 @@ def print_gv(ctx, gv_filename, pic_filename):
         label = corr["correspondence"][:6]
 #        if "value" in cond:
 #            label = f"{label},{corr['value']}"
-        dot.edge(ss, es, label=label,**_EDGE_STYLES[cond["tag"]])
-    click.echo(json.dumps(_EDGE_STYLES,indent=2))
+        dot.edge(ss, es, label=label, **_EDGE_STYLES[cond["tag"]])
+    click.echo(json.dumps(_EDGE_STYLES, indent=2))
     dot.node(_ANYSTATE, label="ANY STATE")
     dot.view()
 

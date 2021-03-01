@@ -124,9 +124,20 @@
       "value": "validButton"
     },
     {
-      "correspondence": "9c851972cb7438c5",
-      "src_state": "choose_amount",
+      "correspondence": "12f00bba97cabd0d",
       "type": "validButton"
+    }
+  ],
+  [
+    "choose_snack_amount",
+    "choose_snack_amount",
+    {
+      "tag": "WidgetPredicate",
+      "value": "invalidButton"
+    },
+    {
+      "correspondence": "fd015f0790fa137a",
+      "type": "invalidButton"
     }
   ],
   [
@@ -153,6 +164,17 @@
       "correspondence": "07defdb4543782cb",
       "src_state": "choose_amount",
       "type": "invalidButton"
+    }
+  ],
+  [
+    "choose_snack_amount",
+    "confirm",
+    {
+      "tag": "WidgetPredicate",
+      "value": "finishButton"
+    },
+    {
+      "correspondence": "5e11c9696e9b38f0"
     }
   ],
   [

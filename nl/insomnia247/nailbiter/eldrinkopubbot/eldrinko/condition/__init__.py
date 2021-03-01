@@ -47,7 +47,7 @@ class WidgetPredicate(MessageKeyboardComparisonPredicate):
         self._type = type_
 
     def __call__(self, eim):
-        if not super()(eim):
+        if not super().__call__(eim):
             return False
         im = eim.input_message
         i = int(im.message)
@@ -57,7 +57,7 @@ class WidgetPredicate(MessageKeyboardComparisonPredicate):
             numProducts = len(ElDrinkoActionInflator.BOTTLE_TYPES)
         elif "category" in eim.data["order"]["cart"][-1]:
             category = eim.data["order"]["cart"][-1]["category"]
-            numProducts = len(eim.beerlist_df.query(f"category==\"{category}\""))
+            numProducts = len(eim.beerlist.query(f"category==\"{category}\""))
         else:
             raise NotImplementedError
 #        _Log.info(SecureString.format("numProducts: %d",numProducts));

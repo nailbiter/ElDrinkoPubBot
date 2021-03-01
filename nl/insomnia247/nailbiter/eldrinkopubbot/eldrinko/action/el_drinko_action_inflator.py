@@ -26,6 +26,7 @@ import json
 from datetime import datetime
 import pytz
 import logging
+import math
 
 #    private static JSONObject _GetOrder(JSONObject obj) {
 #        JSONObject order = obj.optJSONObject("order");
@@ -98,7 +99,7 @@ class ElDrinkoActionInflator:
     def transitions(self):
         return self._transitions
 
-    def _call(self, o, im, start_state, end_state):
+    def _call(self, o, im, src_state, dst_state):
         """return (outmessage, user_data_update)"""
 #        return new Function<ElDrinkoInputMessage, ImmutablePair<OutputMessage,JSONObject>>() {
 #            @Override
@@ -309,10 +310,27 @@ class ElDrinkoActionInflator:
         elif o["correspondence"]=="12f00bba97cabd0d":
             #TODO
             #map_["category"] = im.input_message.button_title
-            order = im.data.get("order",{})
-            cart = order.get("cart",[])
-            cart.append({"category":im.input_message.button_title, "goods":{}})
-            im.data["order"] = {**order, "cart":cart}
+            if src_state=="choose_snack_amount":
+                order = im.data["order"]
+                cart = order.get("cart",[])
+                if o["type"]=="validButton":
+                    button_idx = int(im.input_message.message)
+                    last_order = cart[-1]
+                    self._logger.info(last_order)
+                    self._logger.info(im.beerlist)
+                    goods_df = im.beerlist.query(f"category==\"{last_order['category']}\"")
+                    self._logger.info(goods_df)
+                    self._logger.info(button_idx)
+                    inc = 1 if button_idx%4==1 else -1
+                    goods_r = goods_df.to_dict(orient="records")[math.floor(button_idx/4)]
+                    last_order["goods"][goods_r["name"]] = last_order["goods"].get(goods_r["name"],0) + inc
+                    last_order["goods"][goods_r["name"]] = max(last_order["goods"][goods_r["name"]],0)
+                im.data["order"] = {**order, "cart":cart}
+            else:
+                order = im.data.get("order",{})
+                cart = order.get("cart",[])
+                cart.append({"category":im.input_message.button_title, "goods":{}})
+                im.data["order"] = {**order, "cart":cart}
         elif o["correspondence"] == "9c851972cb7438c5" or o["correspondence"] == "07defdb4543782cb":
             #                    Map<String,Object> beerVolumes = new HashMap<>();
             #                    Tsv tsv = im.beerlist;
@@ -392,8 +410,8 @@ class ElDrinkoActionInflator:
 #                return new ImmutablePair<OutputMessage,JSONObject>(om,im.right);
         return (om, im.data)
 
-    def __call__(self, obj, start_state, end_state):
-        return lambda eim: self._call(obj, eim, start_state, end_state)
+    def __call__(self, obj, src_state, dst_state):
+        return lambda eim: self._call(obj, eim, src_state, dst_state)
 #    private static OutputMessage _InflateOutputMessage(String code, Map<String,Object> env, Object obj, Tsv tsv) {
 
     def _inflate_output_message(self, code, env, obj, tsv):
@@ -434,8 +452,11 @@ class ElDrinkoActionInflator:
             #            for(int i = 0; i < ((JSONArray)m).length();i++) {
             #                msgs.add(_InflateOutputMessageFromJson(((JSONArray)m).get(i),env,obj,tsv));
             #            }
-            msgs = [self._inflate_output_message_from_json(
-                mm, env, obj, tsv) for mm in m]
+            msgs = []
+            for mm in m:
+                if str(mm) in self._transitions["transitions"]:
+                    mm = self._transitions["transitions"][str(mm)]
+                msgs.append(self._inflate_output_message_from_json(mm, env, obj, tsv))    
 #            return new OutputArrayMessage(msgs.toArray(OutputMessage[]::new));
             return TelegramArrayOutputMessage(messages=msgs)
 #        } else {

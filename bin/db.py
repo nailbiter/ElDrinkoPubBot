@@ -50,7 +50,7 @@ def db(ctx, mongo_url):
 @db.command()
 @click.option("-c", "--chat-id", default="me", type=click.Choice(list(_USERS)))
 @click.pass_context
-def reset(ctx, chat_id):
+def rm(ctx, chat_id):
     client = ctx.obj["client"]
     for o, cn in itertools.product(ctx.obj["settings"].values(), ["data", "state_machine_states"]):
         client.beerbot[o["mongodb"][cn]].delete_one({"id": _USERS[chat_id]})
@@ -60,9 +60,9 @@ def reset(ctx, chat_id):
 @click.argument("src", type=click.Choice(["dev", "prd", "stg"]))
 @click.argument("dst", type=click.Choice(["dev", "prd", "stg"]))
 @click.option("-w", "--what", type=click.Choice(["beerlist"]), default="beerlist")
-@click.option("--dry-run/--no-dry-run",default=False)
+@click.option("--dry-run/--no-dry-run", default=False)
 @click.pass_context
-def mv(ctx, src, dst, what,dry_run):
+def mv(ctx, src, dst, what, dry_run):
     assert dst != "prd"
     src, dst = [ctx.obj["settings"][k]["mongodb"][what] for k in [src, dst]]
     click.echo(f"{src} => {dst}")

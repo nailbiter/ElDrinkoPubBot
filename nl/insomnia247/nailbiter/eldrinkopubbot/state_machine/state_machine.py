@@ -19,7 +19,7 @@ ORGANIZATION:
 ==============================================================================="""
 
 import logging
-from collections import namedtuple, OrderedDict 
+from collections import namedtuple, OrderedDict
 import json
 
 
@@ -33,8 +33,9 @@ class StateMachine:
     def addTransition(self, from_, to, transition_condition, transition_action):
         self._states.add(from_)
         self._states.add(to)
-        self._logger.info((from_,to,transition_condition))
-        self._transitions.append((from_,to,transition_condition,transition_action))
+        self._logger.info((from_, to, transition_condition))
+        self._transitions.append(
+            (from_, to, transition_condition, transition_action))
 
     def _setState(self, state):
         assert state in self._states, f"{state} not in {self._states}"
@@ -45,8 +46,8 @@ class StateMachine:
         self._logger.info(f"set state: {state}")
 
     def __call__(self, input_message):
-        for k,state,transition_condition,transition_action in self._transitions:
-            if k!=self._current_state:
+        for k, state, transition_condition, transition_action in self._transitions:
+            if k != self._current_state:
                 self._logger.info(f"{k}!={self._current_state}")
                 continue
             self._logger.info(f"checking condition {transition_condition}")
@@ -81,12 +82,12 @@ class StateMachine:
 
     def inflateTransitionsFromJSON(self, conditionInflator, actionInflator, s):
         transitions = json.loads(s)
-        for ss,es, *_ in transitions:
-            self._states.update([x for x in [ss,es] if x is not None])
+        for ss, es, *_ in transitions:
+            self._states.update([x for x in [ss, es] if x is not None])
         self._logger.info(self._states)
         for ss, es, c, a in transitions:
             condition = conditionInflator(c)
-            action = actionInflator(a, start_state=ss,end_state=ss)
+            action = actionInflator(a, src_state=ss, dst_state=ss)
             if ss is not None and es is not None:
                 self.addTransition(ss, es, condition, action)
             elif ss is None and es is not None:
@@ -94,4 +95,5 @@ class StateMachine:
                     self.addTransition(s, es, condition, action)
             else:
                 raise NotImplementedError(f"{ss,es}")
-        self._logger.info([(ss,es,str(c)) for ss,es,c,a in self._transitions])
+        self._logger.info([(ss, es, str(c))
+                           for ss, es, c, a in self._transitions])

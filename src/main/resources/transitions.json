@@ -26,10 +26,7 @@
     "tag": "TelegramKeyboard"
   },
   "07defdb4543782cb": [
-    {
-      "message": "b0a3c9bdf91ea92bb36a3624",
-      "tag": "TelegramTextOutputMessage"
-    },
+    "01f5005d45547c7f",
     {
       "columns": 4,
       "keyboard": "2c3381744a60241c14250678",
@@ -40,6 +37,12 @@
   "0f13e63d9cd69630": {
     "message": "054edccc65c193f7583a5773",
     "tag": "TelegramTextOutputMessage"
+  },
+  "12f00bba97cabd0d": {
+    "columns": 4,
+    "keyboard": "0072c52da29f8e52aecc21c4",
+    "message": "e1497231ededf21368def1f5",
+    "tag": "TelegramKeyboard"
   },
   "177680903e499486": {
     "message": "5d0c256b4a776245fee81385",
@@ -182,10 +185,12 @@
     "message": "eb34fa7ee27d1192ef20f960",
     "tag": "TelegramKeyboard"
   },
-  "12f00bba97cabd0d": {
-    "tag": "TelegramKeyboard",
-    "keyboard": "0072c52da29f8e52aecc21c4",
-    "message": "e1497231ededf21368def1f5",
-    "columns": 4
+  "fd015f0790fa137a": [
+    "01f5005d45547c7f",
+    "12f00bba97cabd0d"
+  ],
+  "01f5005d45547c7f": {
+      "tag": "TelegramTextOutputMessage",
+      "message": "b0a3c9bdf91ea92bb36a3624"
   }
 }
