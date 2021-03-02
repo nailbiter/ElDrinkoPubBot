@@ -63,8 +63,8 @@ class ElDrinkoPubBot:
         self.send_message(
             f"updated! now at {commit}", "developerChatIds", is_markdown=True)
 
-    def insert_order(self):
-        pass
+    def insert_order(self,order):
+        self._logger.info(f"order: {order}")
 
     def _get_collection(self, key):
         return self._mongo_client.beerbot[self._settings["mongodb"][key]]

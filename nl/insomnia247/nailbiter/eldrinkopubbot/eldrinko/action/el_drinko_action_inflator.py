@@ -23,7 +23,7 @@ from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramKeyboard, T
 from jinja2 import Environment, Template
 from jinja2.loaders import FileSystemLoader
 import json
-from datetime import datetime
+from datetime import datetime, date
 import pytz
 import logging
 import math
@@ -75,6 +75,9 @@ class _DateTimeFormatter:
         self._tz = pytz.timezone("Europe/Kiev")
 
     def __call__(self, d):
+        if not isinstance(d,datetime):
+            assert isinstance(d,date), d
+            d = datetime(d.year,d.month,d.day)
         return d.astimezone(self._tz).strftime("%Y.%m.%d %H:%M")
 
 
@@ -250,7 +253,8 @@ class ElDrinkoActionInflator:
 #                    _orderInserter.accept(new Document(map));
             map_ = ElDrinkoActionInflator._order_object_to_jinja_context(
                 order, im.beerlist)
-            self._orderInserter(map_)
+            ioc = self._insert_order_callback
+            ioc(map_)
 #                    _sendOrderCallback.accept(new ImmutablePair<String,String>(
 #                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",map,im.beerlist)
 #                                ,"salesmanChatIds"));
@@ -510,7 +514,7 @@ class ElDrinkoActionInflator:
 #        JSONArray cart = order.getJSONArray("cart");
         cart = order["cart"]
 #        for(int i = 0; i < cart.length(); i++) {
-        for i, obj in enumerate(cart):
+        for obj in cart:
             #            JSONObject obj = cart.getJSONObject(i);
             #            if(!obj.has("amount")) {
             #                continue;
