@@ -63,6 +63,12 @@ class ElDrinkoPubBot:
         self.send_message(
             f"updated! now at {commit}", "developerChatIds", is_markdown=True)
 
+#        public void accept(Document doc) {
+#            MongoCollection<Document> statesColl = _mongoClient
+#                .getDatabase("beerbot")
+#                .getCollection(_config.getJSONObject("mongodb").getString("order_history"));
+#            statesColl.insertOne(doc);
+#        }
     def insert_order(self,order):
         self._logger.info(f"order: {order}")
 
