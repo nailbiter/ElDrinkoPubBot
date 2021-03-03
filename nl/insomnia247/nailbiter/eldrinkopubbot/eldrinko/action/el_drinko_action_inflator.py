@@ -18,9 +18,8 @@ ORGANIZATION:
 
 ==============================================================================="""
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
-from nl.insomnia247.nailbiter.eldrinkopubbot.util import parse_ukrainian_float, process_template, add_logger
+from nl.insomnia247.nailbiter.eldrinkopubbot.util import parse_ukrainian_float, add_logger, ElDrinkoJinjaEnvironment
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage, TelegramArrayOutputMessage
-from jinja2 import Environment, Template
 from jinja2.loaders import FileSystemLoader
 import json
 from datetime import datetime, date
@@ -91,7 +90,8 @@ class ElDrinkoActionInflator:
         self._persistent_storage = persistent_storage
         self._insert_order_callback = insert_order_callback
         self._sendOrderCallback = send_message_callback
-        self._jinja_env = Environment(loader=FileSystemLoader(template_folder))
+        self._jinja_env = ElDrinkoJinjaEnvironment(
+            loader=FileSystemLoader(template_folder))
         self._date_time_formatter = _DateTimeFormatter()
         self._transitions = None
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -439,13 +439,16 @@ class ElDrinkoActionInflator:
     def _inflate_telegram_keyboard(self, env, msgTemplateResName, keysTemplateResName, tsv, columns):
         #        String keyboardKeys = MiscUtils.ProcessTemplate(keysTemplateResName,env,tsv);
         #        String keyboardMsg = MiscUtils.ProcessTemplate(msgTemplateResName,env,tsv);
-        keyboardKeys = process_template(
-            self._jinja_env, keysTemplateResName, env, tsv).strip().split("\n")
+        keyboardKeys = self._jinja_env.process_template(
+            keysTemplateResName, env, tsv)
+        keyboardKeys = keyboardKeys.strip().split("\n")
+
         self._logger.debug(f"keyboardKeys: {keyboardKeys}")
         keyboardKeys = [l for l in keyboardKeys if len(l.strip()) > 0]
         self._logger.debug(f"keyboardKeys: {keyboardKeys}")
-        keyboardMsg = process_template(
-            self._jinja_env, msgTemplateResName, env, tsv)
+        keyboardMsg = self._jinja_env.process_template(
+            msgTemplateResName, env, tsv)
+
 #        _Log.info(SecureString.format("keyboardMsg: %s",keyboardMsg));
 #        _Log.info(SecureString.format("keyboardKeys: %s",keyboardKeys));
 #        return new TelegramKeyboard(keyboardMsg,keyboardKeys.split("\n"),columns);
@@ -481,7 +484,7 @@ class ElDrinkoActionInflator:
 #            if(tag.equals("TelegramTextOutputMessage")) {
             if tag == "TelegramTextOutputMessage":
                 #                return new TelegramTextOutputMessage(MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv));
-                return TelegramTextOutputMessage(process_template(self._jinja_env, msg["message"], env, tsv))
+                return TelegramTextOutputMessage(self._jinja_env.process_template(msg["message"], env, tsv))
 #            } else if(tag.equals("TelegramKeyboard")) {
             elif tag == "TelegramKeyboard":
                 #                return _InflateTelegramKeyboard(
@@ -492,7 +495,7 @@ class ElDrinkoActionInflator:
                 #                return new TelegramImageOutputMessage(
                 #                        MiscUtils.ProcessTemplate(msg.getString("message"), env,tsv)
                 #                        , (URL)obj);
-                return TelegramImageOutputMessage(message=process_template(self._jinja_env, msg["message"], env, tsv), url=obj)
+                return TelegramImageOutputMessage(message=self._jinja_env.process_template(msg["message"], env, tsv), url=obj)
 #            } else {
             else:
                 #                return null;

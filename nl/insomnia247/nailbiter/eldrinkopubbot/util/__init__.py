@@ -20,6 +20,7 @@ ORGANIZATION:
 
 import re
 import logging
+from jinja2 import Environment, Template
 
 
 def parse_ukrainian_float(s):
@@ -75,15 +76,19 @@ def _myprintf(x, logger=None):
     return res
 
 
-@add_logger
-def process_template(jinja_env, template_name, additional_context, tsv,logger=None):
-    context = {
-        "products": [list(r.values())for r in tsv.to_dict(orient="records")],
-        "beerlist_df": tsv,
-        **({} if additional_context is None else additional_context),
-    }
-    #FIXME: do not do this every time (only on init)
-    jinja_env.filters["myprintf_int"] = _myprintf_int
-    jinja_env.filters["myprintf"] = _myprintf
-    logger.info(f"render {template_name} with {context}")
-    return jinja_env.get_template(f"{template_name}.txt").render(context)
+class ElDrinkoJinjaEnvironment(Environment):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filters["myprintf_int"] = _myprintf_int
+        self.filters["myprintf"] = _myprintf
+        self._logger = logging.getLogger(self.__class__.__name__)
+
+    def process_template(self, template_name, additional_context, tsv):
+        context = {
+            # FIXME: eliminate
+            "products": [list(r.values()) for r in tsv.to_dict(orient="records")],
+            "beerlist_df": tsv,
+            **({} if additional_context is None else additional_context),
+        }
+        self._logger.info(f"render {template_name} with {context}")
+        return self.get_template(f"{template_name}.txt").render(context)

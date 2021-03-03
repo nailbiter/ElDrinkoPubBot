@@ -19,4 +19,5 @@ ORGANIZATION:
 ==============================================================================="""
 
 from collections import namedtuple
-ElDrinkoInputMessage = namedtuple("ElDrinkoInputMessage","input_message data user_data beerlist")
+ElDrinkoInputMessage = namedtuple(
+    "ElDrinkoInputMessage", "input_message data user_data beerlist")
