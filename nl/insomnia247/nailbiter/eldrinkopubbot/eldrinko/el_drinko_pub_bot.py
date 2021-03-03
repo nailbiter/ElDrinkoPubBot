@@ -71,6 +71,7 @@ class ElDrinkoPubBot:
 #        }
     def insert_order(self,order):
         self._logger.info(f"order: {order}")
+        self._get_collection("order_history").insert_one(order)
 
     def _get_collection(self, key):
         return self._mongo_client.beerbot[self._settings["mongodb"][key]]

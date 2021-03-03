@@ -18,7 +18,7 @@ ORGANIZATION:
 
 ==============================================================================="""
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
-from nl.insomnia247.nailbiter.eldrinkopubbot.util import parse_ukrainian_float, process_template
+from nl.insomnia247.nailbiter.eldrinkopubbot.util import parse_ukrainian_float, process_template, add_logger
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage, TelegramArrayOutputMessage
 from jinja2 import Environment, Template
 from jinja2.loaders import FileSystemLoader
@@ -43,13 +43,17 @@ import math
 #    }
 
 
-def _get_order(obj):
+@add_logger
+def _get_order(obj, logger=None):
+    logger.info(f"obj: {obj}")
     order = obj.get("order", None)
     if order is not None:
         order = json.loads(json.dumps(order))
-        for k in ["phone_number", "address", "payment"]:
-            if k in obj:
-                obj[k] = str(obj[k])
+        order = {
+            **order,
+            **{k: str(obj[k]) for k in ["phone_number", "address", "payment"] if k in obj}
+        }
+    logger.info(f"order: {order}")
     return order
 
 #    private static int _IncrementOrderCount(PersistentStorage masterPersistentStorage) {
@@ -75,9 +79,6 @@ class _DateTimeFormatter:
         self._tz = pytz.timezone("Europe/Kiev")
 
     def __call__(self, d):
-        if not isinstance(d,datetime):
-            assert isinstance(d,date), d
-            d = datetime(d.year,d.month,d.day)
         return d.astimezone(self._tz).strftime("%Y.%m.%d %H:%M")
 
 
@@ -89,6 +90,7 @@ class ElDrinkoActionInflator:
         self._send_message_callback = send_message_callback
         self._persistent_storage = persistent_storage
         self._insert_order_callback = insert_order_callback
+        self._sendOrderCallback = send_message_callback
         self._jinja_env = Environment(loader=FileSystemLoader(template_folder))
         self._date_time_formatter = _DateTimeFormatter()
         self._transitions = None
@@ -98,6 +100,7 @@ class ElDrinkoActionInflator:
             self._transitions["transitions"] = json.load(f)
         with open(f"{template_folder}/correspondence.json") as f:
             self._transitions["correspondence"] = json.load(f)
+
     @property
     def transitions(self):
         return self._transitions
@@ -112,7 +115,7 @@ class ElDrinkoActionInflator:
         if o["correspondence"] in ["9c851972cb7438c5", "07defdb4543782cb"]:
             #                    _Log.info(SecureString.format("%s",o));
             #                    if ((((JSONObject)o).optString("src_state")).equals("choose_product_to_make_order")) {
-            if o.get("src_state",None) == "choose_product_to_make_order":
+            if o.get("src_state", None) == "choose_product_to_make_order":
                 #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                 #                        int i = Integer.parseInt(tka.getMsg());
                 #                        Tsv tsv = im.beerlist;
@@ -189,8 +192,8 @@ class ElDrinkoActionInflator:
 #                    }
 #                } else if( ((JSONObject)o).getString("correspondence").equals("5e11c9696e9b38f0") ) {
         elif o["correspondence"] == "5e11c9696e9b38f0":
-                #                    if(((JSONObject)o).optString("src_state").equals("delete")) {
-            if o.get("src_state",None) == "delete":
+            #                    if(((JSONObject)o).optString("src_state").equals("delete")) {
+            if o.get("src_state", None) == "delete":
                 #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                 #                        int i = Integer.parseInt(tka.getMsg());
                 tka = im.input_message
@@ -205,7 +208,7 @@ class ElDrinkoActionInflator:
                 cart = [x for i_, x in enumerate(cart) if i_ != i]
 #                    }
 #                } else if( (((JSONObject)o).getString("correspondence").equals("72e97b89bcab08c4") && ((JSONObject)o).getString("src_state").equals("choose_address")) ||  ((JSONObject)o).getString("correspondence").equals("774ed3e0f5ef17cf")) {
-        elif (o["correspondence"] == "72e97b89bcab08c4" and o.get("src_state",None) == "choose_address") or o["correspondence"] == "774ed3e0f5ef17cf":
+        elif (o["correspondence"] == "72e97b89bcab08c4" and o.get("src_state", None) == "choose_address") or o["correspondence"] == "774ed3e0f5ef17cf":
             #                    im.right.put("address",im.left.getMsg());
             im.data["address"] = im.input_message.message
 #                } else if( ((JSONObject)o).getString("correspondence").equals("8e0edde4a3199d0c") ) {
@@ -216,10 +219,10 @@ class ElDrinkoActionInflator:
         elif o["correspondence"] == "fa702a44b70ddcae":
             #                    if(((JSONObject)o).optString("src_state").equals("edit_address")) {
             #                        im.right.put("address",im.left.getMsg());
-            if o.get("src_state",None) == "edit_address":
+            if o.get("src_state", None) == "edit_address":
                 im.data["address"] = im.input_message.message
 #                    } else if(((JSONObject)o).optString("src_state").equals("choose_payment")) {
-            elif o.get("src_state",None) == "choose_payment":
+            elif o.get("src_state", None) == "choose_payment":
                 #                        TelegramKeyboardAnswer tka = (TelegramKeyboardAnswer) im.left;
                 #                        int i = Integer.parseInt(tka.getMsg());
                 #                        String paymentMethods
@@ -232,7 +235,7 @@ class ElDrinkoActionInflator:
                 im.data["payment"] = paymentMethods[i]
 #                    } else if(((JSONObject)o).optString("src_state").equals("edit_phone_number")) {
 #                        im.right.put("phone_number",im.left.getMsg());
-            elif o.get("src_state",None) == "edit_phone_number":
+            elif o.get("src_state", None) == "edit_phone_number":
                 im.data["phone_number"] = im.input_message.message
 #                    }
 #                } else if( ((JSONObject)o).getString("correspondence").equals("48c6907046b03db8") ) {
@@ -246,15 +249,14 @@ class ElDrinkoActionInflator:
 #                    order.put("timestamp", _ORDER_REPORT_FORMATTER.format(d));
 #                    order.put("_timestamp", d);
             order["count"] = _increment_order_count(self._persistent_storage)
-            d = datetime.now().date()
+            d = datetime.now()
             order["timestamp"] = self._date_time_formatter(d)
             order["_timestamp"] = d
 #                    Map<String,Object> map = _OrderObjectToJinjaContext(order,im.beerlist);
 #                    _orderInserter.accept(new Document(map));
-            map_ = ElDrinkoActionInflator._order_object_to_jinja_context(
+            map_ = self._order_object_to_jinja_context(
                 order, im.beerlist)
-            ioc = self._insert_order_callback
-            ioc(map_)
+            self._insert_order_callback(map_)
 #                    _sendOrderCallback.accept(new ImmutablePair<String,String>(
 #                            MiscUtils.ProcessTemplate("3804e512b18b339fe8786dbd",map,im.beerlist)
 #                                ,"salesmanChatIds"));
@@ -271,7 +273,7 @@ class ElDrinkoActionInflator:
             self._sendOrderCallback(
                 self._jinja_env.get_template(
                     "3804e512b18b339fe8786dbd.txt").render({**map_}),
-                str(im.userData)
+                str(im.user_data)
             )
             im.data["order"] = {}  # FIXME: this should be done prettier
         elif o["correspondence"] == "75f676187e00dd85" and o.get("src_state", None) is None:
@@ -286,7 +288,7 @@ class ElDrinkoActionInflator:
 #                _Log.info(SecureString.format("_OrderObjectToJinjaContext(%s,%s)",ppo,im.beerlist.toJsonString()));
 #                Map<String,Object> map = _OrderObjectToJinjaContext(ppo,im.beerlist);
 #                Object oo = null;
-        map_ = ElDrinkoActionInflator._order_object_to_jinja_context(
+        map_ = self._order_object_to_jinja_context(
             ppo, im.beerlist)
         oo = None
 #                _Log.info(SecureString.format("after _GetOrder(%s)",im.right));
@@ -305,36 +307,42 @@ class ElDrinkoActionInflator:
             map_["i"] = int(tka.message)
             oo = imgUrl
 #                } else if((((JSONObject)o).getString("correspondence")).equals("9c851972cb7438c5") || (((JSONObject)o).getString("correspondence")).equals("07defdb4543782cb") ) {
-        elif o["correspondence"]=="02503b04d94259c5":
-            r = im.beerlist.query(f"name=='{im.input_message.button_title}'").to_dict(orient="records")[0]
+        elif o["correspondence"] == "02503b04d94259c5":
+            r = im.beerlist.query(f"name=='{im.input_message.button_title}'").to_dict(
+                orient="records")[0]
             oo = r["image link"]
             map_["description"] = r["description"]
-        elif o["correspondence"] =="18ca55e51d11ba24":
+        elif o["correspondence"] == "18ca55e51d11ba24":
             map_["category"] = im.input_message.button_title
-        elif o["correspondence"]=="12f00bba97cabd0d":
-            #TODO
+        elif o["correspondence"] == "12f00bba97cabd0d":
+            # TODO
             #map_["category"] = im.input_message.button_title
-            if src_state=="choose_snack_amount":
+            if src_state == "choose_snack_amount":
                 order = im.data["order"]
-                cart = order.get("cart",[])
-                if o["type"]=="validButton":
+                cart = order.get("cart", [])
+                if o["type"] == "validButton":
                     button_idx = int(im.input_message.message)
                     last_order = cart[-1]
                     self._logger.info(last_order)
                     self._logger.info(im.beerlist)
-                    goods_df = im.beerlist.query(f"category==\"{last_order['category']}\"")
+                    goods_df = im.beerlist.query(
+                        f"category==\"{last_order['category']}\"")
                     self._logger.info(goods_df)
                     self._logger.info(button_idx)
-                    inc = 1 if button_idx%4==1 else -1
-                    goods_r = goods_df.to_dict(orient="records")[math.floor(button_idx/4)]
-                    last_order["goods"][goods_r["name"]] = last_order["goods"].get(goods_r["name"],0) + inc
-                    last_order["goods"][goods_r["name"]] = max(last_order["goods"][goods_r["name"]],0)
-                im.data["order"] = {**order, "cart":cart}
+                    inc = 1 if button_idx % 4 == 1 else -1
+                    goods_r = goods_df.to_dict(orient="records")[
+                        math.floor(button_idx/4)]
+                    last_order["goods"][goods_r["name"]] = last_order["goods"].get(
+                        goods_r["name"], 0) + inc
+                    last_order["goods"][goods_r["name"]] = max(
+                        last_order["goods"][goods_r["name"]], 0)
+                im.data["order"] = {**order, "cart": cart}
             else:
-                order = im.data.get("order",{})
-                cart = order.get("cart",[])
-                cart.append({"category":im.input_message.button_title, "goods":{}})
-                im.data["order"] = {**order, "cart":cart}
+                order = im.data.get("order", {})
+                cart = order.get("cart", [])
+                cart.append(
+                    {"category": im.input_message.button_title, "goods": {}})
+                im.data["order"] = {**order, "cart": cart}
         elif o["correspondence"] == "9c851972cb7438c5" or o["correspondence"] == "07defdb4543782cb":
             #                    Map<String,Object> beerVolumes = new HashMap<>();
             #                    Tsv tsv = im.beerlist;
@@ -434,7 +442,7 @@ class ElDrinkoActionInflator:
         keyboardKeys = process_template(
             self._jinja_env, keysTemplateResName, env, tsv).strip().split("\n")
         self._logger.debug(f"keyboardKeys: {keyboardKeys}")
-        keyboardKeys = [l for l in keyboardKeys if len(l.strip())>0]
+        keyboardKeys = [l for l in keyboardKeys if len(l.strip()) > 0]
         self._logger.debug(f"keyboardKeys: {keyboardKeys}")
         keyboardMsg = process_template(
             self._jinja_env, msgTemplateResName, env, tsv)
@@ -460,7 +468,8 @@ class ElDrinkoActionInflator:
             for mm in m:
                 if str(mm) in self._transitions["transitions"]:
                     mm = self._transitions["transitions"][str(mm)]
-                msgs.append(self._inflate_output_message_from_json(mm, env, obj, tsv))    
+                msgs.append(self._inflate_output_message_from_json(
+                    mm, env, obj, tsv))
 #            return new OutputArrayMessage(msgs.toArray(OutputMessage[]::new));
             return TelegramArrayOutputMessage(messages=msgs)
 #        } else {
@@ -495,14 +504,15 @@ class ElDrinkoActionInflator:
 #        Map<String, Object> context = new HashMap<String,Object>();
 #        context.put("BOTTLES",Arrays.asList(BOTTLE_TYPES));
 
-    @classmethod
-    def _order_object_to_jinja_context(cls, order, tsv):
-        context = {"BOTTLES": cls.BOTTLE_TYPES}
+    def _order_object_to_jinja_context(self, order, tsv):
+        self._logger.info(f"order: {order}")
+        context = {"BOTTLES": self.__class__.BOTTLE_TYPES}
 #        _Log.info(order);
 #        if(order==null) {
 #            return context;
 #        }
         if order is None:
+            self._logger.info(f"context: {context}")
             return context
 #        List<List<String>> products = tsv.getRecords();
         products = [list(r.values()) for r in tsv.to_dict(orient="records")]
@@ -540,4 +550,5 @@ class ElDrinkoActionInflator:
 #        _Log.info(SecureString.format("context: %s",context));
 #        return context;
 #    }
+        self._logger.info(f"context: {context}")
         return context

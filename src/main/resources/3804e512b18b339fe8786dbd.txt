@@ -1,6 +1,6 @@
 Замовлення №{{order.count}}; {{order.timestamp}}
 Покупець: {{order.uid}}
-Замовив: {%for r in order.cart%}{{r.name}}-{{r.amount}}(={%for k,v in (r.bottles|dictsort)%}{{k}}*{{v}}{%if not loop.last%}+{%endif%}{%endfor%})л{%if not loop.last%}; {%endif%}{%endfor%}
+Замовив: {%include "_order_line.jinja.txt"%}
 Адреса замовлення: {{order.address}}
 Номер телефону: {{order.phone_number}}
 Форма сплати: {{order.payment}}
