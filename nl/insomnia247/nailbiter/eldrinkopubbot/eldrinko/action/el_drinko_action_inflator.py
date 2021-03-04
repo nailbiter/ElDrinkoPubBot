@@ -156,10 +156,12 @@ class ElDrinkoActionInflator:
             im.data["order"] = {}  # FIXME: this should be done prettier
         elif o["correspondence"] == "75f676187e00dd85" and o.get("src_state", None) is None:
             im.data["order"] = {}
+
         ppo = _get_order(im.data)
         map_ = self._order_object_to_jinja_context(
             ppo, im.beerlist)
         oo = None
+
         if o["correspondence"] == "72aa7197071b6503":
             tka = im.input_message
             tsv = im.beerlist
@@ -231,6 +233,7 @@ class ElDrinkoActionInflator:
                 pass
             map_["totalVolume"] = totalVolume
             map_["totalPrice"] = totalPrice
+
         im.data["username"] = im.user_data.username
         im.data["firstName"] = im.user_data.first_name
         im.data["lastName"] = im.user_data.last_name
