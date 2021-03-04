@@ -67,7 +67,7 @@ def add_transition(ctx, message_type, create_files, create_new_transition):
             "message": message
         }
         files_to_create = [keyboard, message]
-    elif message_type=="TelegramTextOutputMessage":
+    elif message_type == "TelegramTextOutputMessage":
         message = _get_random_string(24)
         transitions[last_key] = {
             "tag": message_type,
@@ -99,19 +99,21 @@ _EDGE_STYLES = {
 }
 
 
+def _get_transitions_data(template_folder):
+    data = {}
+    for k in "transitions correspondence".split(" "):
+        fn = path.join(template_folder, f"{k}.json")
+        with open(fn) as f:
+            data[k] = json.load(f)
+    return data
+
+
 @edit_transitions.command()
 @click.option("--gv-filename", type=click.Path(), default=".tmp/state_machine.gv")
 @click.option("--pic-filename", type=click.Path())
 @click.pass_context
 def print_gv(ctx, gv_filename, pic_filename):
-    #    if pic_filename is None:
-    #        base,ext = path.splitext(gv_filename)
-    #        pic_filename = f"{base}.png"
-    data = {}
-    for k in "transitions correspondence".split(" "):
-        fn = path.join(ctx.obj["template_folder"], f"{k}.json")
-        with open(fn) as f:
-            data[k] = json.load(f)
+    data = _get_transitions_data(ctx.obj["template_folder"])
 
     # click.echo(data["correspondence"])
     dot = Digraph()
@@ -125,6 +127,48 @@ def print_gv(ctx, gv_filename, pic_filename):
     click.echo(json.dumps(_EDGE_STYLES, indent=2))
     dot.node(_ANYSTATE, label="ANY STATE")
     dot.view()
+
+
+def _add_filename(file_names, transitions, v):
+    if isinstance(v, list):
+        for v_ in v:
+            _add_filename(file_names, transitions, v_)
+    elif isinstance(v, str):
+        _add_filename(file_names, transitions, transitions[v])
+    elif isinstance(v, dict):
+        file_names.add(v["message"])
+        if v.get("tag", None) == "TelegramKeyboard":
+            file_names.add(v["keyboard"])
+    else:
+        raise NotImplementedError(v)
+
+
+@edit_transitions.command()
+@click.option("--dry-run/--no-dry-run", default=False)
+@click.pass_context
+def remove_unused_templates(ctx, dry_run):
+    transitions = _get_transitions_data(ctx.obj["template_folder"])
+    transitions = transitions["transitions"]
+    file_names = {
+        "made_order_notification",
+    }
+    for v in transitions.values():
+        _add_filename(file_names, transitions, v)
+
+    file_names = {path.abspath(
+        path.join(ctx.obj["template_folder"], f"{fn}.txt")) for fn in file_names}
+    for fn in file_names:
+        assert os.path.isfile(fn)
+
+    blacklist = set()
+    for root, dirs, files in os.walk(ctx.obj["template_folder"], topdown=False):
+        for name in files:
+            fn = path.abspath(path.join(root, name))
+            if not fn.endswith(".txt"):
+                continue
+            if fn not in file_names and not(path.basename(name).startswith("_") or path.basename(name).startswith(".")):
+                blacklist.add(fn)
+    click.echo(blacklist)
 
 
 if __name__ == "__main__":

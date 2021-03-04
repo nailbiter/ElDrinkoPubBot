@@ -147,12 +147,12 @@ class ElDrinkoActionInflator:
             self._insert_order_callback(map_)
             self._sendOrderCallback(
                 self._jinja_env.get_template(
-                    "3804e512b18b339fe8786dbd.txt").render({**map_}),
+                    "made_order_notification.txt").render({**map_}),
                 "salesmanChatIds"
             )
             self._sendOrderCallback(
                 self._jinja_env.get_template(
-                    "3804e512b18b339fe8786dbd.txt").render({**map_}),
+                    "made_order_notification.txt").render({**map_}),
                 str(im.user_data)
             )
             im.data["order"] = {}  # FIXME: this should be done prettier
