@@ -18,38 +18,7 @@ ORGANIZATION:
 
 ==============================================================================="""
 
-import re
 import logging
-from jinja2 import Environment, Template
-
-
-def parse_ukrainian_float(s):
-    m = re.match(r"(-?\d+)(,\d+)?", s)
-    assert m is not None
-    return float(s.replace(",", "."))
-
-# FIXME: eliminate this
-#    public static String ProcessTemplate(String templateName, Map<String, Object> additionalContext, Tsv tsv) {
-#        TemplateEngine _jinjava = new TemplateEngine();
-#        Map<String,Object> context = new HashMap<>();
-#        List<List<String>> products = tsv.getRecords();
-#        context.put("products",products);
-#        if(additionalContext!=null) {
-#            for(String k:additionalContext.keySet()) {
-#                context.put(k,additionalContext.get(k));
-#            }
-#        }
-#        _Log.info(SecureString.format("_ProcessTemplate: context before rendering: %s",context));
-#
-#        _Log.info(SecureString.format("getting resource %s",templateName));
-#        String template = MiscUtils.GetResource(templateName);
-#        _Log.info(SecureString.format("template: %s",template));
-#        String renderedTemplate = MiscUtils.GetResource(templateName);
-#        renderedTemplate = _jinjava.render(template, context);
-#        _Log.info(SecureString.format("renderedTemplate: %s",renderedTemplate));
-#        return renderedTemplate;
-#    }
-
 
 def add_logger(f):
     logger = logging.getLogger(f.__name__)
@@ -58,37 +27,3 @@ def add_logger(f):
         return f(*args, logger=logger, **kwargs)
     _f.__name__ = f.__name__
     return _f
-
-
-@add_logger
-def _myprintf_int(x, logger=None):
-    logger.debug(f"x: {x}")
-    res = f"{int(x):02d}"
-    logger.debug(f"res: {res}")
-    return res
-
-
-@add_logger
-def _myprintf(x, logger=None):
-    logger.debug(f"x: {x}")
-    res = f"{float(x):.2f}".replace(".", ",")
-    logger.debug(f"res: {res}")
-    return res
-
-
-class ElDrinkoJinjaEnvironment(Environment):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.filters["myprintf_int"] = _myprintf_int
-        self.filters["myprintf"] = _myprintf
-        self._logger = logging.getLogger(self.__class__.__name__)
-
-    def process_template(self, template_name, additional_context, tsv):
-        context = {
-            # FIXME: eliminate
-            "products": [list(r.values()) for r in tsv.to_dict(orient="records")],
-            "beerlist_df": tsv,
-            **({} if additional_context is None else additional_context),
-        }
-        self._logger.info(f"render {template_name} with {context}")
-        return self.get_template(f"{template_name}.txt").render(context)

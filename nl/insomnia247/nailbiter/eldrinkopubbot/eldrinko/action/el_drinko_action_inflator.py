@@ -13,7 +13,8 @@ ORGANIZATION:
     REVISION: ---
 ==============================================================================="""
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
-from nl.insomnia247.nailbiter.eldrinkopubbot.util import parse_ukrainian_float, add_logger, ElDrinkoJinjaEnvironment
+from nl.insomnia247.nailbiter.eldrinkopubbot.util import add_logger, ukrainian_floats
+from nl.insomnia247.nailbiter.eldrinkopubbot.util.el_drinko_jinja_environment import ElDrinkoJinjaEnvironment
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage, TelegramArrayOutputMessage
 from jinja2.loaders import FileSystemLoader
 import json
@@ -53,7 +54,8 @@ class _DateTimeFormatter:
 
 
 class ElDrinkoActionInflator:
-    BOTTLE_TYPES = ["0,5", "1,0", "1,5", "2,0", "3,0"]
+    BOTTLE_TYPES = [ukrainian_floats.print(x, width=1) for x in [
+        0.5, 1, 1.5, 1.5, 2, 3]]
 
     def __init__(self, send_message_callback, persistent_storage, insert_order_callback, template_folder):
         self._send_message_callback = send_message_callback
@@ -106,7 +108,7 @@ class ElDrinkoActionInflator:
                 amount = 0.0
                 for s in ElDrinkoActionInflator.BOTTLE_TYPES:
                     try:
-                        amount += parse_ukrainian_float(s) * bottles.get(s, 0)
+                        amount += ukrainian_floats.parse(s) * bottles.get(s, 0)
                     finally:
                         pass
                 lastItem["amount"] = amount
@@ -219,7 +221,7 @@ class ElDrinkoActionInflator:
             for s in ElDrinkoActionInflator.BOTTLE_TYPES:
                 volume = 0.0
                 try:
-                    volume = parse_ukrainian_float(s)
+                    volume = ukrainian_floats.parse(s)
                 finally:
                     pass
                 totalVolume += volume*bottles.get(s, 0)
