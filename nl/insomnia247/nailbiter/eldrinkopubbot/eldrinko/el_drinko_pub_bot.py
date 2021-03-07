@@ -46,7 +46,7 @@ class ElDrinkoPubBot:
 
         # FIXME: actually, preloading is not necessary => remove `PreloadImages` method and `DownloadCache` class
         # ElDrinkoStateMachine.PreloadImages(self._get_collection("beerlist"))
-        self._edsm = ElDrinkoStateMachine(self)
+        self._edsm = ElDrinkoStateMachine(self,template_folder)
         _actionInflator = ElDrinkoActionInflator(
             self.send_message,
             PersistentStorage(mongo_client.beerbot.var, settings["id"]),

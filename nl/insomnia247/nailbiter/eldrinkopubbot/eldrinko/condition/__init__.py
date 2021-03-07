@@ -19,7 +19,7 @@ ORGANIZATION:
 ==============================================================================="""
 
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_inflator import ElDrinkoActionInflator
+from nl.insomnia247.nailbiter.eldrinkopubbot.util.el_drinko_jinja_environment import BOTTLE_TYPES
 import re
 import logging
 
@@ -54,7 +54,7 @@ class WidgetPredicate(MessageKeyboardComparisonPredicate):
 #        _Log.info(SecureString.format("i: %d",i));
 #        int numProducts = ElDrinkoActionInflator.BOTTLE_TYPES.length;
         if "name" in eim.data["order"]["cart"][-1]:
-            numProducts = len(ElDrinkoActionInflator.BOTTLE_TYPES)
+            numProducts = len(BOTTLE_TYPES)
         elif "category" in eim.data["order"]["cart"][-1]:
             category = eim.data["order"]["cart"][-1]["category"]
             numProducts = len(eim.beerlist.query(f"category==\"{category}\""))

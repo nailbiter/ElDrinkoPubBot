@@ -14,7 +14,7 @@ ORGANIZATION:
 ==============================================================================="""
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
 from nl.insomnia247.nailbiter.eldrinkopubbot.util import add_logger, ukrainian_floats
-from nl.insomnia247.nailbiter.eldrinkopubbot.util.el_drinko_jinja_environment import ElDrinkoJinjaEnvironment
+from nl.insomnia247.nailbiter.eldrinkopubbot.util.el_drinko_jinja_environment import ElDrinkoJinjaEnvironment, BOTTLE_TYPES
 from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage, TelegramArrayOutputMessage
 from jinja2.loaders import FileSystemLoader
 import json
@@ -54,8 +54,6 @@ class _DateTimeFormatter:
 
 
 class ElDrinkoActionInflator:
-    BOTTLE_TYPES = [ukrainian_floats.print(x, width=1) for x in [
-        0.5, 1, 1.5, 1.5, 2, 3]]
 
     def __init__(self, send_message_callback, persistent_storage, insert_order_callback, template_folder):
         self._send_message_callback = send_message_callback
@@ -89,7 +87,11 @@ class ElDrinkoActionInflator:
                     order = {"cart": []}
                 obj = {}
                 name = list(tsv["name"])[i]
-                obj = {**obj, "name": name, "bottles": {}, "amount": 0}
+                obj = {
+                    **obj,
+                    "name": name,
+                    "bottles": {},
+                }
                 order["cart"].append(obj)
                 im.data["order"] = order
             elif o["type"] == "validButton":
@@ -99,19 +101,12 @@ class ElDrinkoActionInflator:
                 _i = int(im.input_message.message)
                 idx = int(_i/4)
                 shouldAdd = _i % 4 == 1
-                bottleType = ElDrinkoActionInflator.BOTTLE_TYPES[idx]
+                bottleType = BOTTLE_TYPES[idx]
                 if bottleType not in bottles:
                     bottles[bottleType] = 0
                 bottles[bottleType] = bottles[bottleType] + \
                     (1 if shouldAdd else -1)
                 bottles[bottleType] = max(bottles[bottleType], 0)
-                amount = 0.0
-                for s in ElDrinkoActionInflator.BOTTLE_TYPES:
-                    try:
-                        amount += ukrainian_floats.parse(s) * bottles.get(s, 0)
-                    finally:
-                        pass
-                lastItem["amount"] = amount
         elif o["correspondence"] == "5e11c9696e9b38f0":
             if o.get("src_state", None) == "delete":
                 tka = im.input_message
@@ -138,6 +133,7 @@ class ElDrinkoActionInflator:
         elif o["correspondence"] == "48c6907046b03db8":
             order = _get_order(im.data)
             order["uid"] = im.user_data.username
+            tsv = im.beerlist
             order["count"] = _increment_order_count(self._persistent_storage)
             d = datetime.now()
             order["timestamp"] = self._date_time_formatter(d)
@@ -145,16 +141,12 @@ class ElDrinkoActionInflator:
             map_ = self._order_object_to_jinja_context(
                 order, im.beerlist)
             self._insert_order_callback(map_)
-            self._sendOrderCallback(
-                self._jinja_env.get_template(
-                    "made_order_notification.txt").render({**map_}),
-                "salesmanChatIds"
-            )
-            self._sendOrderCallback(
-                self._jinja_env.get_template(
-                    "made_order_notification.txt").render({**map_}),
-                str(im.user_data)
-            )
+            for tgt in ["salesmanChatIds", str(im.user_data)]:
+                self._sendOrderCallback(
+                    self._jinja_env.process_template(
+                        "made_order_notification", map_, tsv),
+                    tgt
+                )
             im.data["order"] = {}  # FIXME: this should be done prettier
         elif o["correspondence"] == "75f676187e00dd85" and o.get("src_state", None) is None:
             im.data["order"] = {}
@@ -204,37 +196,6 @@ class ElDrinkoActionInflator:
                 cart.append(
                     {"category": im.input_message.button_title, "goods": {}})
                 im.data["order"] = {**order, "cart": cart}
-        elif o["correspondence"] == "9c851972cb7438c5" or o["correspondence"] == "07defdb4543782cb":
-            beerVolumes = {}
-            tsv = im.beerlist
-            totalVolume = 0.0
-            data = im.data
-            self._logger.info(f"data: {data}")
-            order = data["order"]
-            self._logger.info(f"order: {order}")
-            cart = order["cart"]
-            self._logger.info(f"cart: {cart}")
-            last_item_in_cart = cart[-1]
-            bottles = last_item_in_cart["bottles"]
-            self._logger.info(f"bottles: {bottles}")
-            beerName = last_item_in_cart["name"]
-            for s in ElDrinkoActionInflator.BOTTLE_TYPES:
-                volume = 0.0
-                try:
-                    volume = ukrainian_floats.parse(s)
-                finally:
-                    pass
-                totalVolume += volume*bottles.get(s, 0)
-            i = next(i_ for i_, name in enumerate(
-                list(tsv["name"])) if name == beerName)
-            totalPrice = 0.0
-            try:
-                totalPrice = totalVolume * \
-                    (list(tsv["price (UAH/L)"])[i])
-            finally:
-                pass
-            map_["totalVolume"] = totalVolume
-            map_["totalPrice"] = totalPrice
 
         im.data["username"] = im.user_data.username
         im.data["firstName"] = im.user_data.first_name
@@ -286,21 +247,8 @@ class ElDrinkoActionInflator:
 
     def _order_object_to_jinja_context(self, order, tsv):
         self._logger.info(f"order: {order}")
-        context = {"BOTTLES": self.__class__.BOTTLE_TYPES}
-        if order is None:
-            self._logger.info(f"context: {context}")
-            return context
-        products = [list(r.values()) for r in tsv.to_dict(orient="records")]
-        orderMap = order
-        sum_ = 0
-        cart = order["cart"]
-        for obj in cart:
-            if "amount" not in obj:
-                continue
-            beerPrice = sum([r[3] for r in products if r[1] == obj["name"]])
-            sum_ += beerPrice * obj["amount"]
-        orderMap["sum"] = sum_
-        orderMap["delivery_fee"] = (0.0 if sum_ >= 250 else 20.0)
-        context["order"] = orderMap
+        context = {}
+        if order is not None:
+            context["order"] = order
         self._logger.info(f"context: {context}")
         return context

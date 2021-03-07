@@ -22,9 +22,9 @@ import re
 
 @add_logger
 def print(x,width=2,logger=None):
-    logger.debug(f"x: {x}")
+    logger.info(f"x: {x}")
     res = f"{x:.{width}f}".replace(".", ",")
-    logger.debug(f"res: {res}")
+    logger.info(f"res: {res}")
     return res
 
 

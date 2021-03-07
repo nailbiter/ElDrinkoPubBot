@@ -151,6 +151,7 @@ def remove_unused_templates(ctx, dry_run):
     transitions = transitions["transitions"]
     file_names = {
         "made_order_notification",
+        "user_error_message",
     }
     for v in transitions.values():
         _add_filename(file_names, transitions, v)
