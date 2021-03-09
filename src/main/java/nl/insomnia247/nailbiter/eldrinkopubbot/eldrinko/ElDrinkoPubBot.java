@@ -103,7 +103,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
     private TelegramInputMessage _createInputMessage(Update u) {
         if (u.hasMessage()) {
             Message m = u.getMessage();
-            _Log.info("CreateInputMessage: %s\n",m.getText());
+            _Log.info(SecureString.format("CreateInputMessage: %s\n",m.getText()));
             return new TelegramTextInputMessage(m.getText());
         } else if(u.hasCallbackQuery()) {
             Integer replyMessageId = null;
@@ -177,6 +177,7 @@ public class ElDrinkoPubBot extends TelegramLongPollingBot implements Consumer<I
                 .getDatabase("beerbot")
                 .getCollection(_config.getJSONObject("mongodb").getString("data"))
                 .find(Filters.eq("id",ud.toString())).first();
+            _Log.info(SecureString.format("data: %s",data==null?"data==null":data.toJson()));
             ElDrinkoInputMessage im = new ElDrinkoInputMessage(
                     tim,
                     data==null ? new JSONObject() : new JSONObject(data.toJson()).getJSONObject("data"), 
