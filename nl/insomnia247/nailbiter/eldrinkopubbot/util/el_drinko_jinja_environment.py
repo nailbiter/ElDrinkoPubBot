@@ -78,7 +78,7 @@ class ElDrinkoJinjaEnvironment(Environment):
                         additional_context["totalVolume"] = totalVolume
                         order["sum"] += additional_context["totalPrice"]
                     elif "category" in obj:
-                        for name, i in obj["goods"]:
+                        for name, i in obj["goods"].items():
                             price = tsv.query(f"category==\"{obj['category']}\" and name==\"{name}\"")[
                                 ElDrinkoJinjaEnvironment._PRICE_FN].sum()
                             order["sum"] += price*i
