@@ -46,21 +46,31 @@ class StateMachine:
         self._logger.info(f"set state: {state}")
 
     def __call__(self, input_message):
-        for k, state, transition_condition, transition_action in self._transitions:
-            if k != self._current_state:
-                self._logger.info(f"{k}!={self._current_state}")
-                continue
-            self._logger.info(f"checking condition {transition_condition}")
-            if transition_condition(input_message):
-                self._logger.info("take")
-                self._setState(state)
-                res = transition_action(input_message)
-                self._logger.info(f"res: {res}")
-                return res
-            else:
-                self._logger.info("pass")
+        try:
+            x = 1/0
+            self._logger.info(x)
+            for k, state, transition_condition, transition_action in self._transitions:
+                if k != self._current_state:
+                    self._logger.info(f"{k}!={self._current_state}")
+                    continue
+                self._logger.info(f"checking condition {transition_condition}")
+                if transition_condition(input_message):
+                    self._logger.info("take")
+                    self._setState(state)
+                    res = transition_action(input_message)
+                    self._logger.info(f"res: {res}")
+                    return res
+                else:
+                    self._logger.info("pass")
+        except Exception as exception:
+            self._exception_handler(exception, input_message)
+
         self._didNotFoundSuitableTransition(input_message)
         return None
+
+    def _exception_handler(self, exception, input_message):
+        self._logger.error(f"exception: {exception}")
+        raise exception
 
     def _didNotFoundSuitableTransition(self, input_message):
         self._logger(
