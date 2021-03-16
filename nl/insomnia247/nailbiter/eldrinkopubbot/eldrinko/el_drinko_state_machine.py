@@ -51,7 +51,7 @@ class ElDrinkoStateMachine(ExposedStateMachine):
             error_code = -error_code
         self._logger.error(f"error code: {error_code}")
         self._sendOrderCallback.send_message(self._tpl.render(
-            {"error_code": error_code}), str(im.user_data))
+            {"error_code": error_code}), str(input_message.user_data))
 
     def _didNotFoundSuitableTransition(self, im):
         self._eldrinko_exception_handler(im)
