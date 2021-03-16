@@ -78,12 +78,14 @@ class ElDrinkoJinjaEnvironment(Environment):
                         additional_context["totalVolume"] = totalVolume
                         order["sum"] += additional_context["totalPrice"]
                     elif "category" in obj:
-                        for name, i in obj["goods"].items():
+                        for name, j in obj["goods"].items():
                             price = tsv.query(f"category==\"{obj['category']}\" and name==\"{name}\"")[
                                 ElDrinkoJinjaEnvironment._PRICE_FN].sum()
-                            order["sum"] += price*i
+                            order["sum"] += price*j
                     else:
                         raise NotImplementedError
+                    self._logger.info(f"i: {i}")
+                    self._logger.info(f"lhs: {order['cart']}")
                     order["cart"][i] = obj
             if order["sum"] >= 250:
                 order["delivery_fee"] = 0

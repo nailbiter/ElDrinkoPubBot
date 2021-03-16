@@ -24,6 +24,8 @@ from jinja2 import Template
 from time import time
 from os import path
 import logging
+import traceback
+import uuid
 
 
 class ElDrinkoStateMachine(ExposedStateMachine):
@@ -43,6 +45,7 @@ class ElDrinkoStateMachine(ExposedStateMachine):
 
     def _exception_handler(self, exception, input_message):
         self._eldrinko_exception_handler(input_message, exception=exception)
+        raise exception
 
     def _eldrinko_exception_handler(self, input_message, exception=None):
         error_code = int(time())

@@ -21,6 +21,8 @@ ORGANIZATION:
 import logging
 from collections import namedtuple, OrderedDict
 import json
+import traceback
+import uuid
 
 
 class StateMachine:
@@ -63,6 +65,11 @@ class StateMachine:
                 else:
                     self._logger.info("pass")
         except Exception as exception:
+#            self._logger.info("\n".join(traceback.format_stack()))
+#            exc_fn = f"/tmp/{uuid.uuid4()}.log.txt"
+#            with open(exc_fn,"w") as f:
+#                traceback.print_tb(exception.__traceback__,file=f)
+#            self._logger.info(f"exception data saved to {exc_fn}")
             self._exception_handler(exception, input_message)
 
         self._didNotFoundSuitableTransition(input_message)
