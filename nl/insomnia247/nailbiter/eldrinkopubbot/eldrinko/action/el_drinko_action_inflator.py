@@ -217,7 +217,7 @@ class ElDrinkoActionInflator:
             keysTemplateResName, env, tsv)
         keyboardKeys = keyboardKeys.strip().split("\n")
         self._logger.debug(f"keyboardKeys: {keyboardKeys}")
-        keyboardKeys = [l for l in keyboardKeys if len(l.strip()) > 0]
+        keyboardKeys = [l.strip() for l in keyboardKeys if len(l.strip()) > 0]
         self._logger.debug(f"keyboardKeys: {keyboardKeys}")
         keyboardMsg = self._jinja_env.process_template(
             msgTemplateResName, env, tsv)

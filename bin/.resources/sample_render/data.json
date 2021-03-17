@@ -1,0 +1,39 @@
+{
+  "BOTTLES": [
+    "0,5",
+    "1,0",
+    "1,5",
+    "1,5",
+    "2,0",
+    "3,0"
+  ],
+  "data": {
+    "firstName": "Kostiantyn",
+    "lastName": "Leontiev",
+    "order": {
+      "cart": [
+        {
+          "category": "Чіпси",
+          "goods": {
+            "Long Chips Bacon": 1
+          }
+        }
+      ]
+    },
+    "username": "BearBig67"
+  },
+  "order": {
+    "cart": [
+      {
+        "category": "Чіпси",
+        "goods": {
+          "Long Chips Bacon": 1
+        }
+      }
+    ],
+    "delivery_fee": 20,
+    "sum": 0
+  },
+  "totalPrice": 0,
+  "totalVolume": 0
+}
