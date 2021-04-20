@@ -1,15 +1,4 @@
 {
-  "02503b04d94259c5": [
-    {
-      "message": "80408abd0802d8fbd6d5d1e0",
-      "tag": "TelegramImageOutputMessage"
-    },
-    {
-      "keyboard": "16c4082080253eee262c9cf2",
-      "message": "fdb3ef9a7dcc8e36c4fa489f",
-      "tag": "TelegramKeyboard"
-    }
-  ],
   "02b6ac70d65c067e": [
     {
       "message": "526b3b48fb69070e6953eba3",
@@ -26,7 +15,10 @@
     "tag": "TelegramKeyboard"
   },
   "07defdb4543782cb": [
-    "01f5005d45547c7f",
+    {
+      "message": "b0a3c9bdf91ea92bb36a3624",
+      "tag": "TelegramTextOutputMessage"
+    },
     {
       "columns": 4,
       "keyboard": "2c3381744a60241c14250678",
@@ -38,44 +30,13 @@
     "message": "054edccc65c193f7583a5773",
     "tag": "TelegramTextOutputMessage"
   },
-  "12f00bba97cabd0d": {
-    "columns": 4,
-    "keyboard": "0072c52da29f8e52aecc21c4",
-    "message": "e1497231ededf21368def1f5",
-    "tag": "TelegramKeyboard"
-  },
   "177680903e499486": {
     "message": "5d0c256b4a776245fee81385",
     "tag": "TelegramTextOutputMessage"
   },
-  "18ca55e51d11ba24": {
-    "keyboard": "670d302c9783d0b4",
-    "message": "812c01360c36fdaf",
-    "tag": "TelegramKeyboard"
-  },
   "19ed501387d9bc4d": {
     "keyboard": "16c4082080253eee262c9cf2",
     "message": "fdb3ef9a7dcc8e36c4fa489f",
-    "tag": "TelegramKeyboard"
-  },
-  "1df8ef4b2a4751f1": [
-    {
-      "message": "526b3b48fb69070e6953eba3",
-      "tag": "TelegramTextOutputMessage"
-    },
-    {
-      "message": "f540cf40794c154afbd807a6",
-      "tag": "TelegramTextOutputMessage"
-    },
-    {
-      "keyboard": "4ea9a63509e8ed5826a37f8a",
-      "message": "1dc02faec7377fc537510e30",
-      "tag": "TelegramKeyboard"
-    }
-  ],
-  "2aa9198cbca5cb21": {
-    "keyboard": "ff42d8eb54444970",
-    "message": "58f69a055a614078",
     "tag": "TelegramKeyboard"
   },
   "2e2aa27f140e603a": [
@@ -122,6 +83,21 @@
     {
       "keyboard": "16c4082080253eee262c9cf2",
       "message": "fdb3ef9a7dcc8e36c4fa489f",
+      "tag": "TelegramKeyboard"
+    }
+  ],
+  "1df8ef4b2a4751f1": [
+    {
+      "message": "526b3b48fb69070e6953eba3",
+      "tag": "TelegramTextOutputMessage"
+    },
+    {
+      "message": "f540cf40794c154afbd807a6",
+      "tag": "TelegramTextOutputMessage"
+    },
+    {
+      "keyboard": "4ea9a63509e8ed5826a37f8a",
+      "message": "1dc02faec7377fc537510e30",
       "tag": "TelegramKeyboard"
     }
   ],
@@ -184,13 +160,5 @@
     "keyboard": "a203791aec81dfaf5a187b3d",
     "message": "eb34fa7ee27d1192ef20f960",
     "tag": "TelegramKeyboard"
-  },
-  "fd015f0790fa137a": [
-    "01f5005d45547c7f",
-    "12f00bba97cabd0d"
-  ],
-  "01f5005d45547c7f": {
-      "tag": "TelegramTextOutputMessage",
-      "message": "b0a3c9bdf91ea92bb36a3624"
   }
 }

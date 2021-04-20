@@ -1,17 +1,5 @@
 [
   [
-    null,
-    "start",
-    {
-      "tag": "MessageComparisonPredicate",
-      "value": "/start"
-    },
-    {
-      "correspondence": "75f676187e00dd85",
-      "src_state": "null"
-    }
-  ],
-  [
     "_",
     "start",
     {
@@ -30,47 +18,6 @@
     },
     {
       "correspondence": "950c3e4921e05d14"
-    }
-  ],
-  [
-    "choose_product_to_see_description",
-    "choose_category_to_see_description",
-    {
-      "tag": "MessageKeyboardComparisonPredicate",
-      "value": -1
-    },
-    {
-      "correspondence": "2aa9198cbca5cb21"
-    }
-  ],
-  [
-    "choose_category_to_see_description",
-    "choose_snack_to_see_description",
-    {
-      "tag": "MessageKeyboardComparisonPredicate"
-    },
-    {
-      "correspondence": "18ca55e51d11ba24"
-    }
-  ],
-  [
-    "choose_category_to_make_order",
-    "choose_snack_amount",
-    {
-      "tag": "MessageKeyboardComparisonPredicate"
-    },
-    {
-      "correspondence": "12f00bba97cabd0d"
-    }
-  ],
-  [
-    "choose_snack_to_see_description",
-    "start",
-    {
-      "tag": "MessageKeyboardComparisonPredicate"
-    },
-    {
-      "correspondence": "02503b04d94259c5"
     }
   ],
   [
@@ -96,17 +43,6 @@
   ],
   [
     "choose_product_to_make_order",
-    "choose_category_to_make_order",
-    {
-      "tag": "MessageKeyboardComparisonPredicate",
-      "value":-1
-    },
-    {
-      "correspondence": "2aa9198cbca5cb21"
-    }
-  ],
-  [
-    "choose_product_to_make_order",
     "choose_amount",
     {
       "tag": "MessageKeyboardComparisonPredicate"
@@ -114,30 +50,6 @@
     {
       "correspondence": "9c851972cb7438c5",
       "src_state": "choose_product_to_make_order"
-    }
-  ],
-  [
-    "choose_snack_amount",
-    "choose_snack_amount",
-    {
-      "tag": "WidgetPredicate",
-      "value": "validButton"
-    },
-    {
-      "correspondence": "12f00bba97cabd0d",
-      "type": "validButton"
-    }
-  ],
-  [
-    "choose_snack_amount",
-    "choose_snack_amount",
-    {
-      "tag": "WidgetPredicate",
-      "value": "invalidButton"
-    },
-    {
-      "correspondence": "fd015f0790fa137a",
-      "type": "invalidButton"
     }
   ],
   [
@@ -164,17 +76,6 @@
       "correspondence": "07defdb4543782cb",
       "src_state": "choose_amount",
       "type": "invalidButton"
-    }
-  ],
-  [
-    "choose_snack_amount",
-    "confirm",
-    {
-      "tag": "WidgetPredicate",
-      "value": "finishButton"
-    },
-    {
-      "correspondence": "5e11c9696e9b38f0"
     }
   ],
   [
@@ -353,22 +254,22 @@
   ],
   [
     "choose_phone_number",
-    "choose_payment",
-    {
-      "tag": "IsPhoneNumberPredicate"
-    },
-    {
-      "correspondence": "8e0edde4a3199d0c"
-    }
-  ],
-  [
-    "choose_phone_number",
     "choose_phone_number",
     {
       "tag": "TrivialPredicate"
     },
     {
       "correspondence": "dd7404e376113591"
+    }
+  ],
+  [
+    "choose_phone_number",
+    "choose_payment",
+    {
+      "tag": "IsPhoneNumberPredicate"
+    },
+    {
+      "correspondence": "8e0edde4a3199d0c"
     }
   ],
   [
@@ -471,6 +372,18 @@
     },
     {
       "correspondence": "19ed501387d9bc4d"
+    }
+  ],
+  [
+    null,
+    "start",
+    {
+      "tag": "MessageComparisonPredicate",
+      "value": "/start"
+    },
+    {
+      "correspondence": "75f676187e00dd85",
+      "src_state": "null"
     }
   ],
   [
