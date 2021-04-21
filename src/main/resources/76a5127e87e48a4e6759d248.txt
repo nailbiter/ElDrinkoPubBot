@@ -3,4 +3,3 @@
 {{r.name}} - {{r['price (UAH/L)']|myprintf_int}}грн.
 {%-endif%}
 {%endfor-%}
-list other snacks
