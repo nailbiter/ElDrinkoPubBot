@@ -127,15 +127,17 @@ class ElDrinkoPubBot:
                 beerlist=pd.DataFrame(self._get_collection("beerlist").find())
             )
             self._logger.info(f"eim: {eim}")
-            om, data = self._edsm(eim)
-            self._logger.info(f"om: {om}")
-#            _updateUserData(om.right,ud.toString());
-            self._updateUserData(data, str(chat_id))
-#            statesColl.updateOne(Filters.eq("id",ud.toString()),Updates.set("state",_edsm.getState()),new UpdateOptions().upsert(true));
-            states_coll.update_one({"id": str(chat_id)}, {
-                                   "$set": {"state": self._edsm.getState()}}, upsert=True)
-#            _execute(om.left,ud);
-            self._execute(om, chat_id)
+            res = self._edsm(eim)
+            if res is not None:
+                om, data = res
+                self._logger.info(f"om: {om}")
+    #            _updateUserData(om.right,ud.toString());
+                self._updateUserData(data, str(chat_id))
+    #            statesColl.updateOne(Filters.eq("id",ud.toString()),Updates.set("state",_edsm.getState()),new UpdateOptions().upsert(true));
+                states_coll.update_one({"id": str(chat_id)}, {
+                                       "$set": {"state": self._edsm.getState()}}, upsert=True)
+    #            _execute(om.left,ud);
+                self._execute(om, chat_id)
 
     def _execute(self, om, user_data):
         self._logger.info(om)

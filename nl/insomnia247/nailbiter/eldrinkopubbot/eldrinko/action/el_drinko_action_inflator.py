@@ -92,7 +92,9 @@ class ElDrinkoActionInflator:
                     "name": name,
                     "bottles": {},
                 }
-                order["cart"].append(obj)
+                cart = order.get("cart",[])
+                order["cart"] = cart
+                cart.append(obj)
                 im.data["order"] = order
             elif o["type"] == "validButton":
                 cart = im.data["order"]["cart"]
