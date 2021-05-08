@@ -1,5 +1,17 @@
 [
   [
+    null,
+    "start",
+    {
+      "tag": "MessageComparisonPredicate",
+      "value": "/start"
+    },
+    {
+      "correspondence": "75f676187e00dd85",
+      "src_state": "null"
+    }
+  ],
+  [
     "_",
     "start",
     {
@@ -372,18 +384,6 @@
     },
     {
       "correspondence": "19ed501387d9bc4d"
-    }
-  ],
-  [
-    null,
-    "start",
-    {
-      "tag": "MessageComparisonPredicate",
-      "value": "/start"
-    },
-    {
-      "correspondence": "75f676187e00dd85",
-      "src_state": "null"
     }
   ],
   [

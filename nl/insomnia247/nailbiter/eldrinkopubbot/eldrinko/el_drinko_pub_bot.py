@@ -57,6 +57,7 @@ class ElDrinkoPubBot:
         transitions = _actionInflator.transitions
         self._edsm.inflateTransitionsFromJSON(
             _conditionInflator, _actionInflator, json.dumps(transitions["correspondence"]))
+        self._logger.info(f"edsm: {self._edsm}")
 
         commit = subprocess.getoutput("git rev-parse HEAD")
         commit = commit[:7]
