@@ -254,22 +254,22 @@
   ],
   [
     "choose_phone_number",
-    "choose_phone_number",
-    {
-      "tag": "TrivialPredicate"
-    },
-    {
-      "correspondence": "dd7404e376113591"
-    }
-  ],
-  [
-    "choose_phone_number",
     "choose_payment",
     {
       "tag": "IsPhoneNumberPredicate"
     },
     {
       "correspondence": "8e0edde4a3199d0c"
+    }
+  ],
+  [
+    "choose_phone_number",
+    "choose_phone_number",
+    {
+      "tag": "TrivialPredicate"
+    },
+    {
+      "correspondence": "dd7404e376113591"
     }
   ],
   [
