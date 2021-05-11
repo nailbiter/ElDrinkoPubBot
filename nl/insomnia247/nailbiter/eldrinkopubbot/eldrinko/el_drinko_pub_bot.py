@@ -184,6 +184,7 @@ class ElDrinkoPubBot:
 #            .updateOne(Filters.eq("id",id),Updates.set("data",Document.parse(userData.toString())),new UpdateOptions().upsert(true));
 #    }
     def _updateUserData(self, data, id_):
+        self._logger.info(f"data: {data}")
         self._get_collection("data").update_one(
             {"id": id_}, {"$set": {"data": data}}, upsert=True)
 
