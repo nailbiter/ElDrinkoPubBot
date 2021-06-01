@@ -28,3 +28,5 @@ jupyter-notebooks/
 src
 
 .envrc.secret
+Digraph.*
+download_cache.db
