@@ -19,5 +19,7 @@ ORGANIZATION:
 ==============================================================================="""
 
 from collections import namedtuple
+from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.util import UserDbEntry
+
 ElDrinkoInputMessage = namedtuple(
     "ElDrinkoInputMessage", "input_message data user_data beerlist")

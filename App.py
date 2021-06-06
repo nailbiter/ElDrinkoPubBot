@@ -50,7 +50,7 @@ def App(mongo_url, environment, debug, template_folder):
     if debug:
         logging.basicConfig(level=logging.INFO,
                             filename=f".log/{environment}_{datetime.now().strftime('%Y%m%d%H%M%S')}.log.txt",
-                            format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                            format='%(asctime)s,%(msecs)d %(levelname)-8s %(name)s [%(filename)s:%(lineno)d] %(message)s',
                             datefmt='%Y-%m-%d:%H:%M:%S',
                             )
     assert not path.isfile(

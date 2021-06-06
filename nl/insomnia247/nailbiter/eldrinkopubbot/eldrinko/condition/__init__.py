@@ -53,10 +53,10 @@ class WidgetPredicate(MessageKeyboardComparisonPredicate):
         i = int(im.message)
 #        _Log.info(SecureString.format("i: %d",i));
 #        int numProducts = ElDrinkoActionInflator.BOTTLE_TYPES.length;
-        if "name" in eim.data["order"]["cart"][-1]:
+        if "name" in eim.data.order["cart"][-1]:
             numProducts = len(BOTTLE_TYPES)
-        elif "category" in eim.data["order"]["cart"][-1]:
-            category = eim.data["order"]["cart"][-1]["category"]
+        elif "category" in eim.data.order["cart"][-1]:
+            category = eim.data.order["cart"][-1]["category"]
             numProducts = len(eim.beerlist.query(f"category==\"{category}\""))
         else:
             raise NotImplementedError

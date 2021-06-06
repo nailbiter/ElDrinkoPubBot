@@ -24,20 +24,6 @@ import logging
 import math
 
 
-@add_logger
-def _get_order(obj, logger=None):
-    logger.info(f"obj: {obj}")
-    order = obj.get("order", None)
-    if order is not None:
-        order = json.loads(json.dumps(order))
-        order = {
-            **order,
-            **{k: str(obj[k]) for k in ["phone_number", "address", "payment"] if k in obj}
-        }
-    logger.info(f"order: {order}")
-    return order
-
-
 def _increment_order_count(persistent_storage):
     res = int(persistent_storage.get("order_count", 0))
     res += 1
@@ -54,7 +40,6 @@ class _DateTimeFormatter:
 
 
 class ElDrinkoActionInflator:
-
     def __init__(self, send_message_callback, persistent_storage, insert_order_callback, template_folder):
         self._send_message_callback = send_message_callback
         self._persistent_storage = persistent_storage
@@ -82,9 +67,7 @@ class ElDrinkoActionInflator:
                 tka = im.input_message
                 i = int(tka.message)
                 tsv = im.beerlist
-                order = im.data.get("order", None)
-                if order is None:
-                    order = {"cart": []}
+                order = im.data.order
                 obj = {}
                 name = list(tsv["name"])[i]
                 obj = {
@@ -92,12 +75,10 @@ class ElDrinkoActionInflator:
                     "name": name,
                     "bottles": {},
                 }
-                cart = order.get("cart",[])
-                order["cart"] = cart
+                cart = order["cart"]
                 cart.append(obj)
-                im.data["order"] = order
             elif o["type"] == "validButton":
-                cart = im.data["order"]["cart"]
+                cart = im.data.order["cart"]
                 lastItem = cart[-1]
                 bottles = lastItem["bottles"]
                 _i = int(im.input_message.message)
@@ -110,13 +91,16 @@ class ElDrinkoActionInflator:
                     (1 if shouldAdd else -1)
                 bottles[bottleType] = max(bottles[bottleType], 0)
         elif o["correspondence"] == "5e11c9696e9b38f0":
+            self._logger.info("here")
             if o.get("src_state", None) == "delete":
+                self._logger.info("here")
                 tka = im.input_message
                 i = int(tka.message)
-                order = im.data["order"]
+                order = im.data.order
                 cart = order["cart"]
-                removed = cart[i]
-                cart = [x for i_, x in enumerate(cart) if i_ != i]
+#                removed = cart[i]
+#                cart = [x for i_, x in enumerate(cart) if i_ != i]
+                del cart[i]
         elif (o["correspondence"] == "72e97b89bcab08c4" and o.get("src_state", None) == "choose_address") or o["correspondence"] == "774ed3e0f5ef17cf":
             im.data["address"] = im.input_message.message
         elif o["correspondence"] == "8e0edde4a3199d0c":
@@ -133,7 +117,7 @@ class ElDrinkoActionInflator:
             elif o.get("src_state", None) == "edit_phone_number":
                 im.data["phone_number"] = im.input_message.message
         elif o["correspondence"] == "48c6907046b03db8":
-            order = _get_order(im.data)
+            order = im.data.get_order_pretty()
             order["uid"] = im.user_data.username
             tsv = im.beerlist
             order["count"] = _increment_order_count(self._persistent_storage)
@@ -149,11 +133,11 @@ class ElDrinkoActionInflator:
                         "made_order_notification", map_, tsv),
                     tgt
                 )
-            im.data["order"] = {}  # FIXME: this should be done prettier
+            im.data.reset_order()
         elif o["correspondence"] == "75f676187e00dd85" and o.get("src_state", None) is None:
-            im.data["order"] = {}
+            im.data.reset_order()
 
-        ppo = _get_order(im.data)
+        ppo = im.data.get_order_pretty()
         map_ = self._order_object_to_jinja_context(
             ppo, im.beerlist)
         oo = None
@@ -172,9 +156,8 @@ class ElDrinkoActionInflator:
         elif o["correspondence"] == "18ca55e51d11ba24":
             map_["category"] = im.input_message.button_title
         elif o["correspondence"] == "12f00bba97cabd0d":
+            cart = im.data["cart"]
             if src_state == "choose_snack_amount":
-                order = im.data["order"]
-                cart = order.get("cart", [])
                 if o["type"] == "validButton":
                     button_idx = int(im.input_message.message)
                     last_order = cart[-1]
@@ -191,14 +174,11 @@ class ElDrinkoActionInflator:
                         goods_r["name"], 0) + inc
                     last_order["goods"][goods_r["name"]] = max(
                         last_order["goods"][goods_r["name"]], 0)
-                im.data["order"] = {**order, "cart": cart}
             else:
-                order = im.data.get("order", {})
-                cart = order.get("cart", [])
                 cart.append(
                     {"category": im.input_message.button_title, "goods": {}})
-                im.data["order"] = {**order, "cart": cart}
 
+        # FIXME: we need this?
         im.data["username"] = im.user_data.username
         im.data["firstName"] = im.user_data.first_name
         im.data["lastName"] = im.user_data.last_name

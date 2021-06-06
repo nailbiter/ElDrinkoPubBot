@@ -20,7 +20,7 @@ ORGANIZATION:
 
 import logging
 from nl.insomnia247.nailbiter.eldrinkopubbot.util.persistent_storage import PersistentStorage
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
+from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage, UserDbEntry
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_inflator import ElDrinkoActionInflator
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition.el_drinko_condition_inflator import ElDrinkoConditionInflator
 from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
@@ -117,15 +117,12 @@ class ElDrinkoPubBot:
             self._logger.info(f"state: {state}")
             self._edsm.setState(state)
             obj = self._get_collection("data").find_one({"id": str(chat_id)})
-            if obj is None:
-                data = {}
-            else:
-                data = obj["data"]
+            data = {} if obj is None else obj["data"]
             eim = ElDrinkoInputMessage(
                 input_message=im,
-                data=data,
+                data=UserDbEntry(data),
                 user_data=chat_id,
-                beerlist=pd.DataFrame(self._get_collection("beerlist").find())
+                beerlist=pd.DataFrame(self._get_collection("beerlist").find()).query("category=='Напої'")
             )
             self._logger.info(f"eim: {eim}")
             res = self._edsm(eim)
@@ -133,7 +130,7 @@ class ElDrinkoPubBot:
                 om, data = res
                 self._logger.info(f"om: {om}")
     #            _updateUserData(om.right,ud.toString());
-                self._updateUserData(data, str(chat_id))
+                self._updateUserData(data.as_dict(), str(chat_id))
     #            statesColl.updateOne(Filters.eq("id",ud.toString()),Updates.set("state",_edsm.getState()),new UpdateOptions().upsert(true));
                 states_coll.update_one({"id": str(chat_id)}, {
                                        "$set": {"state": self._edsm.getState()}}, upsert=True)
