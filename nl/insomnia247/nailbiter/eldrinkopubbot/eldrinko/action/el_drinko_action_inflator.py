@@ -91,16 +91,13 @@ class ElDrinkoActionInflator:
                     (1 if shouldAdd else -1)
                 bottles[bottleType] = max(bottles[bottleType], 0)
         elif o["correspondence"] == "5e11c9696e9b38f0":
-            self._logger.info("here")
             if o.get("src_state", None) == "delete":
-                self._logger.info("here")
                 tka = im.input_message
                 i = int(tka.message)
                 order = im.data.order
                 cart = order["cart"]
-#                removed = cart[i]
-#                cart = [x for i_, x in enumerate(cart) if i_ != i]
                 del cart[i]
+            im.data.normalize_order()
         elif (o["correspondence"] == "72e97b89bcab08c4" and o.get("src_state", None) == "choose_address") or o["correspondence"] == "774ed3e0f5ef17cf":
             im.data["address"] = im.input_message.message
         elif o["correspondence"] == "8e0edde4a3199d0c":

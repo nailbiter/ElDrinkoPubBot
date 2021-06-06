@@ -64,5 +64,9 @@ class UserDbEntry:
             **{k: str(obj[k]) for k in ["phone_number", "address", "payment"] if k in obj}
         }
 
+    def normalize_order(self):
+        cart = self.order["cart"]
+        self.order["cart"] = [o for o in cart if sum(o["bottles"].values()) > 0]
+
     def __str__(self,):
         return str(self.as_dict())
