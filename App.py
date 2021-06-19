@@ -46,8 +46,8 @@ def _echo(update, context):
 Шукайте наші напої у мережi Craft Beer Shop та слідкуйте за новинами на: 
 
 https://t.me/ElDrinko_Channel
-https://www.instagram.com/el_drinko_beer/
-http://ElDrinko.Beer.
+https://www.instagram.com/El_Drinko_Beer
+http://ElDrinko.Beer
 
 Не втрачайте нас з поля зору! :)
     """)
