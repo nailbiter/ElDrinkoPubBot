@@ -39,6 +39,7 @@ class _AtExitHook:
         click.echo("_atexit_hook")
         os.system(f"rm -rf {self._pidfile}")
 
+
 def _echo(update, context):
     update.message.reply_text(text="""
 На жаль, ми пішли з Кварталу і більше не обробляємо замовлення, але далі буде.
@@ -54,7 +55,7 @@ http://ElDrinko.Beer.
 
 @click.command()
 @click.option("--mongo-url", envvar="MONGO_URL")
-@click.option("--template-folder", type=click.Path(),envvar="TEMPLATE_FOLDER")
+@click.option("--template-folder", type=click.Path(), envvar="TEMPLATE_FOLDER")
 @click.option("--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot")
 @click.option("--debug/--no-debug", default=True)
 def App(mongo_url, environment, debug, template_folder):
