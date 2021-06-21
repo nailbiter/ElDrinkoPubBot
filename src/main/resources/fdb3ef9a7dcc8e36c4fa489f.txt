@@ -1,4 +1,6 @@
 Сьогодні ми пропонуємо:
-{%-for r in products%}
-- {{r[1]}} ({{r[3]}}.00 грн/л)
+{%-for r in beerlist_df.to_dict(orient='records')%}
+{%-if r["category"]=="Напої"%}
+- {{r.name}} ({{r['price (UAH/L)']}}.00 грн/л)
+{%-endif%}
 {%-endfor%}

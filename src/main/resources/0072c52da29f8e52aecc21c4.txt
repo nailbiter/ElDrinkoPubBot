@@ -1,0 +1,10 @@
+{%- for r in beerlist_df.to_dict(orient='records') %}
+{%-if r.category==data.order.cart[-1].category%}
+{{r.name}}
++1
+-1
+{{data.order.cart[-1].goods.get(r.name,0)}}шт
+{%-endif%}
+{%-endfor%}
+Замовити {% for name in data.order.cart[-1].goods %}{{data.order.cart[-1].goods[name]}}шт. {{name}}{{", " if not loop.last}}{%-endfor%}.
+

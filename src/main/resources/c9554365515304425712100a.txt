@@ -1,1 +1,1 @@
-{{products[i][2]}}
+{{products[i][1]}}
