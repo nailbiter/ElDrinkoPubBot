@@ -40,22 +40,9 @@ class _AtExitHook:
         os.system(f"rm -rf {self._pidfile}")
 
 
-def _echo(update, context):
-    update.message.reply_text(text="""
-На жаль, ми пішли з Кварталу і більше не обробляємо замовлення, але далі буде.
-Шукайте наші напої у мережi Craft Beer Shop та слідкуйте за новинами на: 
-
-https://t.me/ElDrinko_Channel
-https://www.instagram.com/El_Drinko_Beer
-http://ElDrinko.Beer
-
-Не втрачайте нас з поля зору! :)
-    """)
-
-
 @click.command()
 @click.option("--mongo-url", envvar="MONGO_URL")
-@click.option("--template-folder", type=click.Path(), envvar="TEMPLATE_FOLDER")
+@click.option("--template-folder", type=click.Path(),envvar="TEMPLATE_FOLDER")
 @click.option("--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot")
 @click.option("--debug/--no-debug", default=True)
 def App(mongo_url, environment, debug, template_folder):
@@ -92,16 +79,16 @@ def App(mongo_url, environment, debug, template_folder):
 
     updater = Updater(keyring["telegram"]["token"], use_context=True)
     bot = updater.bot
-#    edbp = ElDrinkoPubBot(
-#        settings={**settings, "id": environment},
-#        bot=bot,
-#        mongo_url=mongo_url,
-#        template_folder=template_folder
-#    )
+    edbp = ElDrinkoPubBot(
+        settings={**settings, "id": environment},
+        bot=bot,
+        mongo_url=mongo_url,
+        template_folder=template_folder
+    )
     updater.dispatcher.add_handler(
-        MessageHandler(filters=Filters.all, callback=_echo))
-#    updater.dispatcher.add_handler(
-#        CallbackQueryHandler(callback=edbp))
+        MessageHandler(filters=Filters.all, callback=edbp))
+    updater.dispatcher.add_handler(
+        CallbackQueryHandler(callback=edbp))
     updater.start_polling()
     updater.idle()
 
