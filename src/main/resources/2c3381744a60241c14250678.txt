@@ -1,7 +1,7 @@
 {%for t in BOTTLES-%}
-{{t}}л пляшка 
+пляшка 
 +1
 -1
 {{(order.cart|last)["bottles"][t]|default(0)}}шт
 {%endfor-%}
-Замовити {{totalVolume|myprintf}}л {{totalPrice|myprintf}} грн.
+Замовити {{totalPrice|myprintf}} грн.

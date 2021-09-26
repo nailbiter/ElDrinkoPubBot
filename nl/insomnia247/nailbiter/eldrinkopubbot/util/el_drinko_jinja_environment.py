@@ -100,5 +100,4 @@ class ElDrinkoJinjaEnvironment(Environment):
         return self.get_template(f"{template_name}.txt").render(context)
 
 
-BOTTLE_TYPES = [ukrainian_floats.print(x, width=1) for x in [
-    0.5, 1, 1.5, 1.5, 2, 3]]
+BOTTLE_TYPES = [ukrainian_floats.print(x, width=1) for x in [1]]
