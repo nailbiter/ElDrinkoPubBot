@@ -33,7 +33,7 @@ def _myprintf_int(x, logger=None):
 
 
 def _deep_copy(obj):
-    #return json.loads(json.dumps(obj))
+    # return json.loads(json.dumps(obj))
     return copy.deepcopy(obj)
 
 

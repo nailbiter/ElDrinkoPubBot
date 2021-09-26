@@ -47,8 +47,8 @@ class StateMachine:
 
     def __call__(self, input_message):
         try:
-#            x = 1/0
-#            self._logger.info(x)
+            #            x = 1/0
+            #            self._logger.info(x)
             for k, state, transition_condition, transition_action in self._transitions:
                 if k != self._current_state:
                     self._logger.info(f"{k}!={self._current_state}")

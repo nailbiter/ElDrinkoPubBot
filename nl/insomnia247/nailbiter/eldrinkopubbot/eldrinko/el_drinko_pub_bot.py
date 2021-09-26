@@ -46,7 +46,7 @@ class ElDrinkoPubBot:
 
         # FIXME: actually, preloading is not necessary => remove `PreloadImages` method and `DownloadCache` class
         # ElDrinkoStateMachine.PreloadImages(self._get_collection("beerlist"))
-        self._edsm = ElDrinkoStateMachine(self,template_folder)
+        self._edsm = ElDrinkoStateMachine(self, template_folder)
         _actionInflator = ElDrinkoActionInflator(
             self.send_message,
             PersistentStorage(mongo_client.beerbot.var, settings["id"]),
@@ -70,7 +70,7 @@ class ElDrinkoPubBot:
 #                .getCollection(_config.getJSONObject("mongodb").getString("order_history"));
 #            statesColl.insertOne(doc);
 #        }
-    def insert_order(self,order):
+    def insert_order(self, order):
         self._logger.info(f"order: {order}")
         self._get_collection("order_history").insert_one(order)
 
@@ -122,7 +122,8 @@ class ElDrinkoPubBot:
                 input_message=im,
                 data=UserDbEntry(data),
                 user_data=chat_id,
-                beerlist=pd.DataFrame(self._get_collection("beerlist").find()).query("category=='Напої'")
+                beerlist=pd.DataFrame(self._get_collection(
+                    "beerlist").find()).query("category=='Напої'")
             )
             self._logger.info(f"eim: {eim}")
             res = self._edsm(eim)

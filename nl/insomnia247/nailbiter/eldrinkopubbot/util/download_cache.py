@@ -38,13 +38,14 @@ class DownloadCache:
             self._cache_df = pd.read_sql(
                 f"select * from {DownloadCache._DOWNLOAD_CACHE_TABLE_NAME}", conn)
         except pd.io.sql.DatabaseError:
-            self._cache_df = pd.DataFrame({"filename":[],"url":[]})
+            self._cache_df = pd.DataFrame({"filename": [], "url": []})
         slice_ = self._cache_df[[url == url_ for url_ in self._cache_df.url]]
         res = None
         if len(slice_) > 0:
             res = list(slice_["filename"])[0]
         else:
-            fn = path.join(self._tmp_folder, f"{uuid.uuid4()}{self._extension}")
+            fn = path.join(self._tmp_folder,
+                           f"{uuid.uuid4()}{self._extension}")
             os.system(f"wget -O {fn} \"{url}\"")
             pd.DataFrame({"filename": [fn], "url": [url]}).to_sql(
                 DownloadCache._DOWNLOAD_CACHE_TABLE_NAME, conn, if_exists="append", index=None)

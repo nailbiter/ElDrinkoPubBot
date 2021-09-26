@@ -20,8 +20,9 @@ ORGANIZATION:
 from nl.insomnia247.nailbiter.eldrinkopubbot.util import add_logger
 import re
 
+
 @add_logger
-def print(x,width=2,logger=None):
+def print(x, width=2, logger=None):
     logger.info(f"x: {x}")
     res = f"{x:.{width}f}".replace(".", ",")
     logger.info(f"res: {res}")

@@ -25,21 +25,26 @@ import jsonpath_ng
 import logging
 import json
 
+
 class _SimpleCondition:
-    def __init__(self,pred,obj):
+    def __init__(self, pred, obj):
         self._pred = pred
         self._obj = obj
-    def __call__(self,*args,**kwargs):
-        return self._pred(*args,**kwargs)
+
+    def __call__(self, *args, **kwargs):
+        return self._pred(*args, **kwargs)
+
     def __str__(self):
         return json.dumps(self._obj)
+
 
 class ElDrinkoConditionInflator:
     def __init__(self):
         self._logger = logging.getLogger(self.__class__.__name__)
 
-    def __call__(self,o):
-        return _SimpleCondition(self._call(o),o)
+    def __call__(self, o):
+        return _SimpleCondition(self._call(o), o)
+
     def _call(self, o):
         if o["tag"] == "TrivialPredicate":
             return lambda x: True
@@ -52,14 +57,14 @@ class ElDrinkoConditionInflator:
         elif o["tag"] == "MessageComparisonPredicate":
             return lambda x: x.input_message.message == o["value"]
         elif o["tag"] == "MessageKeyboardComparisonPredicate":
-            return MessageKeyboardComparisonPredicate(**{k:v for k,v in o.items() if k!="tag"})
+            return MessageKeyboardComparisonPredicate(**{k: v for k, v in o.items() if k != "tag"})
         elif o["tag"] == "ConjunctionPredicate":
             return lambda x: functools.reduce(lambda x_, y_: x_ and y_, [self(o_)(x) for o_ in o["value"]], True)
         elif o["tag"] == "JsonCheckFieldPredicate":
-            return lambda x:len(jsonpath_ng.parse(o["value"]["path"]).find(x.input_message))>0
+            return lambda x: len(jsonpath_ng.parse(o["value"]["path"]).find(x.input_message)) > 0
         elif o["tag"] == "IsHalfIntegerFloatPredicate":
-            return lambda x:int(2*float(x.input_message.message))==2*float(x.input_message.message)
+            return lambda x: int(2*float(x.input_message.message)) == 2*float(x.input_message.message)
         elif o["tag"] == "WidgetPredicate":
-            return WidgetPredicate(o.get("value",None))
+            return WidgetPredicate(o.get("value", None))
         else:
             raise NotImplementedError(f"o: {o}")

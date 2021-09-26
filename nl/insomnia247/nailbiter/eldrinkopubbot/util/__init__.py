@@ -28,5 +28,3 @@ def add_logger(f):
         return f(*args, logger=logger, **kwargs)
     _f.__name__ = f.__name__
     return _f
-
-
