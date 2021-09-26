@@ -48,17 +48,21 @@ class _AtExitHook:
 def App(mongo_url, environment, debug, template_folder):
     pidfile = f".tmp/{environment}.txt"
 
-    basic_config_kwargs = {"handlers":[]}
+    basic_config_kwargs = {"handlers":[],"level":logging.DEBUG}
     _handler = logging.FileHandler(
-        level=logging.DEBUG,
         filename=f".log/{environment}_{datetime.now().strftime('%Y%m%d%H%M%S')}.log.txt",
-        format='%(asctime)s,%(msecs)d %(levelname)-8s %(name)s [%(filename)s:%(lineno)d] %(message)s',
-        datefmt='%Y-%m-%d:%H:%M:%S',
     )
+    _handler.setFormatter(logging.Formatter(
+        fmt='%(asctime)s,%(msecs)d %(levelname)-8s %(name)s [%(filename)s:%(lineno)d] %(message)s',
+        datefmt='%Y-%m-%d:%H:%M:%S',
+    ))
+    _handler.setLevel(logging.DEBUG)
     basic_config_kwargs["handlers"].append(_handler)
     _handler = logging.StreamHandler()
     if debug:
         _handler.setLevel(logging.INFO)
+    else:
+        _handler.setLevel(logging.WARNING)
     basic_config_kwargs["handlers"].append(_handler)
     logging.basicConfig(**basic_config_kwargs)    
 
