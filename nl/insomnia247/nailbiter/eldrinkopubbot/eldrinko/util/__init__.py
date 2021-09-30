@@ -65,9 +65,8 @@ class UserDbEntry:
         }
 
     def normalize_order(self):
-        cart = self.order["cart"]
-        self.order["cart"] = [
-            o for o in cart if sum(o["bottles"].values()) > 0]
+        self.order["cart"] = {k: v for k,
+                              v in self.order["cart"].items() if v > 0}
 
     def __str__(self,):
         return str(self.as_dict())

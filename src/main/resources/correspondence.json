@@ -44,24 +44,13 @@
   ],
   [
     "start",
-    "choose_product_to_make_order",
-    {
-      "tag": "MessageKeyboardComparisonPredicate",
-      "value": "0"
-    },
-    {
-      "correspondence": "f4a78dc2c6339be1"
-    }
-  ],
-  [
-    "choose_product_to_make_order",
     "choose_amount",
     {
       "tag": "MessageKeyboardComparisonPredicate"
     },
     {
       "correspondence": "9c851972cb7438c5",
-      "src_state": "choose_product_to_make_order"
+      "src_state": "start"
     }
   ],
   [
@@ -103,35 +92,14 @@
   ],
   [
     "confirm",
-    "choose_product_to_make_order",
+    "choose_amount",
     {
       "tag": "MessageKeyboardComparisonPredicate",
       "value": "0"
     },
     {
-      "correspondence": "f4a78dc2c6339be1"
-    }
-  ],
-  [
-    "confirm",
-    "delete",
-    {
-      "tag": "MessageKeyboardComparisonPredicate",
-      "value": "1"
-    },
-    {
-      "correspondence": "04dc388df66f8e8c"
-    }
-  ],
-  [
-    "delete",
-    "confirm",
-    {
-      "tag": "MessageKeyboardComparisonPredicate"
-    },
-    {
-      "correspondence": "5e11c9696e9b38f0",
-      "src_state": "delete"
+      "correspondence": "9c851972cb7438c5",
+      "src_state": "confirm"
     }
   ],
   [
@@ -142,7 +110,7 @@
       "value": [
         {
           "tag": "MessageKeyboardComparisonPredicate",
-          "value": "2"
+          "value": "1"
         },
         {
           "tag": "JsonCheckFieldPredicate",
@@ -173,7 +141,7 @@
       "value": [
         {
           "tag": "MessageKeyboardComparisonPredicate",
-          "value": "2"
+          "value": "1"
         },
         {
           "tag": "NegationPredicate",
@@ -198,7 +166,7 @@
       "value": [
         {
           "tag": "MessageKeyboardComparisonPredicate",
-          "value": "2"
+          "value": "1"
         },
         {
           "tag": "JsonCheckFieldPredicate",

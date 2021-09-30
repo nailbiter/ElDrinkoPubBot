@@ -1,7 +1,9 @@
-{%for t in BOTTLES-%}
-пляшка 
+{%for r in beerlist_df.to_dict(orient="records")-%}
+{%-if r["category"]=="Напої"-%}
+{{r.name}} - {{r['price (UAH/L)']|myprintf_int}}грн.
 +1
 -1
-{{(order.cart|last)["bottles"][t]|default(0)}}шт
+{{order.cart[r.name]|default(0)}}шт
+{%-endif%}
 {%endfor-%}
 Замовити {{totalPrice|myprintf}} грн.

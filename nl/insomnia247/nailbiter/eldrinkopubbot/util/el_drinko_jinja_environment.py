@@ -63,28 +63,34 @@ class ElDrinkoJinjaEnvironment(Environment):
                 "delivery_fee": 20,
                 **order,
             }
-            if "cart" in order:
-                for i, obj in enumerate(order["cart"]):
-                    if "name" in obj:
-                        totalVolume = 0
-                        beerPrice = tsv.query(f"name==\"{obj['name']}\"")[
-                            ElDrinkoJinjaEnvironment._PRICE_FN].sum()
-                        totalVolume = sum([ukrainian_floats.parse(
-                            k)*v for k, v in obj["bottles"].items()])
-
-                        obj["amount"] = totalVolume
-                        additional_context["totalPrice"] = beerPrice * \
-                            totalVolume
-                        additional_context["totalVolume"] = totalVolume
-                        order["sum"] += additional_context["totalPrice"]
-                    elif "category" in obj:
-                        for name, i in obj["goods"].items():
-                            price = tsv.query(f"category==\"{obj['category']}\" and name==\"{name}\"")[
-                                ElDrinkoJinjaEnvironment._PRICE_FN].sum()
-                            order["sum"] += price*i
-                    else:
-                        raise NotImplementedError
-                    order["cart"][i] = obj
+            price = 0
+            if "cart" in order and isinstance(order["cart"], dict):
+                #                for i, obj in enumerate(order["cart"]):
+                #                    if "name" in obj:
+                #                        totalVolume = 0
+                #                        beerPrice = tsv.query(f"name==\"{obj['name']}\"")[
+                #                            ElDrinkoJinjaEnvironment._PRICE_FN].sum()
+                #                        totalVolume = sum([ukrainian_floats.parse(
+                #                            k)*v for k, v in obj["bottles"].items()])
+                #
+                #                        obj["amount"] = totalVolume
+                #                        additional_context["totalPrice"] = beerPrice * \
+                #                            totalVolume
+                #                        additional_context["totalVolume"] = totalVolume
+                #                        order["sum"] += additional_context["totalPrice"]
+                #                    elif "category" in obj:
+                #                        for name, i in obj["goods"].items():
+                #                            price = tsv.query(f"category==\"{obj['category']}\" and name==\"{name}\"")[
+                #                                ElDrinkoJinjaEnvironment._PRICE_FN].sum()
+                #                            order["sum"] += price*i
+                #                    else:
+                #                        raise NotImplementedError
+                #                    order["cart"][i] = obj
+                _prices = {n: p for n, p in zip(
+                    tsv.name, tsv['price (UAH/L)'])}
+                price = sum([v*_prices[k] for k, v in order["cart"].items()])
+            additional_context["totalPrice"] = price
+            order["sum"] = additional_context["totalPrice"]
             if order["sum"] >= 250:
                 order["delivery_fee"] = 0
             additional_context["order"] = order

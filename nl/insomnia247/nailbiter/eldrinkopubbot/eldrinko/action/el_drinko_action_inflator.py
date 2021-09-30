@@ -63,33 +63,30 @@ class ElDrinkoActionInflator:
     def _call(self, o, im, src_state, dst_state):
         """return (outmessage, user_data_update)"""
         if o["correspondence"] in ["9c851972cb7438c5", "07defdb4543782cb"]:
-            if o.get("src_state", None) == "choose_product_to_make_order":
-                tka = im.input_message
-                i = int(tka.message)
-                tsv = im.beerlist
-                order = im.data.order
-                obj = {}
-                name = list(tsv["name"])[i]
-                obj = {
-                    **obj,
-                    "name": name,
-                    "bottles": {},
-                }
-                cart = order["cart"]
-                cart.append(obj)
-            elif o["type"] == "validButton":
+#            if o.get("src_state", None) == "choose_product_to_make_order":
+#                tka = im.input_message
+#                i = int(tka.message)
+#                tsv = im.beerlist
+#                order = im.data.order
+#                obj = {}
+#                name = list(tsv["name"])[i]
+#                obj = {
+#                    **obj,
+#                    "name": name,
+#                    "bottles": {},
+#                }
+#                cart = order["cart"]
+#                cart.append(obj)
+#            elif o["type"] == "validButton":
+            self._logger.info(f"o: {o}")
+            if o.get("src_state",None)=="start":
+                im.data.order["cart"] = {}
+            elif o.get("type",None) == "validButton":
                 cart = im.data.order["cart"]
-                lastItem = cart[-1]
-                bottles = lastItem["bottles"]
                 _i = int(im.input_message.message)
-                idx = int(_i/4)
-                shouldAdd = _i % 4 == 1
-                bottleType = BOTTLE_TYPES[idx]
-                if bottleType not in bottles:
-                    bottles[bottleType] = 0
-                bottles[bottleType] = bottles[bottleType] + \
-                    (1 if shouldAdd else -1)
-                bottles[bottleType] = max(bottles[bottleType], 0)
+                idx,shouldAdd = int(_i/4), _i % 4 == 1
+                name = im.beerlist.name.iloc[idx]
+                cart[name] = max(cart.get(name,0) + (1 if shouldAdd else -1),0)
         elif o["correspondence"] == "5e11c9696e9b38f0":
             if o.get("src_state", None) == "delete":
                 tka = im.input_message
