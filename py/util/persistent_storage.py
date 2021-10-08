@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/nl/insomnia247/nailbiter/eldrinkopubbot/util/persistent_storage.py
+        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/py/util/persistent_storage.py
 
        USAGE: (not intended to be directly executed)
 

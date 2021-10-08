@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: ./nl/insomnia247/nailbiter/eldrinkopubbot/eldrinko/el_drinko_state_machine.py
+        FILE: ./py/eldrinko/el_drinko_state_machine.py
 
        USAGE: (not intended to be directly executed)
 
@@ -18,8 +18,8 @@ ORGANIZATION:
 
 ==============================================================================="""
 
-from nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.exposed_state_machine import ExposedStateMachine
-from nl.insomnia247.nailbiter.eldrinkopubbot.util.download_cache import DownloadCache
+from py.state_machine.exposed_state_machine import ExposedStateMachine
+from py.util.download_cache import DownloadCache
 from jinja2 import Template
 from time import time
 from os import path

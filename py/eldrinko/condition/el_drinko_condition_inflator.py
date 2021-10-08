@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/nl/insomnia247/nailbiter/eldrinkopubbot/eldrinko/condition/el_drinko_condition_inflator.py
+        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/py/eldrinko/condition/el_drinko_condition_inflator.py
 
        USAGE: (not intended to be directly executed)
 
@@ -18,8 +18,8 @@ ORGANIZATION:
 
 ==============================================================================="""
 import re
-from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition import WidgetPredicate, MessageKeyboardComparisonPredicate
+from py.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
+from py.eldrinko.condition import WidgetPredicate, MessageKeyboardComparisonPredicate
 import functools
 import jsonpath_ng
 import logging

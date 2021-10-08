@@ -1,5 +1,5 @@
 """===============================================================================
-        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/nl/insomnia247/nailbiter/eldrinkopubbot/eldrinko/action/el_drinko_action_inflator.py
+        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/py/eldrinko/action/el_drinko_action_inflator.py
        USAGE: (not intended to be directly executed)
  DESCRIPTION:
      OPTIONS: ---
@@ -12,10 +12,10 @@ ORGANIZATION:
      CREATED: 2021-02-07T14:32:53.623252
     REVISION: ---
 ==============================================================================="""
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage
-from nl.insomnia247.nailbiter.eldrinkopubbot.util import add_logger, ukrainian_floats
-from nl.insomnia247.nailbiter.eldrinkopubbot.util.el_drinko_jinja_environment import ElDrinkoJinjaEnvironment, BOTTLE_TYPES
-from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage, TelegramArrayOutputMessage
+from py.eldrinko import ElDrinkoInputMessage
+from py.util import add_logger, ukrainian_floats
+from py.util.el_drinko_jinja_environment import ElDrinkoJinjaEnvironment, BOTTLE_TYPES
+from py.telegram import TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage, TelegramArrayOutputMessage
 from jinja2.loaders import FileSystemLoader
 import json
 from datetime import datetime, date

@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: ./nl/insomnia247/nailbiter/eldrinkopubbot/eldrinko/__init__.py
+        FILE: ./py/eldrinko/__init__.py
 
        USAGE: (not intended to be directly executed)
 
@@ -19,7 +19,7 @@ ORGANIZATION:
 ==============================================================================="""
 
 from collections import namedtuple
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.util import UserDbEntry
+from py.eldrinko.util import UserDbEntry
 
 ElDrinkoInputMessage = namedtuple(
     "ElDrinkoInputMessage", "input_message data user_data beerlist")

@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: nl/insomnia247/nailbiter/eldrinkopubbot/telegram/user_data.py
+        FILE: py/telegram/user_data.py
 
        USAGE: (not intended to be directly executed)
 

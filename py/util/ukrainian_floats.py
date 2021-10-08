@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: nl/insomnia247/nailbiter/eldrinkopubbot/eldrinko/action/../../util/ukrainian_floats.py
+        FILE: py/eldrinko/action/../../util/ukrainian_floats.py
 
        USAGE: (not intended to be directly executed)
 
@@ -17,7 +17,7 @@ ORGANIZATION:
     REVISION: ---
 
 ==============================================================================="""
-from nl.insomnia247.nailbiter.eldrinkopubbot.util import add_logger
+from py.util import add_logger
 import re
 
 

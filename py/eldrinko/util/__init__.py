@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/nl/insomnia247/nailbiter/eldrinkopubbot/eldrinko/util/__init__.py
+        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/py/eldrinko/util/__init__.py
 
        USAGE: (not intended to be directly executed)
 

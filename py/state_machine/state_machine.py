@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/nl/insomnia247/nailbiter/eldrinkopubbot/state_machine/StateMachine.py
+        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/py/state_machine/StateMachine.py
 
        USAGE: (not intended to be directly executed)
 

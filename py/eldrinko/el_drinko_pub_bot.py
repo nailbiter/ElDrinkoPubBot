@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: nl/insomnia247/nailbiter/eldrinkopubbot/ElDrinkoPubBot.py
+        FILE: py/ElDrinkoPubBot.py
 
        USAGE: (not intended to be directly executed)
 
@@ -19,13 +19,13 @@ ORGANIZATION:
 ==============================================================================="""
 
 import logging
-from nl.insomnia247.nailbiter.eldrinkopubbot.util.persistent_storage import PersistentStorage
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko import ElDrinkoInputMessage, UserDbEntry
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.action.el_drinko_action_inflator import ElDrinkoActionInflator
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.condition.el_drinko_condition_inflator import ElDrinkoConditionInflator
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
-from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer, TelegramArrayOutputMessage, TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage
-from nl.insomnia247.nailbiter.eldrinkopubbot.telegram.user_data import UserData
+from py.util.persistent_storage import PersistentStorage
+from py.eldrinko import ElDrinkoInputMessage, UserDbEntry
+from py.eldrinko.action.el_drinko_action_inflator import ElDrinkoActionInflator
+from py.eldrinko.condition.el_drinko_condition_inflator import ElDrinkoConditionInflator
+from py.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
+from py.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer, TelegramArrayOutputMessage, TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage
+from py.telegram.user_data import UserData
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 from pymongo import MongoClient
 import os
@@ -105,6 +105,11 @@ class ElDrinkoPubBot:
         else:
             return None
 
+    def _get_beerlist(self):
+        df = pd.DataFrame(self._get_collection(
+            "beerlist").find()).query("category=='Напої'")
+        return df
+
     def __call__(self, update, context):
         self._logger.info(f"message> {update.message}")
         # update.message.reply_text(text="text")
@@ -122,8 +127,7 @@ class ElDrinkoPubBot:
                 input_message=im,
                 data=UserDbEntry(data),
                 user_data=chat_id,
-                beerlist=pd.DataFrame(self._get_collection(
-                    "beerlist").find()).query("category=='Напої'")
+                beerlist=self._get_beerlist()
             )
             self._logger.info(f"eim: {eim}")
             res = self._edsm(eim)

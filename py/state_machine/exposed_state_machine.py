@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: ./nl/insomnia247/nailbiter/eldrinkopubbot/state_machine/exposed_state_machine.py
+        FILE: ./py/state_machine/exposed_state_machine.py
 
        USAGE: (not intended to be directly executed)
 
@@ -18,7 +18,7 @@ ORGANIZATION:
 
 ==============================================================================="""
 
-from nl.insomnia247.nailbiter.eldrinkopubbot.state_machine.state_machine import StateMachine
+from py.state_machine.state_machine import StateMachine
 
 
 class ExposedStateMachine(StateMachine):

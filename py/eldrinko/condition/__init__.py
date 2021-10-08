@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/nl/insomnia247/nailbiter/eldrinkopubbot/eldrinko/condition/__init__.py
+        FILE: /Users/nailbiter/Documents/forgithub/ElDrinkoPubBot/py/eldrinko/condition/__init__.py
 
        USAGE: (not intended to be directly executed)
 
@@ -18,8 +18,8 @@ ORGANIZATION:
 
 ==============================================================================="""
 
-from nl.insomnia247.nailbiter.eldrinkopubbot.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
-from nl.insomnia247.nailbiter.eldrinkopubbot.util.el_drinko_jinja_environment import BOTTLE_TYPES
+from py.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer
+from py.util.el_drinko_jinja_environment import BOTTLE_TYPES
 import re
 import logging
 

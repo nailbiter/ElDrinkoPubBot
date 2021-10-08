@@ -1,6 +1,6 @@
 """===============================================================================
 
-        FILE: nl/insomnia247/nailbiter/eldrinkopubbot/util/el_drinko_jinja_environment.py
+        FILE: py/util/el_drinko_jinja_environment.py
 
        USAGE: (not intended to be directly executed)
 
@@ -19,7 +19,7 @@ ORGANIZATION:
 ==============================================================================="""
 from jinja2 import Environment, Template
 import logging
-from nl.insomnia247.nailbiter.eldrinkopubbot.util import ukrainian_floats, add_logger
+from py.util import ukrainian_floats, add_logger
 import json
 import copy
 
