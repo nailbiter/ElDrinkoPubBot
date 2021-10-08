@@ -61,7 +61,7 @@ class UserDbEntry:
         obj = self._data
         return {
             **json.loads(json.dumps(self.order)),
-            **{k: str(obj[k]) for k in ["phone_number", "address", "payment"] if k in obj}
+            **{k: str(obj[k]) for k in ["address"] if k in obj}
         }
 
     def normalize_order(self):

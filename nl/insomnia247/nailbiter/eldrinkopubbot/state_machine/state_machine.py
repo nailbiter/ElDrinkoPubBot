@@ -49,6 +49,7 @@ class StateMachine:
         try:
             #            x = 1/0
             #            self._logger.info(x)
+            self._logger.info(f"we got {(self._current_state,input_message)}")
             for k, state, transition_condition, transition_action in self._transitions:
                 if k != self._current_state:
                     self._logger.info(f"{k}!={self._current_state}")

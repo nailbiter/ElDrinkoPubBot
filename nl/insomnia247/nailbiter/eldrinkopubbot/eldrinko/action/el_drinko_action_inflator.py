@@ -98,19 +98,9 @@ class ElDrinkoActionInflator:
             im.data.normalize_order()
         elif (o["correspondence"] == "72e97b89bcab08c4" and o.get("src_state", None) == "choose_address") or o["correspondence"] == "774ed3e0f5ef17cf":
             im.data["address"] = im.input_message.message
-        elif o["correspondence"] == "8e0edde4a3199d0c":
-            im.data["phone_number"] = im.input_message.message
         elif o["correspondence"] == "fa702a44b70ddcae":
             if o.get("src_state", None) == "edit_address":
                 im.data["address"] = im.input_message.message
-            elif o.get("src_state", None) == "choose_payment":
-                tka = im.input_message
-                i = int(tka.message)
-                paymentMethods = self._jinja_env.get_template(
-                    "4ea9a63509e8ed5826a37f8a.txt").render().split("\n")
-                im.data["payment"] = paymentMethods[i]
-            elif o.get("src_state", None) == "edit_phone_number":
-                im.data["phone_number"] = im.input_message.message
         elif o["correspondence"] == "48c6907046b03db8":
             order = im.data.get_order_pretty()
             order["uid"] = im.user_data.username

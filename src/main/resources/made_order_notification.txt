@@ -2,6 +2,4 @@
 Покупець: {{order.uid}}
 Замовив: {%include "_order_line.jinja.txt"%}
 Адреса замовлення: {{order.address}}
-Номер телефону: {{order.phone_number}}
-Форма сплати: {{order.payment}}
 Сума до сплати {{(order.sum)|myprintf}} грн.
