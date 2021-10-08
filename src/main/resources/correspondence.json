@@ -94,8 +94,8 @@
     "confirm",
     "choose_amount",
     {
-        "tag": "MessageKeyboardComparisonPredicate",
-        "value": "0"
+      "tag": "MessageKeyboardComparisonPredicate",
+      "value": "0"
     },
     {
       "correspondence": "9c851972cb7438c5"

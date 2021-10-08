@@ -23,18 +23,18 @@ jobs:
           .github_scripts/slack_and_fail.sh
 #        env:
 #          PIPELINE_PR_FAIL_NOTIFICATION_WH: ${{secrets.PIPELINE_PR_FAIL_NOTIFICATION_WH}}
-#      - name: Set up Python 3.7
-#        uses: actions/setup-python@v1
-#        with:
-#         python-version: 3.7
-#      - name: Install Dependencies
-#        run: |
-#          sudo apt-get install python3-pip
-#          pip3 install --upgrade pip
-#          pip3 install -r ./composer/test_requirements.txt
-#      - name: pytest
-#        run: |
-#          cd composer
-#          pytest || ../.github_scripts/slack_and_fail.sh
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+         python-version: 3.7
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install python3-pip
+          pip3 install --upgrade pip
+          pip3 install -r ./test_requirements.txt
+      - name: pytest
+        run: |
+          cd composer
+          pytest || ../.github_scripts/slack_and_fail.sh
 #        env:
 #          PIPELINE_PR_FAIL_NOTIFICATION_WH: ${{secrets.PIPELINE_PR_FAIL_NOTIFICATION_WH}}

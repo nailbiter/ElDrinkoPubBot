@@ -39,6 +39,21 @@
     "message": "fdb3ef9a7dcc8e36c4fa489f",
     "tag": "TelegramKeyboard"
   },
+  "1df8ef4b2a4751f1": [
+    {
+      "message": "526b3b48fb69070e6953eba3",
+      "tag": "TelegramTextOutputMessage"
+    },
+    {
+      "message": "f540cf40794c154afbd807a6",
+      "tag": "TelegramTextOutputMessage"
+    },
+    {
+      "keyboard": "4ea9a63509e8ed5826a37f8a",
+      "message": "1dc02faec7377fc537510e30",
+      "tag": "TelegramKeyboard"
+    }
+  ],
   "2e2aa27f140e603a": [
     {
       "message": "f540cf40794c154afbd807a6",
@@ -83,21 +98,6 @@
     {
       "keyboard": "16c4082080253eee262c9cf2",
       "message": "fdb3ef9a7dcc8e36c4fa489f",
-      "tag": "TelegramKeyboard"
-    }
-  ],
-  "1df8ef4b2a4751f1": [
-    {
-      "message": "526b3b48fb69070e6953eba3",
-      "tag": "TelegramTextOutputMessage"
-    },
-    {
-      "message": "f540cf40794c154afbd807a6",
-      "tag": "TelegramTextOutputMessage"
-    },
-    {
-      "keyboard": "4ea9a63509e8ed5826a37f8a",
-      "message": "1dc02faec7377fc537510e30",
       "tag": "TelegramKeyboard"
     }
   ],
