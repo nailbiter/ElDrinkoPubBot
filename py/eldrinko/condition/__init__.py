@@ -69,6 +69,7 @@ class WidgetPredicate(MessageKeyboardComparisonPredicate):
 #        } else if (_type.equals("invalidButton")) {
 #            return (i==4*numProducts) || ((i%4!=1) && (i%4!=2));
 #        }
+        self._logger.info(f"before test: {(i,self._type,numProducts)}")
         if self._type == "finishButton":
             return i == 4*numProducts
         elif self._type == "validButton":

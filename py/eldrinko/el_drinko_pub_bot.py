@@ -26,13 +26,16 @@ from py.eldrinko.condition.el_drinko_condition_inflator import ElDrinkoCondition
 from py.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
 from py.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer, TelegramArrayOutputMessage, TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage
 from py.telegram.user_data import UserData
+from py.util import google_spreadsheet
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 from pymongo import MongoClient
 import os
+from os import path
 import subprocess
 import pandas as pd
 import json
 import itertools
+from datetime import datetime, timedelta
 
 
 class ElDrinkoPubBot:
@@ -43,6 +46,7 @@ class ElDrinkoPubBot:
         self._bot = bot
         mongo_client = MongoClient(mongo_url)
         self._mongo_client = mongo_client
+        self._beerlist_cache = None
 
         # FIXME: actually, preloading is not necessary => remove `PreloadImages` method and `DownloadCache` class
         # ElDrinkoStateMachine.PreloadImages(self._get_collection("beerlist"))
@@ -106,9 +110,19 @@ class ElDrinkoPubBot:
             return None
 
     def _get_beerlist(self):
-        df = pd.DataFrame(self._get_collection(
-            "beerlist").find()).query("category=='Напої'")
-        return df
+        if self._beerlist_cache is None or (datetime.now()-self._beerlist_cache["timestamp"]) >= timedelta(minutes=5):
+            now = datetime.now()
+            creds = google_spreadsheet.get_creds(
+                client_secret_file="client_secret.json", create_if_not_exist=True)
+            beerlist_url = self._settings["google_spreadsheet"]["beerlist"]
+            df = google_spreadsheet.download_df_from_google_sheets(
+                creds, **beerlist_url)
+            df["price (UAH/L)"] = df["price (UAH/L)"].apply(int)
+            df = df.query("category=='Напої'")
+            self._beerlist_cache = {"timestamp": now, "df": df}
+        else:
+            self._logger.warning("using cache")
+        return self._beerlist_cache["df"]
 
     def __call__(self, update, context):
         self._logger.info(f"message> {update.message}")

@@ -26,7 +26,7 @@ import json
 import os
 from os import path
 import atexit
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_pub_bot import ElDrinkoPubBot
+from py.eldrinko.el_drinko_pub_bot import ElDrinkoPubBot
 import logging
 from datetime import datetime
 
