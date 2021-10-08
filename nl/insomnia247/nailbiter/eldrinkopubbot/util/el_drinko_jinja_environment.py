@@ -60,7 +60,6 @@ class ElDrinkoJinjaEnvironment(Environment):
             order = additional_context["order"]
             order = {
                 "sum": 0,
-                "delivery_fee": 20,
                 **order,
             }
             price = 0
@@ -91,8 +90,6 @@ class ElDrinkoJinjaEnvironment(Environment):
                 price = sum([v*_prices[k] for k, v in order["cart"].items()])
             additional_context["totalPrice"] = price
             order["sum"] = additional_context["totalPrice"]
-            if order["sum"] >= 250:
-                order["delivery_fee"] = 0
             additional_context["order"] = order
 
         context = {

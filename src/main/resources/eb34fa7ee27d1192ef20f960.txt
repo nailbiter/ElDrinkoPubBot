@@ -1,5 +1,5 @@
 Ви замовили: {%include "_order_line.jinja.txt"%}.
-Сума до сплати {{(order.sum + order.delivery_fee)|myprintf}} грн.
+Сума до сплати {{(order.sum)|myprintf}} грн.
 Форма сплати: {{order.payment}}
 Адреса замовлення: {{order.address}}
 Телефон: {{order.phone_number}}
