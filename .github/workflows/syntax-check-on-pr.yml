@@ -34,6 +34,6 @@ jobs:
           pip3 install -r ./test_requirements.txt
       - name: pytest
         run: |
-          pytest || ../.github_scripts/slack_and_fail.sh
+          pytest || .github_scripts/slack_and_fail.sh
 #        env:
 #          PIPELINE_PR_FAIL_NOTIFICATION_WH: ${{secrets.PIPELINE_PR_FAIL_NOTIFICATION_WH}}
