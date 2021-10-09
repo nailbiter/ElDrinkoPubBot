@@ -128,16 +128,16 @@ class ElDrinkoActionInflator:
         oo = None
 
         if o["correspondence"] == "72aa7197071b6503":
-            tka = im.input_message
-            tsv = im.beerlist
-            imgUrl = list(tsv["image link"])[int(tka.message)]
-            map_["i"] = int(tka.message)
-            oo = imgUrl
-        elif o["correspondence"] == "02503b04d94259c5":
-            r = im.beerlist.query(f"name=='{im.input_message.button_title}'").to_dict(
-                orient="records")[0]
-            oo = r["image link"]
-            map_["description"] = r["description"]
+            #            tka = im.input_message
+            #            tsv = im.beerlist
+            #            imgUrl = list(tsv["image link"])[int(tka.message)]
+            #            map_["i"] = int(tka.message)
+            #            oo = imgUrl
+            #        elif o["correspondence"] == "02503b04d94259c5":
+            logging.info(f"72aa7197071b6503: {im.input_message}")
+            i = int(im.input_message.message)
+            oo = im.beerlist["image link"].iloc[i]
+            map_["description"] = im.beerlist.description.iloc[i]
         elif o["correspondence"] == "18ca55e51d11ba24":
             map_["category"] = im.input_message.button_title
         elif o["correspondence"] == "12f00bba97cabd0d":
@@ -204,7 +204,11 @@ class ElDrinkoActionInflator:
             msg = m
             tag = msg["tag"]
             if tag == "TelegramTextOutputMessage":
-                return TelegramTextOutputMessage(self._jinja_env.process_template(msg["message"], env, tsv))
+                self._logger.info(f"image msg: {msg['message']}")
+                res = self._jinja_env.process_template(
+                    msg["message"], env, tsv)
+                self._logger.info(f"image msg: {res}")
+                return TelegramTextOutputMessage(res)
             elif tag == "TelegramKeyboard":
                 return self._inflate_telegram_keyboard(env, msg["message"], msg["keyboard"], tsv, msg.get("columns", 2))
             elif tag == "TelegramImageOutputMessage":
