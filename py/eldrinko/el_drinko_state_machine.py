@@ -25,6 +25,7 @@ from time import time
 from os import path
 import logging
 import traceback
+import uuid
 
 
 class ElDrinkoStateMachine(ExposedStateMachine):
@@ -43,17 +44,20 @@ class ElDrinkoStateMachine(ExposedStateMachine):
             dc(r["image link"])
 
     def _exception_handler(self, exception, input_message):
+        self._logger.info("_exception_handler was called")
         self._eldrinko_exception_handler(input_message, exception=exception)
 
     def _eldrinko_exception_handler(self, input_message, exception=None):
-        error_code = int(time())
+        self._logger.info("_eldrinko_exception_handler was called")
+        error_code = str(uuid.uuid4())
         if exception is not None:
             self._logger.info(traceback.format_exc())
             self._logger.info(f"exception: {exception}")
-            error_code = -error_code
+#            error_code = -error_code
         self._logger.error(f"error code: {error_code}")
         self._sendOrderCallback.send_message(self._tpl.render(
             {"error_code": error_code}), str(input_message.user_data))
 
     def _didNotFoundSuitableTransition(self, im):
+        self._logger.info("_didNotFoundSuitableTransition was called")
         self._eldrinko_exception_handler(im)
