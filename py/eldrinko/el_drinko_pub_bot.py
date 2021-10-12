@@ -205,7 +205,10 @@ class ElDrinkoPubBot:
             {"id": id_}, {"$set": {"data": data}}, upsert=True)
 
     def _send_message(self, chat_id, msg):
-        sent_msg = self._bot.sendMessage(chat_id=chat_id, **msg)
+        try:
+            sent_msg = self._bot.sendMessage(chat_id=chat_id, **msg)
+        except telegram.error.Unauthorized:
+            self._logger.warning(f"could not send {msg} to {chat_id}")
 
     def send_message(self, message, recipient, is_markdown=False):
         if recipient == "developerChatIds":
