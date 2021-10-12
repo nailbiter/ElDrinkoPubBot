@@ -27,7 +27,7 @@ from py.eldrinko.el_drinko_state_machine import ElDrinkoStateMachine
 from py.telegram import TelegramTextInputMessage, TelegramKeyboardAnswer, TelegramArrayOutputMessage, TelegramKeyboard, TelegramTextOutputMessage, TelegramImageOutputMessage
 from py.telegram.user_data import UserData
 from py.util import google_spreadsheet
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, error
 from pymongo import MongoClient
 import os
 from os import path
@@ -207,7 +207,7 @@ class ElDrinkoPubBot:
     def _send_message(self, chat_id, msg):
         try:
             sent_msg = self._bot.sendMessage(chat_id=chat_id, **msg)
-        except telegram.error.Unauthorized:
+        except error.Unauthorized:
             self._logger.warning(f"could not send {msg} to {chat_id}")
 
     def send_message(self, message, recipient, is_markdown=False):
