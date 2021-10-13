@@ -1,19 +1,4 @@
 {
-  "02b6ac70d65c067e": [
-    {
-      "message": "526b3b48fb69070e6953eba3",
-      "tag": "TelegramTextOutputMessage"
-    },
-    {
-      "message": "fcff2695d806371dab5d7e05",
-      "tag": "TelegramTextOutputMessage"
-    }
-  ],
-  "04dc388df66f8e8c": {
-    "keyboard": "ac9a00c3bc0e96735b047a7e",
-    "message": "2ae6c7859b755abf51a3289b",
-    "tag": "TelegramKeyboard"
-  },
   "07defdb4543782cb": [
     {
       "message": "b0a3c9bdf91ea92bb36a3624",
