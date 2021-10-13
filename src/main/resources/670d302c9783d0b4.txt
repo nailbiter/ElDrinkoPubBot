@@ -1,5 +1,0 @@
-{%-for r in beerlist_df.to_dict(orient='records')%}
-{%-if r['category']==category%}
-{{r['name']}}
-{%-endif%}
-{%-endfor%}
