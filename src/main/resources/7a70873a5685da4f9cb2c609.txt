@@ -1,5 +1,4 @@
 Ви замовили {%include "_order_line.jinja.txt"%}.
 Сума замовлення: {{order.sum|myprintf}} грн.
-Сума до сплати: {{(order.sum)|myprintf}} грн.
 
 Що робимо далі?
