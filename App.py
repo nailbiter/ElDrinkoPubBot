@@ -26,7 +26,7 @@ import json
 import os
 from os import path
 import atexit
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_pub_bot import ElDrinkoPubBot
+from py.eldrinko.el_drinko_pub_bot import ElDrinkoPubBot
 import logging
 from datetime import datetime
 
@@ -40,19 +40,6 @@ class _AtExitHook:
         os.system(f"rm -rf {self._pidfile}")
 
 
-def _echo(update, context):
-    update.message.reply_text(text="""
-На жаль, ми пішли з Кварталу і більше не обробляємо замовлення, але далі буде.
-Шукайте наші напої у мережi Craft Beer Shop та слідкуйте за новинами на: 
-
-https://t.me/ElDrinko_Channel
-https://www.instagram.com/El_Drinko_Beer
-http://ElDrinko.Beer
-
-Не втрачайте нас з поля зору! :)
-    """)
-
-
 @click.command()
 @click.option("--mongo-url", envvar="MONGO_URL")
 @click.option("--template-folder", type=click.Path(), envvar="TEMPLATE_FOLDER")
@@ -60,16 +47,30 @@ http://ElDrinko.Beer
 @click.option("--debug/--no-debug", default=True)
 def App(mongo_url, environment, debug, template_folder):
     pidfile = f".tmp/{environment}.txt"
+
+    basic_config_kwargs = {"handlers": [], "level": logging.DEBUG}
+    _handler = logging.FileHandler(
+        filename=f".log/{environment}_{datetime.now().strftime('%Y%m%d%H%M%S')}.log.txt",
+    )
+    _handler.setFormatter(logging.Formatter(
+        fmt='%(asctime)s,%(msecs)d %(levelname)-8s %(name)s [%(filename)s:%(lineno)d] %(message)s',
+        datefmt='%Y-%m-%d:%H:%M:%S',
+    ))
+    _handler.setLevel(logging.DEBUG)
+    basic_config_kwargs["handlers"].append(_handler)
+    _handler = logging.StreamHandler()
     if debug:
-        logging.basicConfig(level=logging.INFO,
-                            filename=f".log/{environment}_{datetime.now().strftime('%Y%m%d%H%M%S')}.log.txt",
-                            format='%(asctime)s,%(msecs)d %(levelname)-8s %(name)s [%(filename)s:%(lineno)d] %(message)s',
-                            datefmt='%Y-%m-%d:%H:%M:%S',
-                            )
+        _handler.setLevel(logging.INFO)
+    else:
+        _handler.setLevel(logging.WARNING)
+    basic_config_kwargs["handlers"].append(_handler)
+    logging.basicConfig(**basic_config_kwargs)
+
     assert not path.isfile(
         pidfile), "only one instance of ElDrinkoPubBot allowed to run"
     with open(pidfile, "w") as f:
         f.write(str(os.getpid()))
+
     mongo_client = MongoClient(mongo_url)
     settings, keyring = [
         {k: v for k, v in mongo_client.beerbot[kk].find_one(
@@ -82,16 +83,16 @@ def App(mongo_url, environment, debug, template_folder):
 
     updater = Updater(keyring["telegram"]["token"], use_context=True)
     bot = updater.bot
-#    edbp = ElDrinkoPubBot(
-#        settings={**settings, "id": environment},
-#        bot=bot,
-#        mongo_url=mongo_url,
-#        template_folder=template_folder
-#    )
+    edbp = ElDrinkoPubBot(
+        settings={**settings, "id": environment},
+        bot=bot,
+        mongo_url=mongo_url,
+        template_folder=template_folder
+    )
     updater.dispatcher.add_handler(
-        MessageHandler(filters=Filters.all, callback=_echo))
-#    updater.dispatcher.add_handler(
-#        CallbackQueryHandler(callback=edbp))
+        MessageHandler(filters=Filters.all, callback=edbp))
+    updater.dispatcher.add_handler(
+        CallbackQueryHandler(callback=edbp))
     updater.start_polling()
     updater.idle()
 

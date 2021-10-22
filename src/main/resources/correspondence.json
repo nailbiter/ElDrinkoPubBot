@@ -44,24 +44,13 @@
   ],
   [
     "start",
-    "choose_product_to_make_order",
-    {
-      "tag": "MessageKeyboardComparisonPredicate",
-      "value": "0"
-    },
-    {
-      "correspondence": "f4a78dc2c6339be1"
-    }
-  ],
-  [
-    "choose_product_to_make_order",
     "choose_amount",
     {
       "tag": "MessageKeyboardComparisonPredicate"
     },
     {
       "correspondence": "9c851972cb7438c5",
-      "src_state": "choose_product_to_make_order"
+      "src_state": "start"
     }
   ],
   [
@@ -103,66 +92,35 @@
   ],
   [
     "confirm",
-    "choose_product_to_make_order",
+    "choose_amount",
     {
       "tag": "MessageKeyboardComparisonPredicate",
       "value": "0"
     },
     {
-      "correspondence": "f4a78dc2c6339be1"
+      "correspondence": "9c851972cb7438c5"
     }
   ],
   [
     "confirm",
-    "delete",
-    {
-      "tag": "MessageKeyboardComparisonPredicate",
-      "value": "1"
-    },
-    {
-      "correspondence": "04dc388df66f8e8c"
-    }
-  ],
-  [
-    "delete",
-    "confirm",
-    {
-      "tag": "MessageKeyboardComparisonPredicate"
-    },
-    {
-      "correspondence": "5e11c9696e9b38f0",
-      "src_state": "delete"
-    }
-  ],
-  [
-    "confirm",
-    "choose_phone_number",
+    "send",
     {
       "tag": "ConjunctionPredicate",
       "value": [
         {
           "tag": "MessageKeyboardComparisonPredicate",
-          "value": "2"
+          "value": "1"
         },
         {
           "tag": "JsonCheckFieldPredicate",
           "value": {
             "path": "$.address"
           }
-        },
-        {
-          "tag": "NegationPredicate",
-          "value": {
-            "tag": "JsonCheckFieldPredicate",
-            "value": {
-              "path": "$.phone_number"
-            }
-          }
         }
       ]
     },
     {
-      "correspondence": "02b6ac70d65c067e"
+      "correspondence": "0f13e63d9cd69630"
     }
   ],
   [
@@ -173,7 +131,7 @@
       "value": [
         {
           "tag": "MessageKeyboardComparisonPredicate",
-          "value": "2"
+          "value": "1"
         },
         {
           "tag": "NegationPredicate",
@@ -191,108 +149,14 @@
     }
   ],
   [
-    "confirm",
-    "choose_payment",
-    {
-      "tag": "ConjunctionPredicate",
-      "value": [
-        {
-          "tag": "MessageKeyboardComparisonPredicate",
-          "value": "2"
-        },
-        {
-          "tag": "JsonCheckFieldPredicate",
-          "value": {
-            "path": "$.address"
-          }
-        },
-        {
-          "tag": "JsonCheckFieldPredicate",
-          "value": {
-            "path": "$.phone_number"
-          }
-        }
-      ]
-    },
-    {
-      "correspondence": "1df8ef4b2a4751f1"
-    }
-  ],
-  [
     "choose_address",
-    "choose_phone_number",
-    {
-      "tag": "ConjunctionPredicate",
-      "value": [
-        {
-          "tag": "IsTextMessagePredicate"
-        },
-        {
-          "tag": "NegationPredicate",
-          "value": {
-            "tag": "JsonCheckFieldPredicate",
-            "value": {
-              "path": "$.phone_number"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "correspondence": "72e97b89bcab08c4",
-      "src_state": "choose_address"
-    }
-  ],
-  [
-    "choose_address",
-    "choose_payment",
-    {
-      "tag": "ConjunctionPredicate",
-      "value": [
-        {
-          "tag": "IsTextMessagePredicate"
-        },
-        {
-          "tag": "JsonCheckFieldPredicate",
-          "value": {
-            "path": "$.phone_number"
-          }
-        }
-      ]
-    },
-    {
-      "correspondence": "774ed3e0f5ef17cf"
-    }
-  ],
-  [
-    "choose_phone_number",
-    "choose_payment",
-    {
-      "tag": "IsPhoneNumberPredicate"
-    },
-    {
-      "correspondence": "8e0edde4a3199d0c"
-    }
-  ],
-  [
-    "choose_phone_number",
-    "choose_phone_number",
+    "send",
     {
       "tag": "TrivialPredicate"
     },
     {
-      "correspondence": "dd7404e376113591"
-    }
-  ],
-  [
-    "choose_payment",
-    "send",
-    {
-      "tag": "MessageKeyboardComparisonPredicate"
-    },
-    {
       "correspondence": "fa702a44b70ddcae",
-      "src_state": "choose_payment"
+      "src_state": "edit_address"
     }
   ],
   [
@@ -300,7 +164,7 @@
     "edit_address",
     {
       "tag": "MessageKeyboardComparisonPredicate",
-      "value": "2"
+      "value": "1"
     },
     {
       "correspondence": "177680903e499486"
@@ -315,53 +179,6 @@
     {
       "correspondence": "fa702a44b70ddcae",
       "src_state": "edit_address"
-    }
-  ],
-  [
-    "send",
-    "edit_phone_number",
-    {
-      "tag": "MessageKeyboardComparisonPredicate",
-      "value": "3"
-    },
-    {
-      "correspondence": "72e97b89bcab08c4",
-      "src_state": "send"
-    }
-  ],
-  [
-    "edit_phone_number",
-    "send",
-    {
-      "tag": "IsPhoneNumberPredicate"
-    },
-    {
-      "correspondence": "fa702a44b70ddcae",
-      "src_state": "edit_phone_number"
-    }
-  ],
-  [
-    "edit_phone_number",
-    "edit_phone_number",
-    {
-      "tag": "NegationPredicate",
-      "value": {
-        "tag": "IsPhoneNumberPredicate"
-      }
-    },
-    {
-      "correspondence": "dd7404e376113591"
-    }
-  ],
-  [
-    "send",
-    "choose_payment",
-    {
-      "tag": "MessageKeyboardComparisonPredicate",
-      "value": "1"
-    },
-    {
-      "correspondence": "8e0edde4a3199d0c"
     }
   ],
   [

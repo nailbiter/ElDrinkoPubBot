@@ -24,13 +24,15 @@ import os
 from os import path
 import re
 
+
 @click.command()
-@click.option("--logs-folder",type=click.Path(),default=".log")
+@click.option("--logs-folder", type=click.Path(), default=".log")
 def get_latest_log(logs_folder):
     fns = os.listdir(logs_folder)
 #    fns = [fn for fn in fns if re.match(r"[a-zA-Z]+_\d{14}\.log\.txt",fn) is not None]
-    fn = max(fns,key=lambda fn:path.getmtime(path.join(logs_folder,fn)))
+    fn = max(fns, key=lambda fn: path.getmtime(path.join(logs_folder, fn)))
     os.system(f"less {path.join(logs_folder,fn)}")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     get_latest_log()

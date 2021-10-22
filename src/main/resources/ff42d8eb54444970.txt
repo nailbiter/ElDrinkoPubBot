@@ -1,3 +1,0 @@
-{%for fn in beerlist_df["category"].unique()%}
-{%if fn!="Напої"%}{{fn}}{%endif%}
-{%endfor%}

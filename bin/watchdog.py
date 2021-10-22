@@ -17,21 +17,24 @@ from pymongo import MongoClient
 from pprint import pprint
 
 
-#global const's
+# global const's
 REFRESH_PERIOD_SECONDS = 60
-#global var's
+# global var's
 Child_pid = 0
-#procedures
+# procedures
+
+
 class GithubChecker:
     @staticmethod
-    def __Get_sha(login,repo,branch,github_pass):
+    def __Get_sha(login, repo, branch, github_pass):
         url = f"https://api.github.com/repos/{login}/{repo}/branches/{branch}"
-        r = get(url,auth=('nailbiter',github_pass))
-        data = json.loads(r.text)    
+        r = get(url, auth=('nailbiter', github_pass))
+        data = json.loads(r.text)
         return data["commit"]["sha"]
         print(f"url: {url}")
-    def __init__(self,repo_url,branch):
-        m = re.match("https://github.com/([a-zA-Z]+)/([a-zA-Z]+)",repo_url)
+
+    def __init__(self, repo_url, branch):
+        m = re.match("https://github.com/([a-zA-Z]+)/([a-zA-Z]+)", repo_url)
         assert(m is not None)
 
         self.login = m.group(1)
@@ -39,47 +42,57 @@ class GithubChecker:
         self.branch = branch
 
         secret = ""
-        with open("secret.txt") as f: secret = f.read().strip()
+        with open("secret.txt") as f:
+            secret = f.read().strip()
         mongo_uri = f"mongodb+srv://nailbiter:{secret}@cluster0-ta3pc.gcp.mongodb.net/beerbot?retryWrites=true&w=majority"
         mongo_client = MongoClient(mongo_uri)
-        doc = mongo_client["beerbot"]["_passwords"].find_one({"key":"github_token"})
+        doc = mongo_client["beerbot"]["_passwords"].find_one(
+            {"key": "github_token"})
         self.github_pass = doc["value"]
 
-        self.sha = GithubChecker.__Get_sha(self.login,self.repo,self.branch,self.github_pass)
+        self.sha = GithubChecker.__Get_sha(
+            self.login, self.repo, self.branch, self.github_pass)
+
     def __call__(self):
         print(f"should restart callback {datetime.now().isoformat()}")
-        new_sha = GithubChecker.__Get_sha(self.login,self.repo,self.branch,self.github_pass)
-        if(self.sha!=new_sha):
+        new_sha = GithubChecker.__Get_sha(
+            self.login, self.repo, self.branch, self.github_pass)
+        if(self.sha != new_sha):
             print(f"{self.sha}!={new_sha} => reload")
             self.sha = new_sha
             return True
         else:
             print(f"{self.sha}=={new_sha} => no reload")
             return False
+
+
 def kill_child(p):
     print(f"pid: {p}")
     pgrp = os.getpgid(p)
     print(f"pgrp: {pgrp}")
     os.killpg(pgrp, SIGKILL)
+
+
 def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
     kill_child(Child_pid)
     sys.exit(0)
 
-#main
+
+# main
 parser = ArgumentParser()
-parser.add_argument("repo_url",help="remote repository's URL in https scheme")
-parser.add_argument("branch",help="branch name")
-parser.add_argument("command",help="command to execute on hash change")
+parser.add_argument("repo_url", help="remote repository's URL in https scheme")
+parser.add_argument("branch", help="branch name")
+parser.add_argument("command", help="command to execute on hash change")
 args = parser.parse_args()
 print(f"getcwd: {getcwd()}")
-shouldRestartCallback = GithubChecker(args.repo_url,args.branch)
+shouldRestartCallback = GithubChecker(args.repo_url, args.branch)
 signal(SIGINT, signal_handler)
 
 while True:
     Child_pid = fork()
-    if(Child_pid==0):
-        os.setpgid(0,0)
+    if(Child_pid == 0):
+        os.setpgid(0, 0)
         system(args.command)
         _exit(0)
     else:
