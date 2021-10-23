@@ -43,7 +43,7 @@ class _AtExitHook:
 @click.command()
 @click.option("--mongo-url", envvar="MONGO_URL")
 @click.option("--template-folder", type=click.Path(), envvar="TEMPLATE_FOLDER")
-@click.option("--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot")
+@click.option("-e", "--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot", envvar="BEERBOT_ENVIRONMENT")
 @click.option("--debug/--no-debug", default=True)
 def App(mongo_url, environment, debug, template_folder):
     pidfile = f".tmp/{environment}.txt"
