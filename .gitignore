@@ -28,3 +28,5 @@ src/main/resources/eldrinkopubbot.tsv
 .envrc.secret
 download_cache.db
 Digraph.gv*
+.token.json
+client_secret.json

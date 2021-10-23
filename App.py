@@ -26,7 +26,6 @@ import json
 import os
 from os import path
 import atexit
-from nl.insomnia247.nailbiter.eldrinkopubbot.eldrinko.el_drinko_pub_bot import ElDrinkoPubBot
 import logging
 from datetime import datetime
 
@@ -54,11 +53,11 @@ http://ElDrinko.Beer
 
 
 @click.command()
-@click.option("--mongo-url", envvar="MONGO_URL")
 @click.option("--template-folder", type=click.Path(), envvar="TEMPLATE_FOLDER")
 @click.option("--environment", type=click.Choice(["ElDrinkoPubBot", "ProtoElDrinkoPubBot", "DevElDrinkoPubBot"]), default="DevElDrinkoPubBot")
 @click.option("--debug/--no-debug", default=True)
-def App(mongo_url, environment, debug, template_folder):
+@click.option("--telegram-token", required=True, envvar="TELEGRAM_TOKEN")
+def App(environment, debug, template_folder, telegram_token):
     pidfile = f".tmp/{environment}.txt"
     if debug:
         logging.basicConfig(level=logging.INFO,
@@ -70,24 +69,16 @@ def App(mongo_url, environment, debug, template_folder):
         pidfile), "only one instance of ElDrinkoPubBot allowed to run"
     with open(pidfile, "w") as f:
         f.write(str(os.getpid()))
-    mongo_client = MongoClient(mongo_url)
-    settings, keyring = [
-        {k: v for k, v in mongo_client.beerbot[kk].find_one(
-            {"id": environment}).items() if k not in ["_id", "id"]}
-        for kk
-        in ["_settings", "_keyring"]
-    ]
+    keyring = {
+        "telegram": {
+            "token": telegram_token,
+        },
+    }
     atexit.register(_AtExitHook(pidfile))
     click.echo("here")
 
     updater = Updater(keyring["telegram"]["token"], use_context=True)
     bot = updater.bot
-#    edbp = ElDrinkoPubBot(
-#        settings={**settings, "id": environment},
-#        bot=bot,
-#        mongo_url=mongo_url,
-#        template_folder=template_folder
-#    )
     updater.dispatcher.add_handler(
         MessageHandler(filters=Filters.all, callback=_echo))
 #    updater.dispatcher.add_handler(
