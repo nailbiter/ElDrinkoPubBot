@@ -30,3 +30,4 @@ download_cache.db
 Digraph.gv*
 .token.json
 client_secret.json
+.telegram_probe.sqlite3
