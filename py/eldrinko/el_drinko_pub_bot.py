@@ -36,6 +36,7 @@ import pandas as pd
 import json
 import itertools
 from datetime import datetime, timedelta
+import google.auth.exceptions
 
 
 class ElDrinkoPubBot:
@@ -112,8 +113,14 @@ class ElDrinkoPubBot:
     def _get_beerlist(self):
         if self._beerlist_cache is None or (datetime.now()-self._beerlist_cache["timestamp"]) >= timedelta(minutes=5):
             now = datetime.now()
-            creds = google_spreadsheet.get_creds(
-                client_secret_file="client_secret.json", create_if_not_exist=True)
+            try:
+                creds = google_spreadsheet.get_creds(
+                    client_secret_file="client_secret.json", create_if_not_exist=True)
+            except google.auth.exceptions.RefreshError:
+                self.send_message(
+                    "problem with beerlist token", "developerChatIds")
+                raise
+
             beerlist_url = self._settings["google_spreadsheet"]["beerlist"]
             df = google_spreadsheet.download_df_from_google_sheets(
                 creds, **beerlist_url)
