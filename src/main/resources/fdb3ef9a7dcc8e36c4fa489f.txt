@@ -1,4 +1,4 @@
-Сьогодні ми пропонуємо:
+Сьогодні ми пропонуємо у пляшках 0,33л:
 {%-for r in beerlist_df.to_dict(orient='records')%}
 {%-if r["category"]=="Напої"%}
 - {{r.name}} ({{r['price (UAH/L)']}}.00 грн.)
