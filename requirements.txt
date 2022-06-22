@@ -13,7 +13,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 jsonpath-ng==1.5.2
 MarkupSafe==1.1.1
-numpy==1.19.5
+numpy==1.22.0
 oauthlib==2.1.0
 pandas==1.1.5
 ply==3.11
