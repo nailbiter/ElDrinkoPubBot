@@ -31,7 +31,7 @@ tornado==6.1
 tqdm==4.56.0
 tzlocal==2.1
 urllib3==1.26.5
-Werkzeug==1.0.1
+Werkzeug==2.2.3
 google-api-core==1.23.0
 google-api-python-client==2.2.0
 google-auth==1.23.0
